@@ -1,0 +1,96 @@
+{% extends "vware/baseArmazem.html" %}
+{% load static %}
+
+{% block body_title %}
+
+    <div class="text-primary">
+        <h6><b><i class="fa fa-home text-secondary"></i><a href={% url 'main:main' %}><span
+                class="text-secondary"> Home | </span></a> Security</b></h6>
+    </div>
+    <style>
+    </style>
+{% endblock %}
+
+{% block body_content %}
+    <div style="margin-top: 20px">
+        <table id="security" class="display" style="width:100%">
+            <thead>
+            <tr>
+                <th>Shipper</th>
+                <th>Master serials embarcados</th>
+                <th>Validação</th>
+                <th>Data/Hora saída</th>
+                <th>Comentários</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>input.</td>
+                <td>input.</td>
+                <td>query ao qad - corresponde ou nao</td>
+                <td style="width: 15%"><input type='datetime-local' class="form-control" id="datetimepicker4"
+                                              style="width: 75%"/></td>
+                <td>input.</td>
+            </tr>
+            </tbody>
+            <tfoot>
+            </tfoot>
+        </table>
+        <div style="position: absolute; right: 85px; bottom: 0">
+            <a href="#reportIssue" data-toggle="modal" data-target="#reportIssue" class="fas fa-info-circle"
+               style="font-size: 15px; height: 22px"> Help</a>
+        </div>
+    </div>
+    <form method="POST" enctype="multipart/form-data" action="{% url 'shippers:reportSecurity' %}">
+        {% csrf_token %}
+        <div class="modal fade" id="reportIssue" tabindex="-1" role="dialog"
+             aria-labelledby="myModalLabel">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: rgba(236,144,0,0.86)">
+                        <h4 class="modal-title" id="myModalLabel" style="margin-left: 45%; font-size: 40px"><i>HELP</i>
+                        </h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body"
+                         style="background: linear-gradient(to bottom, rgba(236,144,0,0.86) 0%, ghostwhite 100%); ">
+                        <div style="margin-top: 10px">
+                            <p style="font-size: 20px"><strong>Escreva aqui possíveis erros de utilização desta página
+                                em
+                                específico, ou deixe sugestões de melhoria</strong></p>
+                            <textarea class="form-control mt-n3" name="reportICDR" id="reportICDR" rows="11"
+                                      style="background-color: floralwhite; text-align: center;font-family:sans-serif;font-size:1.5em"
+                                      required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="background-color: ghostwhite">
+                        <button type="submit" id="submitReportICDR" class="btn btn-primary">Submeter</button>
+                        <button type="button" class="btn btn-primary" value="pending" data-dismiss="modal">Fechar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        $(document).ready(function () {
+            var table = $('#security').DataTable({
+                paging: false,
+                info: false,
+                searching: false,
+                ordering: false,
+                scrollY: 500,
+                scrollCollapse: true,
+                dom: 'frtipB',
+                float: 'right',
+                buttons: [
+                    'excel', 'pdf', 'print', 'copy'
+                ],
+            });
+        });
+    </script>
+{% endblock %}

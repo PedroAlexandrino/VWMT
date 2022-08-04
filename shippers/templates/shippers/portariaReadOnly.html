@@ -1,0 +1,385 @@
+{% extends "vware/baseArmazem.html" %}
+{% load static %}
+
+{% block body_title %}
+
+    <div class="text-primary">
+        <h6><b><i class="fa fa-home text-secondary"></i><a href={% url 'main:main' %}><span
+                class="text-secondary"> Home | </span></a> Portaria</b></h6>
+    </div>
+    <style>
+        .containerPrincipal {
+            height: 860px;
+            width: 100%;
+            top: 11px;
+            left: 0px;
+            position: relative;
+            border: 1px solid transparent;
+        }
+
+        .column_left {
+            border-left: 2px solid black;
+        }
+
+        tfoot input {
+            width: 100%;
+        }
+    </style>
+{% endblock %}
+
+{% block body_content %}
+    <div class="containerPrincipal">
+        <p style="text-align: center; font-size: 60px; margin-bottom: -25px"><b>PORTARIA</b></p>
+        <table id="gatewayHistory" class="stripe hover row-border" style="width:100%">
+            <thead>
+            <tr>
+                <th style="font-size: 13px">Data/hora chegada</th>
+                <th style="font-size: 13px">Condutor</th>
+                <th style="font-size: 13px">ID</th>
+                <th style="font-size: 13px">Contacto</th>
+                <th style="font-size: 13px">Empresa</th>
+                <th style="font-size: 13px">1ªMatrícula</th>
+                <th style="font-size: 13px">2ªMatrícula</th>
+                <th style="font-size: 13px">Carga/ Descarga</th>
+                <th style="font-size: 13px">Doca</th>
+                <th style="font-size: 13px">Destino carga</th>
+                <th style="font-size: 13px">Tipo de Viatura</th>
+                <th style="font-size: 13px; text-align: center">Data/Hora de entrada</th>
+                <th style="font-size: 13px">Abandono</th>
+                <th style="font-size: 13px">Comentários entrada</th>
+                <th style="font-size: 13px; text-align: center">Data/hora de saída</th>
+                <th style="font-size: 13px">Comentários saída</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for elem in elementosGateway.all %}
+                <tr>
+                    <td title="{{ elem.dataHoraChegada }}">{{ elem.dataHoraChegada }}</td>
+                    <td title="{{ elem.condutor }}">{{ elem.condutor }}</td>
+                    <td title="{{ elem.ident }}">{{ elem.ident }}</td>
+                    <td title="{{ elem.contacto }}">{{ elem.contacto }}</td>
+                    <td title="{{ elem.empresa }}">{{ elem.empresa }}</td>
+                    <td title="{{ elem.primeiraMatricula }}">{{ elem.primeiraMatricula }}</td>
+                    <td title="{{ elem.segundaMatricula }}">{{ elem.segundaMatricula }}</td>
+                    <td title="{{ elem.cargaDescarga }}">{{ elem.cargaDescarga }}</td>
+                    <td title="{{ elem.doca }}">{{ elem.doca }}</td>
+                    <td title="{{ elem.destinoCarga }}">{{ elem.destinoCarga }}</td>
+                    <td title="{{ elem.tipoViatura }}">{{ elem.tipoViatura }}</td>
+                    <td title="{{ elem.dataHoraEntrada }}">{{ elem.dataHoraEntrada }}</td>
+                    {% if elem.abandono == 'true' %}
+                        <td style="text-align: center; width: 20px"><input type="checkbox" id="abandonado"
+                                                                           title="Abandonado"
+                                                                           name="abandonado"
+                                                                           checked disabled>
+                        </td>
+                    {% else %}
+                        <td style="text-align: center; width: 10px"><input type="checkbox" id="abandonado"
+                                                                           name="abandonado" title="Abandonado" disabled>
+                        </td>
+                    {% endif %}
+                    <td>{{ elem.comentEntrada }}</td>
+                    <td>{{ elem.dataHoraSaida }}</td>
+                    <td>{{ elem.comentSaida }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            <tfoot>
+            <tr>
+                <th style="font-size: 13px">Data/hora chegada</th>
+                <th style="font-size: 13px">Condutor</th>
+                <th style="font-size: 13px">ID</th>
+                <th style="font-size: 13px">Contacto</th>
+                <th style="font-size: 13px">Empresa</th>
+                <th style="font-size: 13px">1ªMatrícula</th>
+                <th style="font-size: 13px">2ªMatrícula</th>
+                <th style="font-size: 13px">Carga/ Descarga</th>
+                <th style="font-size: 13px">Doca</th>
+                <th style="font-size: 13px">Destino carga</th>
+                <th style="font-size: 13px">Tipo de Viatura</th>
+                <th style="font-size: 13px">Data/hora de entrada</th>
+                <td style="font-size: 13px"></td>
+                <th style="font-size: 13px">Comentários entrada</th>
+                <th style="font-size: 13px">Data/hora de saída</th>
+                <th style="font-size: 13px">Comentários saída</th>
+            </tr>
+            <tr>
+                <td colspan="11"></td>
+                <td><input type="checkbox" style="text-align: center" id="emptySaida" title="Filtrar entrada"></td>
+                <td colspan="2"></td>
+                <td><input type="checkbox" style="text-align: center" id="emptyEntrada" title="Filtrar saída"></td>
+                <td colspan="2"></td>
+            </tr>
+            </tfoot>
+        </table>
+
+        <div style="bottom: 0px; margin-left: 85%; position: absolute">
+            <h6><b><i style="font-size: 20px">Legenda de viaturas </i><a type="button"
+                                                                         class="fas fa-plus-circle fa-2x button5"
+                                                                         id="legenda"
+                                                                         style="color: orange; background-color: black; border-radius: 50%; margin-left: 10px; margin-top: 2px"></a></b>
+            </h6>
+        </div>
+    </div>
+
+    <div class="modal fade" id="tipoViaturaShow" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel" style="margin-left: 40%; font-size: 40px">Viaturas</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <table id="viaturasDisponiveisShow" class="display compact" style="width:100%">
+                        <thead>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td style="text-align: right; font-size: 100px">1 -</td>
+                            <td style="text-align: center"><img src='{% static "camioes1.png" %}' width="250px"></td>
+                            <td style="text-align: right; font-size: 100px">6 -</td>
+                            <td style="text-align: center"><img src='{% static "camioes6.png" %}' width="250px"></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right; font-size: 100px">2 -</td>
+                            <td style="text-align: center"><img src='{% static "camioes2.png" %}' width="250px"></td>
+                            <td style="text-align: right; font-size: 100px">7 -</td>
+                            <td style="text-align: center"><img src='{% static "camioes7.png" %}' width="250px"></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right; font-size: 100px">3 -</td>
+                            <td style="text-align: center"><img src='{% static "camioes3.png" %}' width="250px"></td>
+                            <td style="text-align: right; font-size: 100px">8 -</td>
+                            <td style="text-align: center"><img src='{% static "camioes8.png" %}' width="250px"></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right; font-size: 100px">4 -</td>
+                            <td style="text-align: center"><img src='{% static "camioes4.png" %}' width="250px"></td>
+                            <td style="text-align: right; font-size: 100px">9 -</td>
+                            <td style="text-align: center"><img src='{% static "camioes9.png" %}' width="250px"></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right; font-size: 100px">5 -</td>
+                            <td style="text-align: center"><img src='{% static "camioes5.png" %}' width="250px"></td>
+                            <td style="text-align: right; font-size: 100px">10 -</td>
+                            <td style="text-align: center; font-size: 100px">ND</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" value="pending" data-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        $(document).ready(function () {
+
+            var tableViaturas = $('#viaturasDisponiveis').DataTable({
+                paging: false,
+                info: false,
+                searching: false,
+                ordering: false,
+            });
+
+            $('#viaturasDisponiveis tbody').on('click', 'tr td:nth-child(2n)', function () {
+                if ($(this).hasClass('selected')) {
+                    $(this).removeClass('selected');
+                } else {
+                    tableViaturas.$('td.selected').removeClass('selected');
+                    $(this).addClass('selected');
+                }
+            });
+
+            // Setup - add a text input to each footer cell
+            $('#gatewayHistory tfoot th').each(function (i) {
+                var title = $('#gatewayHistory tfoot th').eq($(this).index()).text();
+                $(this).html('<input class="form-control" style="margin-left: -12px; text-align: center" type="text" placeholder="Procurar" data-index="' + i + '" />');
+            });
+
+            var table = $('#gatewayHistory').DataTable({
+                info: false,
+                scrollY: 540,
+                scrollX: true,
+                scrollCollapse: true,
+                dom: 'frtipB',
+                float: 'right',
+                buttons: [
+                    'excel', 'pdf', 'print', 'copy'
+                ],
+                order: [[0, 'desc']],
+                columnDefs: [{
+                    "targets": 0,
+                    "type": "time-date-sort"
+                },
+                    {
+                        targets: [3, 4],
+                        render: function (data, type, row) {
+                            return data.length > 9 ?
+                                data.substr(0, 9) + '…' :
+                                data;
+                        }
+                    },
+                    {
+                        targets: [1, 2],
+                        render: function (data, type, row) {
+                            return data.length > 7 ?
+                                data.substr(0, 7) + '…' :
+                                data;
+                        }
+                    },
+                    {
+                        targets: 7,
+                        render: function (data, type, row) {
+                            return data.length > 8 ?
+                                data.substr(0, 8) + '…' :
+                                data;
+                        }
+                    },
+                    {
+                        targets: [5, 6, 8, 9],
+                        render: function (data, type, row) {
+                            return data.length > 6 ?
+                                data.substr(0, 6) + '…' :
+                                data;
+                        }
+                    }
+                ],
+            });
+
+            // Filter event handler
+            $(table.table().container()).on('keyup', 'tfoot input', function () {
+                table
+                    .column($(this).data('index'))
+                    .search(this.value)
+                    .draw();
+            });
+
+            //$.fn.dataTable.tables({visible: true, api: true}).columns.adjust();
+
+
+            $(document).on('click', '#confirmar', function () {
+                var row = tableViaturas.cell('.selected').index();
+                var data = tableViaturas.cell(row).data();
+                var posicao = ''
+                var posicaoPag = ''
+
+                if (data.includes('camioes1')) {
+                    posicao = '1'
+                    posicaoPag = '1'
+                } else if (data.includes('camioes2')) {
+                    posicao = '2'
+                    posicaoPag = '2'
+                } else if (data.includes('camioes3')) {
+                    posicao = '3'
+                    posicaoPag = '3'
+                } else if (data.includes('camioes4')) {
+                    posicao = '4'
+                    posicaoPag = '4'
+                } else if (data.includes('camioes5')) {
+                    posicao = '5'
+                    posicaoPag = '5'
+                } else if (data.includes('camioes6')) {
+                    posicao = '6'
+                    posicaoPag = '6'
+                } else if (data.includes('camioes7')) {
+                    posicao = '7'
+                    posicaoPag = '7'
+                } else if (data.includes('camioes8')) {
+                    posicao = '8'
+                    posicaoPag = '8'
+                } else if (data.includes('camioes9')) {
+                    posicao = '9'
+                    posicaoPag = '9'
+                } else {
+                    posicao = ''
+                    posicaoPag = '<a type="button" class="fas fa-plus-circle fa-2x button5" style="color: orange; background-color: black; border-radius: 50%"></a>'
+                }
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/shippers/submitViatura/',
+                    data: {
+                        csrfmiddlewaretoken: "{{ csrf_token }}",
+                        'data': posicao,
+                    },
+                    success: function () {
+                        $("#tipoViatura").hide();
+                        $(".modal-backdrop").remove();
+                        var myModal = new bootstrap.Modal(document.getElementById('criarNovo'))
+                        myModal.show()
+                        if (posicao == '') {
+                            $("#botaoVeiculo").hide('');
+                            $("#valorVeiculo").html('');
+                            $("#valorNovo").html('<a type="button" class="fas fa-plus-circle fa-2x button5" id="botaoVeiculo" style="color: orange; background-color: black; border-radius: 50%"></a>');
+                        } else {
+                            $("#botaoVeiculo").hide('');
+                            $("#valorVeiculo").html('');
+                            $("#valorNovo").html(posicao);
+                        }
+                    }
+                })
+            });
+
+            $(document).on('click', '#legenda', function () {
+                var myModal = new bootstrap.Modal(document.getElementById('tipoViaturaShow'))
+                myModal.show()
+            });
+
+            $(document).on('click', '#valorNovo', function () {
+                $("#criarNovo").hide();
+                $(".modal-backdrop").remove();
+                var myModal = new bootstrap.Modal(document.getElementById('tipoViatura'))
+                myModal.show()
+            });
+
+            $(document).on('click', '#fechar', function () {
+                $("#tipoViatura").hide();
+                $(".modal-backdrop").remove();
+                var myModal = new bootstrap.Modal(document.getElementById('criarNovo'))
+                myModal.show()
+            });
+
+            $('input[id=emptyEntrada]:checkbox').on('change', function () {
+                // Run the search plugin
+                table.draw();
+            });
+
+            $('input[id=emptySaida]:checkbox').on('change', function () {
+                // Run the search plugin
+                table.draw();
+            });
+
+            $.fn.dataTable.ext.search.push(
+                function (settings, searchData, index, rowData, counter) {
+                    var checked = $('input[id=emptyEntrada]:checkbox').is(':checked');
+                    // If checked and Position column is blank don't display the row
+                    if (checked && searchData[14] == '') {
+                        return false;
+                    }
+                    // Otherwise display the row
+                    return true;
+                },
+                function (settings, searchData, index, rowData, counter) {
+                    var checked = $('input[id=emptySaida]:checkbox').is(':checked');
+                    // If checked and Position column is blank don't display the row
+                    if (checked && searchData[11] == '') {
+                        return false;
+                    }
+                    // Otherwise display the row
+                    return true;
+                }
+            );
+        });
+    </script>
+{% endblock %}

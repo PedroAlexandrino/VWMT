@@ -1,0 +1,1363 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="2ea20ec8-bacf-4953-b09f-054f117435cf" name="Default Changelist" comment="ultimo update projeto">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/visteon.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/visteon.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/crossdocking/scheduler.py" beforeDir="false" afterPath="$PROJECT_DIR$/crossdocking/scheduler.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/crossdocking/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/crossdocking/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/main/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/main/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/receiving/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/receiving/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/receiving/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/receiving/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shippers/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/shippers/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shippers/tests.py" beforeDir="false" afterPath="$PROJECT_DIR$/shippers/tests.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shippers/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/shippers/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/MicrosoftTeams-image.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/Visteon_wordmark_orange-removebg-preview.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/excel-2-256.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/fork-truck-256.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/hexagons5-removebg-preview.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/logo-removebg-preview.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/open_box.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/supplier-removebg-preview.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vproject/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/vproject/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vproject/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/vproject/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vware/decorators.py" beforeDir="false" afterPath="$PROJECT_DIR$/vware/decorators.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vware/templates/img/MW-DB745_Visteo_20141217102421_ZQ.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vware/templates/img/fantasy-lights.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vware/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/vware/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vware/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/vware/views.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ChangesViewManager">
+    <option name="groupingKeys">
+      <option value="directory" />
+    </option>
+  </component>
+  <component name="DjangoConsoleOptions" custom-start-script="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)">
+    <option name="myCustomStartScript" value="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+        <option value="HTML File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/crossdocking/views.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/vware/admin.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/vware/models.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/vware/templates/vware/criarProduto.html" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/vware/templates/vware/shippingOperation.html" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/vware/urls.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/vware/views.py" root0="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="1u4Ky7HieA4SQVMRNmVpZCSOtEg" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "last_opened_file_path": "C:/Users/PMARTI30/Desktop/visteon",
+    "settings.editor.selected.configurable": "preferences.pathVariables"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\visteon\pedro_test\templates" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\visteon\static" />
+      <recent name="C:\visteon\cafetaria\templates" />
+      <recent name="C:\visteon\crossdocking" />
+      <recent name="C:\visteon\vproject" />
+      <recent name="C:\visteon\auto" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Django Server.visteon">
+    <configuration name="emailWarehouseProduction" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="visteon" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/shippers/management/commands" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/shippers/management/commands/emailWarehouseProduction.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="visteon" type="Python.DjangoServer" factoryName="Django server">
+      <module name="visteon" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+        <env name="DJANGO_SETTINGS_MODULE" value="vproject.settings" />
+      </envs>
+      <option name="SDK_HOME" value="C:\visteon\venv\Scripts\python.exe" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="launchJavascriptDebuger" value="false" />
+      <option name="port" value="8000" />
+      <option name="host" value="" />
+      <option name="additionalOptions" value="" />
+      <option name="browserUrl" value="" />
+      <option name="runTestServer" value="false" />
+      <option name="runNoReload" value="true" />
+      <option name="useCustomRunCommand" value="false" />
+      <option name="customRunCommand" value="" />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Django Server.visteon" />
+      <item itemvalue="Python.emailWarehouseProduction" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.emailWarehouseProduction" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="2ea20ec8-bacf-4953-b09f-054f117435cf" name="Default Changelist" comment="" />
+      <created>1623919673024</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1623919673024</updated>
+      <workItem from="1623919685942" duration="694000" />
+      <workItem from="1623922580294" duration="1419000" />
+      <workItem from="1623924015700" duration="14061000" />
+      <workItem from="1623999992278" duration="5979000" />
+      <workItem from="1624008943747" duration="16807000" />
+      <workItem from="1624258891791" duration="19844000" />
+      <workItem from="1624345800148" duration="21386000" />
+      <workItem from="1624432111362" duration="24617000" />
+      <workItem from="1624518532010" duration="16297000" />
+      <workItem from="1624541708926" duration="3349000" />
+      <workItem from="1624605122680" duration="25065000" />
+      <workItem from="1624863297696" duration="25939000" />
+      <workItem from="1624949894268" duration="19117000" />
+      <workItem from="1625036855614" duration="20493000" />
+      <workItem from="1625123240941" duration="24165000" />
+      <workItem from="1625209699068" duration="22385000" />
+      <workItem from="1625469045517" duration="19744000" />
+      <workItem from="1625555301072" duration="22794000" />
+      <workItem from="1625640811808" duration="23452000" />
+      <workItem from="1625727611549" duration="21573000" />
+      <workItem from="1625814036996" duration="17248000" />
+      <workItem from="1626073665376" duration="18070000" />
+      <workItem from="1626159812544" duration="20641000" />
+      <workItem from="1626247044996" duration="11467000" />
+      <workItem from="1626332378594" duration="9789000" />
+      <workItem from="1626419069167" duration="14960000" />
+      <workItem from="1626679183779" duration="109000" />
+      <workItem from="1626681045798" duration="3250000" />
+      <workItem from="1626684472677" duration="13068000" />
+      <workItem from="1626764836728" duration="22414000" />
+      <workItem from="1626851063772" duration="24081000" />
+      <workItem from="1626937486943" duration="25096000" />
+      <workItem from="1627023490709" duration="20614000" />
+      <workItem from="1627887319935" duration="24449000" />
+      <workItem from="1627973558422" duration="15017000" />
+      <workItem from="1628060528566" duration="19328000" />
+      <workItem from="1628146930771" duration="24191000" />
+      <workItem from="1628233662694" duration="19077000" />
+      <workItem from="1628493354737" duration="22366000" />
+      <workItem from="1628579699573" duration="7360000" />
+      <workItem from="1628666344936" duration="15474000" />
+      <workItem from="1628751841363" duration="5220000" />
+      <workItem from="1628839911909" duration="23025000" />
+      <workItem from="1629097110198" duration="746000" />
+      <workItem from="1629100577188" duration="154000" />
+      <workItem from="1629100739123" duration="2246000" />
+      <workItem from="1629109089442" duration="11699000" />
+      <workItem from="1629183523658" duration="7529000" />
+      <workItem from="1629275540493" duration="9823000" />
+      <workItem from="1629356623035" duration="22339000" />
+      <workItem from="1629442548190" duration="22337000" />
+      <workItem from="1629702429648" duration="10875000" />
+      <workItem from="1629718092043" duration="5536000" />
+      <workItem from="1629788938760" duration="15890000" />
+      <workItem from="1629874932298" duration="6984000" />
+      <workItem from="1629961090374" duration="4111000" />
+      <workItem from="1630048501353" duration="4245000" />
+      <workItem from="1630911246127" duration="6460000" />
+      <workItem from="1630998766846" duration="4138000" />
+      <workItem from="1631009372158" duration="11763000" />
+      <workItem from="1631085153833" duration="12947000" />
+      <workItem from="1631171231851" duration="10156000" />
+      <workItem from="1631257672914" duration="11148000" />
+      <workItem from="1631517913764" duration="11691000" />
+      <workItem from="1631603410902" duration="12597000" />
+      <workItem from="1631689296667" duration="18248000" />
+      <workItem from="1631776268867" duration="27000" />
+      <workItem from="1631777953673" duration="805000" />
+      <workItem from="1631782126286" duration="14548000" />
+      <workItem from="1631862536542" duration="15958000" />
+      <workItem from="1632121040102" duration="21290000" />
+      <workItem from="1632207296371" duration="20670000" />
+      <workItem from="1632293819014" duration="20084000" />
+      <workItem from="1632381126326" duration="23848000" />
+      <workItem from="1632466262992" duration="24246000" />
+      <workItem from="1632726059257" duration="24503000" />
+      <workItem from="1632811922815" duration="22862000" />
+      <workItem from="1632899012219" duration="7253000" />
+      <workItem from="1632909701898" duration="14234000" />
+      <workItem from="1632984469800" duration="24294000" />
+      <workItem from="1633071275078" duration="23016000" />
+      <workItem from="1633331410597" duration="22624000" />
+      <workItem from="1633503390830" duration="23713000" />
+      <workItem from="1633590593278" duration="22623000" />
+      <workItem from="1633676166697" duration="16893000" />
+      <workItem from="1633935540757" duration="19327000" />
+      <workItem from="1634022277700" duration="23592000" />
+      <workItem from="1634108247488" duration="23779000" />
+      <workItem from="1634195283212" duration="23232000" />
+      <workItem from="1634280832839" duration="24927000" />
+      <workItem from="1634541788868" duration="18527000" />
+      <workItem from="1634626481592" duration="24193000" />
+      <workItem from="1634712766252" duration="4206000" />
+      <workItem from="1634721745619" duration="15283000" />
+      <workItem from="1634799736912" duration="17837000" />
+      <workItem from="1634885865734" duration="23951000" />
+      <workItem from="1635145698091" duration="16670000" />
+      <workItem from="1635232147824" duration="18932000" />
+      <workItem from="1635318371362" duration="19199000" />
+      <workItem from="1635404116002" duration="21522000" />
+      <workItem from="1635490710421" duration="22338000" />
+      <workItem from="1635839306013" duration="22456000" />
+      <workItem from="1635924991588" duration="21233000" />
+      <workItem from="1636011792978" duration="25376000" />
+      <workItem from="1636099735868" duration="15944000" />
+      <workItem from="1636358078441" duration="22345000" />
+      <workItem from="1636445111780" duration="12415000" />
+      <workItem from="1636531430851" duration="23322000" />
+      <workItem from="1636617812369" duration="22191000" />
+      <workItem from="1636704425553" duration="17507000" />
+      <workItem from="1636733564936" duration="884000" />
+      <workItem from="1636963288673" duration="20723000" />
+      <workItem from="1637049301478" duration="20081000" />
+      <workItem from="1637139671964" duration="10748000" />
+      <workItem from="1637157519655" duration="6848000" />
+      <workItem from="1637221720943" duration="23417000" />
+      <workItem from="1637308581900" duration="20472000" />
+      <workItem from="1637568678905" duration="20464000" />
+      <workItem from="1637606404318" duration="3226000" />
+      <workItem from="1637655004351" duration="23120000" />
+      <workItem from="1637692073872" duration="4362000" />
+      <workItem from="1637741134930" duration="20578000" />
+      <workItem from="1637825696026" duration="23544000" />
+      <workItem from="1637914317521" duration="6473000" />
+      <workItem from="1637924742187" duration="6077000" />
+      <workItem from="1638173281908" duration="21672000" />
+      <workItem from="1638260817748" duration="19987000" />
+      <workItem from="1638432831666" duration="23751000" />
+      <workItem from="1638518658775" duration="16591000" />
+      <workItem from="1638727890677" duration="1647000" />
+      <workItem from="1638777971122" duration="22368000" />
+      <workItem from="1638864288703" duration="22477000" />
+      <workItem from="1639037218582" duration="21175000" />
+      <workItem from="1639123899036" duration="20041000" />
+      <workItem from="1639382762130" duration="24074000" />
+      <workItem from="1639468832283" duration="16529000" />
+      <workItem from="1639555551409" duration="17846000" />
+      <workItem from="1639641573138" duration="23077000" />
+      <workItem from="1639728166491" duration="22148000" />
+      <workItem from="1639988132365" duration="23044000" />
+      <workItem from="1640073937085" duration="24483000" />
+      <workItem from="1640160261639" duration="13045000" />
+      <workItem from="1641197282568" duration="23318000" />
+      <workItem from="1641283363938" duration="16956000" />
+      <workItem from="1641307119273" duration="5443000" />
+      <workItem from="1641369943506" duration="20535000" />
+      <workItem from="1641456224120" duration="19432000" />
+      <workItem from="1641544663746" duration="14490000" />
+      <workItem from="1641801637031" duration="20824000" />
+      <workItem from="1641888220161" duration="23400000" />
+      <workItem from="1641974792164" duration="22020000" />
+      <workItem from="1642061037012" duration="25620000" />
+      <workItem from="1642147945409" duration="25111000" />
+      <workItem from="1642406646273" duration="24962000" />
+      <workItem from="1642493117513" duration="26758000" />
+      <workItem from="1642579503430" duration="1115000" />
+      <workItem from="1642581470386" duration="24223000" />
+      <workItem from="1642665791882" duration="21648000" />
+      <workItem from="1642752226450" duration="22823000" />
+      <workItem from="1643011765876" duration="25172000" />
+      <workItem from="1643098086008" duration="21271000" />
+      <workItem from="1643124922410" duration="3314000" />
+      <workItem from="1643184233211" duration="26192000" />
+      <workItem from="1643270677067" duration="25071000" />
+      <workItem from="1643357279054" duration="12080000" />
+      <workItem from="1643376560905" duration="1146000" />
+      <workItem from="1643377775571" duration="8741000" />
+      <workItem from="1643616779514" duration="25012000" />
+      <workItem from="1643702008150" duration="12925000" />
+      <workItem from="1643718340389" duration="13606000" />
+      <workItem from="1643788917772" duration="25268000" />
+      <workItem from="1643874863892" duration="23534000" />
+      <workItem from="1643961133449" duration="12348000" />
+      <workItem from="1643980678601" duration="7558000" />
+      <workItem from="1644220829111" duration="14720000" />
+      <workItem from="1644245368809" duration="5110000" />
+      <workItem from="1644311743133" duration="18570000" />
+      <workItem from="1644393956947" duration="21640000" />
+      <workItem from="1644497837471" duration="9194000" />
+      <workItem from="1644508041323" duration="3898000" />
+      <workItem from="1644565719576" duration="12687000" />
+      <workItem from="1644826058862" duration="6384000" />
+      <workItem from="1644832854138" duration="17328000" />
+      <workItem from="1644912590204" duration="21582000" />
+      <workItem from="1644998684230" duration="22523000" />
+      <workItem from="1645084794222" duration="24527000" />
+      <workItem from="1645170764136" duration="6962000" />
+      <workItem from="1645181390187" duration="12020000" />
+      <workItem from="1645430601454" duration="22725000" />
+      <workItem from="1645516394060" duration="20140000" />
+      <workItem from="1645603845684" duration="23574000" />
+      <workItem from="1645690370873" duration="22595000" />
+      <workItem from="1645775440244" duration="20571000" />
+      <workItem from="1645801279136" duration="4499000" />
+      <workItem from="1646035373476" duration="20448000" />
+      <workItem from="1646208599264" duration="23470000" />
+      <workItem from="1646293270150" duration="24800000" />
+      <workItem from="1646379953195" duration="22336000" />
+      <workItem from="1646640149030" duration="20252000" />
+      <workItem from="1646725194622" duration="25642000" />
+      <workItem from="1646813158290" duration="24508000" />
+      <workItem from="1646898828318" duration="20544000" />
+      <workItem from="1646985702781" duration="28388000" />
+      <workItem from="1647245148007" duration="23913000" />
+      <workItem from="1647330849540" duration="23473000" />
+      <workItem from="1647417373000" duration="24989000" />
+      <workItem from="1647503876339" duration="26346000" />
+      <workItem from="1647589097451" duration="27343000" />
+      <workItem from="1647850925954" duration="41603000" />
+      <workItem from="1648022998330" duration="22736000" />
+      <workItem from="1648109091130" duration="26623000" />
+      <workItem from="1648195231533" duration="22125000" />
+      <workItem from="1648451091424" duration="22853000" />
+      <workItem from="1648537483393" duration="23712000" />
+      <workItem from="1648623575577" duration="27125000" />
+      <workItem from="1648709510282" duration="26039000" />
+      <workItem from="1648796700668" duration="25335000" />
+      <workItem from="1649072906905" duration="18214000" />
+      <workItem from="1649142534769" duration="27280000" />
+      <workItem from="1649228985613" duration="20233000" />
+      <workItem from="1649315142247" duration="2178000" />
+      <workItem from="1649317811020" duration="22644000" />
+      <workItem from="1649401581315" duration="24971000" />
+      <workItem from="1649660784268" duration="25441000" />
+      <workItem from="1649759104852" duration="24198000" />
+      <workItem from="1649833145590" duration="25935000" />
+      <workItem from="1650351307531" duration="18329000" />
+      <workItem from="1650437978158" duration="4776000" />
+      <workItem from="1650443582101" duration="586000" />
+      <workItem from="1650444297509" duration="18578000" />
+      <workItem from="1650524547749" duration="24903000" />
+      <workItem from="1650610989970" duration="19155000" />
+      <workItem from="1650956836816" duration="26579000" />
+      <workItem from="1651042273040" duration="27146000" />
+      <workItem from="1651129341874" duration="13206000" />
+      <workItem from="1651147071909" duration="10564000" />
+      <workItem from="1651215774810" duration="25623000" />
+      <workItem from="1651475503191" duration="23083000" />
+      <workItem from="1651561518068" duration="9994000" />
+      <workItem from="1651647780578" duration="18547000" />
+      <workItem from="1652179144745" duration="6039000" />
+      <workItem from="1653985613744" duration="1009000" />
+      <workItem from="1653986836276" duration="16920000" />
+      <workItem from="1654010243748" duration="789000" />
+      <workItem from="1654153572876" duration="15430000" />
+      <workItem from="1654171788101" duration="67000" />
+      <workItem from="1654174794826" duration="26037000" />
+      <workItem from="1654265411333" duration="94000" />
+      <workItem from="1654500760904" duration="4579000" />
+      <workItem from="1654505930811" duration="3032000" />
+      <workItem from="1654608030345" duration="1496000" />
+    </task>
+    <task id="LOCAL-00122" summary="portaria html">
+      <created>1647446401932</created>
+      <option name="number" value="00122" />
+      <option name="presentableId" value="LOCAL-00122" />
+      <option name="project" value="LOCAL" />
+      <updated>1647446401932</updated>
+    </task>
+    <task id="LOCAL-00123" summary="portaria html">
+      <created>1647605154289</created>
+      <option name="number" value="00123" />
+      <option name="presentableId" value="LOCAL-00123" />
+      <option name="project" value="LOCAL" />
+      <updated>1647605154289</updated>
+    </task>
+    <task id="LOCAL-00124" summary="views shippers">
+      <created>1647606653459</created>
+      <option name="number" value="00124" />
+      <option name="presentableId" value="LOCAL-00124" />
+      <option name="project" value="LOCAL" />
+      <updated>1647606653460</updated>
+    </task>
+    <task id="LOCAL-00125" summary="portaria html">
+      <created>1647609654541</created>
+      <option name="number" value="00125" />
+      <option name="presentableId" value="LOCAL-00125" />
+      <option name="project" value="LOCAL" />
+      <updated>1647609654541</updated>
+    </task>
+    <task id="LOCAL-00126" summary="portaria html">
+      <created>1648121278723</created>
+      <option name="number" value="00126" />
+      <option name="presentableId" value="LOCAL-00126" />
+      <option name="project" value="LOCAL" />
+      <updated>1648121278723</updated>
+    </task>
+    <task id="LOCAL-00127" summary="portaria html">
+      <created>1648121717326</created>
+      <option name="number" value="00127" />
+      <option name="presentableId" value="LOCAL-00127" />
+      <option name="project" value="LOCAL" />
+      <updated>1648121717326</updated>
+    </task>
+    <task id="LOCAL-00128" summary="portaria html">
+      <created>1648121866289</created>
+      <option name="number" value="00128" />
+      <option name="presentableId" value="LOCAL-00128" />
+      <option name="project" value="LOCAL" />
+      <updated>1648121866289</updated>
+    </task>
+    <task id="LOCAL-00129" summary="base armazem html inclui tenda">
+      <created>1648125893567</created>
+      <option name="number" value="00129" />
+      <option name="presentableId" value="LOCAL-00129" />
+      <option name="project" value="LOCAL" />
+      <updated>1648125893567</updated>
+    </task>
+    <task id="LOCAL-00130" summary="Adicionado Scheduler para envio de email e atualizacao bd">
+      <created>1648198664556</created>
+      <option name="number" value="00130" />
+      <option name="presentableId" value="LOCAL-00130" />
+      <option name="project" value="LOCAL" />
+      <updated>1648198664556</updated>
+    </task>
+    <task id="LOCAL-00131" summary="scheduler.py">
+      <created>1648199169007</created>
+      <option name="number" value="00131" />
+      <option name="presentableId" value="LOCAL-00131" />
+      <option name="project" value="LOCAL" />
+      <updated>1648199169007</updated>
+    </task>
+    <task id="LOCAL-00132" summary="Alteracoes em portaria - filtros certos">
+      <created>1648204043168</created>
+      <option name="number" value="00132" />
+      <option name="presentableId" value="LOCAL-00132" />
+      <option name="project" value="LOCAL" />
+      <updated>1648204043168</updated>
+    </task>
+    <task id="LOCAL-00133" summary="reformulação home main html">
+      <created>1648460508627</created>
+      <option name="number" value="00133" />
+      <option name="presentableId" value="LOCAL-00133" />
+      <option name="project" value="LOCAL" />
+      <updated>1648460508627</updated>
+    </task>
+    <task id="LOCAL-00134" summary="melhorado filtro de email shipping">
+      <created>1648555559100</created>
+      <option name="number" value="00134" />
+      <option name="presentableId" value="LOCAL-00134" />
+      <option name="project" value="LOCAL" />
+      <updated>1648555559101</updated>
+    </task>
+    <task id="LOCAL-00135" summary="melhoria estetica em crossdocking">
+      <created>1648630024111</created>
+      <option name="number" value="00135" />
+      <option name="presentableId" value="LOCAL-00135" />
+      <option name="project" value="LOCAL" />
+      <updated>1648630024112</updated>
+    </task>
+    <task id="LOCAL-00136" summary="novas alteracoes esteticas crossdocking">
+      <created>1648630598764</created>
+      <option name="number" value="00136" />
+      <option name="presentableId" value="LOCAL-00136" />
+      <option name="project" value="LOCAL" />
+      <updated>1648630598764</updated>
+    </task>
+    <task id="LOCAL-00137" summary="inqueritos cafetaria e portaria">
+      <created>1649077024585</created>
+      <option name="number" value="00137" />
+      <option name="presentableId" value="LOCAL-00137" />
+      <option name="project" value="LOCAL" />
+      <updated>1649077024586</updated>
+    </task>
+    <task id="LOCAL-00138" summary="models vware">
+      <created>1649077927186</created>
+      <option name="number" value="00138" />
+      <option name="presentableId" value="LOCAL-00138" />
+      <option name="project" value="LOCAL" />
+      <updated>1649077927186</updated>
+    </task>
+    <task id="LOCAL-00139" summary="forms vware">
+      <created>1649078008602</created>
+      <option name="number" value="00139" />
+      <option name="presentableId" value="LOCAL-00139" />
+      <option name="project" value="LOCAL" />
+      <updated>1649078008602</updated>
+    </task>
+    <task id="LOCAL-00140" summary="models receiving">
+      <created>1649078157259</created>
+      <option name="number" value="00140" />
+      <option name="presentableId" value="LOCAL-00140" />
+      <option name="project" value="LOCAL" />
+      <updated>1649078157259</updated>
+    </task>
+    <task id="LOCAL-00141" summary="models qad_ee">
+      <created>1649078220432</created>
+      <option name="number" value="00141" />
+      <option name="presentableId" value="LOCAL-00141" />
+      <option name="project" value="LOCAL" />
+      <updated>1649078220433</updated>
+    </task>
+    <task id="LOCAL-00142" summary="models shippers">
+      <created>1649078763549</created>
+      <option name="number" value="00142" />
+      <option name="presentableId" value="LOCAL-00142" />
+      <option name="project" value="LOCAL" />
+      <updated>1649078763549</updated>
+    </task>
+    <task id="LOCAL-00143" summary="shippers">
+      <created>1649079971369</created>
+      <option name="number" value="00143" />
+      <option name="presentableId" value="LOCAL-00143" />
+      <option name="project" value="LOCAL" />
+      <updated>1649079971369</updated>
+    </task>
+    <task id="LOCAL-00144" summary="routers">
+      <created>1649082771408</created>
+      <option name="number" value="00144" />
+      <option name="presentableId" value="LOCAL-00144" />
+      <option name="project" value="LOCAL" />
+      <updated>1649082771408</updated>
+    </task>
+    <task id="LOCAL-00145" summary="update na pagina portaria - refresh a cada 5 min">
+      <created>1649098761778</created>
+      <option name="number" value="00145" />
+      <option name="presentableId" value="LOCAL-00145" />
+      <option name="project" value="LOCAL" />
+      <updated>1649098761778</updated>
+    </task>
+    <task id="LOCAL-00146" summary="crossdocking detalhe">
+      <created>1649143073150</created>
+      <option name="number" value="00146" />
+      <option name="presentableId" value="LOCAL-00146" />
+      <option name="project" value="LOCAL" />
+      <updated>1649143073151</updated>
+    </task>
+    <task id="LOCAL-00147" summary="ficheiro base armazem html">
+      <created>1649257285640</created>
+      <option name="number" value="00147" />
+      <option name="presentableId" value="LOCAL-00147" />
+      <option name="project" value="LOCAL" />
+      <updated>1649257285640</updated>
+    </task>
+    <task id="LOCAL-00148" summary="Alteraçoes main page html">
+      <created>1649257431340</created>
+      <option name="number" value="00148" />
+      <option name="presentableId" value="LOCAL-00148" />
+      <option name="project" value="LOCAL" />
+      <updated>1649257431340</updated>
+    </task>
+    <task id="LOCAL-00149" summary="Migração de portaria">
+      <created>1649257638210</created>
+      <option name="number" value="00149" />
+      <option name="presentableId" value="LOCAL-00149" />
+      <option name="project" value="LOCAL" />
+      <updated>1649257638210</updated>
+    </task>
+    <task id="LOCAL-00150" summary="Alterações em Shippers - adicionados butoes Help">
+      <created>1650442178841</created>
+      <option name="number" value="00150" />
+      <option name="presentableId" value="LOCAL-00150" />
+      <option name="project" value="LOCAL" />
+      <updated>1650442178842</updated>
+    </task>
+    <task id="LOCAL-00151" summary="Alterações na na base - inclui icdr e tenda; adicionados butoes de Help">
+      <created>1650442518103</created>
+      <option name="number" value="00151" />
+      <option name="presentableId" value="LOCAL-00151" />
+      <option name="project" value="LOCAL" />
+      <updated>1650442518103</updated>
+    </task>
+    <task id="LOCAL-00152" summary="Alterações no file home html">
+      <created>1650442803078</created>
+      <option name="number" value="00152" />
+      <option name="presentableId" value="LOCAL-00152" />
+      <option name="project" value="LOCAL" />
+      <updated>1650442803078</updated>
+    </task>
+    <task id="LOCAL-00153" summary="Report em crossdocking">
+      <created>1651075153300</created>
+      <option name="number" value="00153" />
+      <option name="presentableId" value="LOCAL-00153" />
+      <option name="project" value="LOCAL" />
+      <updated>1651075153300</updated>
+    </task>
+    <task id="LOCAL-00154" summary="atualizacao receiving">
+      <created>1651078113957</created>
+      <option name="number" value="00154" />
+      <option name="presentableId" value="LOCAL-00154" />
+      <option name="project" value="LOCAL" />
+      <updated>1651078113957</updated>
+    </task>
+    <task id="LOCAL-00155" summary="atualizacao crossdocking e packing">
+      <created>1651078761973</created>
+      <option name="number" value="00155" />
+      <option name="presentableId" value="LOCAL-00155" />
+      <option name="project" value="LOCAL" />
+      <updated>1651078761973</updated>
+    </task>
+    <task id="LOCAL-00156" summary="models qad_ee">
+      <created>1651078881680</created>
+      <option name="number" value="00156" />
+      <option name="presentableId" value="LOCAL-00156" />
+      <option name="project" value="LOCAL" />
+      <updated>1651078881681</updated>
+    </task>
+    <task id="LOCAL-00157" summary="models qad_ee">
+      <created>1651079065056</created>
+      <option name="number" value="00157" />
+      <option name="presentableId" value="LOCAL-00157" />
+      <option name="project" value="LOCAL" />
+      <updated>1651079065056</updated>
+    </task>
+    <task id="LOCAL-00158" summary="pagina stock">
+      <created>1651080641783</created>
+      <option name="number" value="00158" />
+      <option name="presentableId" value="LOCAL-00158" />
+      <option name="project" value="LOCAL" />
+      <updated>1651080641783</updated>
+    </task>
+    <task id="LOCAL-00159" summary="Adicionada funcionalidade de enviar email caso haja abandono">
+      <created>1651134333009</created>
+      <option name="number" value="00159" />
+      <option name="presentableId" value="LOCAL-00159" />
+      <option name="project" value="LOCAL" />
+      <updated>1651134333010</updated>
+    </task>
+    <task id="LOCAL-00160" summary="update na pagina Tenda, mostra os 3 dias como deve de ser">
+      <created>1651138256843</created>
+      <option name="number" value="00160" />
+      <option name="presentableId" value="LOCAL-00160" />
+      <option name="project" value="LOCAL" />
+      <updated>1651138256843</updated>
+    </task>
+    <task id="LOCAL-00161" summary="Criado backup da tabela da Portaria">
+      <created>1651142876572</created>
+      <option name="number" value="00161" />
+      <option name="presentableId" value="LOCAL-00161" />
+      <option name="project" value="LOCAL" />
+      <updated>1651142876573</updated>
+    </task>
+    <task id="LOCAL-00162" summary="Criado backup da tabela da ICDR">
+      <created>1651142997870</created>
+      <option name="number" value="00162" />
+      <option name="presentableId" value="LOCAL-00162" />
+      <option name="project" value="LOCAL" />
+      <updated>1651142997870</updated>
+    </task>
+    <task id="LOCAL-00163" summary="Alterados update bd dia 1 - adicionado ICDR e Portaria">
+      <created>1651149504915</created>
+      <option name="number" value="00163" />
+      <option name="presentableId" value="LOCAL-00163" />
+      <option name="project" value="LOCAL" />
+      <updated>1651149504916</updated>
+    </task>
+    <task id="LOCAL-00164" summary="Alterados update bd dia 15 - adicionado update a portaria dia 15">
+      <created>1651150672084</created>
+      <option name="number" value="00164" />
+      <option name="presentableId" value="LOCAL-00164" />
+      <option name="project" value="LOCAL" />
+      <updated>1651150672084</updated>
+    </task>
+    <task id="LOCAL-00165" summary="Alteracoes na pagina mnfg e todas as suas sub-paginas">
+      <created>1651243359811</created>
+      <option name="number" value="00165" />
+      <option name="presentableId" value="LOCAL-00165" />
+      <option name="project" value="LOCAL" />
+      <updated>1651243359812</updated>
+    </task>
+    <task id="LOCAL-00166" summary="Alteracoes na pagina inicial">
+      <created>1651243696494</created>
+      <option name="number" value="00166" />
+      <option name="presentableId" value="LOCAL-00166" />
+      <option name="project" value="LOCAL" />
+      <updated>1651243696494</updated>
+    </task>
+    <task id="LOCAL-00167" summary="Alteracoes em MNFG">
+      <created>1651504896276</created>
+      <option name="number" value="00167" />
+      <option name="presentableId" value="LOCAL-00167" />
+      <option name="project" value="LOCAL" />
+      <updated>1651504896279</updated>
+    </task>
+    <task id="LOCAL-00168" summary="Corrigido bug na tenda e mnfg">
+      <created>1651567790787</created>
+      <option name="number" value="00168" />
+      <option name="presentableId" value="LOCAL-00168" />
+      <option name="project" value="LOCAL" />
+      <updated>1651567790787</updated>
+    </task>
+    <task id="LOCAL-00169" summary="alterada ordem na sidebar vav">
+      <created>1651568177244</created>
+      <option name="number" value="00169" />
+      <option name="presentableId" value="LOCAL-00169" />
+      <option name="project" value="LOCAL" />
+      <updated>1651568177244</updated>
+    </task>
+    <task id="LOCAL-00170" summary="ultimo update projeto">
+      <created>1651669559481</created>
+      <option name="number" value="00170" />
+      <option name="presentableId" value="LOCAL-00170" />
+      <option name="project" value="LOCAL" />
+      <updated>1651669559482</updated>
+    </task>
+    <option name="localTasksCounter" value="171" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="update na pagina portaria - refresh a cada 5 min" />
+    <MESSAGE value="crossdocking detalhe" />
+    <MESSAGE value="ficheiro base armazem html" />
+    <MESSAGE value="Alteraçoes main page html" />
+    <MESSAGE value="Migração de portaria" />
+    <MESSAGE value="Alterações em Shippers - adicionados butoes Help" />
+    <MESSAGE value="Alterações na na base - inclui icdr e tenda; adicionados butoes de Help" />
+    <MESSAGE value="Alterações no file home html" />
+    <MESSAGE value="Report em crossdocking" />
+    <MESSAGE value="atualizacao receiving" />
+    <MESSAGE value="atualizacao crossdocking e packing" />
+    <MESSAGE value="models qad_ee" />
+    <MESSAGE value="pagina stock" />
+    <MESSAGE value="Adicionada funcionalidade de enviar email caso haja abandono" />
+    <MESSAGE value="update na pagina Tenda, mostra os 3 dias como deve de ser" />
+    <MESSAGE value="Criado backup da tabela da Portaria" />
+    <MESSAGE value="Criado backup da tabela da ICDR" />
+    <MESSAGE value="Alterados update bd dia 1 - adicionado ICDR e Portaria" />
+    <MESSAGE value="Alterados update bd dia 15 - adicionado update a portaria dia 15" />
+    <MESSAGE value="Alteracoes na pagina mnfg e todas as suas sub-paginas" />
+    <MESSAGE value="Alteracoes na pagina inicial" />
+    <MESSAGE value="Alteracoes em MNFG" />
+    <MESSAGE value="Corrigido bug na tenda e mnfg" />
+    <MESSAGE value="alterada ordem na sidebar vav" />
+    <MESSAGE value="ultimo update projeto" />
+    <option name="LAST_COMMIT_MESSAGE" value="ultimo update projeto" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pManagement/views.py</url>
+          <line>230</line>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pManagement/views.py</url>
+          <line>288</line>
+          <option name="timeStamp" value="7" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pManagement/views.py</url>
+          <line>289</line>
+          <option name="timeStamp" value="8" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pManagement/views.py</url>
+          <line>323</line>
+          <option name="timeStamp" value="9" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pManagement/views.py</url>
+          <line>324</line>
+          <option name="timeStamp" value="10" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pManagement/views.py</url>
+          <line>231</line>
+          <option name="timeStamp" value="11" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pManagement/views.py</url>
+          <line>233</line>
+          <option name="timeStamp" value="12" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pManagement/views.py</url>
+          <line>609</line>
+          <option name="timeStamp" value="17" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pManagement/views.py</url>
+          <line>477</line>
+          <option name="timeStamp" value="18" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/vware/views.py</url>
+          <line>85</line>
+          <option name="timeStamp" value="19" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/vware/views.py</url>
+          <line>86</line>
+          <option name="timeStamp" value="23" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/vware/views.py</url>
+          <line>88</line>
+          <option name="timeStamp" value="24" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/shippers/views.py</url>
+          <line>576</line>
+          <option name="timeStamp" value="30" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pManagement/views.py</url>
+          <line>608</line>
+          <option name="timeStamp" value="36" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/shippers/views.py</url>
+          <line>700</line>
+          <option name="timeStamp" value="45" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/shippers/views.py</url>
+          <line>701</line>
+          <option name="timeStamp" value="46" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pManagement/views.py</url>
+          <line>648</line>
+          <option name="timeStamp" value="47" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pManagement/views.py</url>
+          <line>649</line>
+          <option name="timeStamp" value="48" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pManagement/views.py</url>
+          <line>374</line>
+          <option name="timeStamp" value="50" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pManagement/views.py</url>
+          <line>17</line>
+          <option name="timeStamp" value="51" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pManagement/views.py</url>
+          <line>18</line>
+          <option name="timeStamp" value="52" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pManagement/views.py</url>
+          <line>47</line>
+          <option name="timeStamp" value="53" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pManagement/views.py</url>
+          <line>651</line>
+          <option name="timeStamp" value="56" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pManagement/views.py</url>
+          <line>658</line>
+          <option name="timeStamp" value="57" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pManagement/views.py</url>
+          <line>661</line>
+          <option name="timeStamp" value="58" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pManagement/views.py</url>
+          <line>662</line>
+          <option name="timeStamp" value="59" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pManagement/views.py</url>
+          <line>849</line>
+          <option name="timeStamp" value="60" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pManagement/views.py</url>
+          <line>749</line>
+          <option name="timeStamp" value="61" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pManagement/views.py</url>
+          <line>750</line>
+          <option name="timeStamp" value="62" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pManagement/views.py</url>
+          <line>701</line>
+          <option name="timeStamp" value="63" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pManagement/views.py</url>
+          <line>702</line>
+          <option name="timeStamp" value="64" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pManagement/views.py</url>
+          <line>485</line>
+          <option name="timeStamp" value="73" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pManagement/views.py</url>
+          <line>486</line>
+          <option name="timeStamp" value="74" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/receiving/views.py</url>
+          <line>1048</line>
+          <option name="timeStamp" value="78" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pManagement/views.py</url>
+          <line>864</line>
+          <option name="timeStamp" value="79" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pManagement/views.py</url>
+          <line>865</line>
+          <option name="timeStamp" value="80" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pManagement/views.py</url>
+          <line>929</line>
+          <option name="timeStamp" value="81" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pManagement/views.py</url>
+          <line>930</line>
+          <option name="timeStamp" value="82" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pManagement/views.py</url>
+          <line>931</line>
+          <option name="timeStamp" value="83" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pManagement/views.py</url>
+          <line>941</line>
+          <option name="timeStamp" value="84" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pManagement/views.py</url>
+          <line>942</line>
+          <option name="timeStamp" value="85" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pManagement/views.py</url>
+          <line>943</line>
+          <option name="timeStamp" value="86" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pManagement/views.py</url>
+          <line>952</line>
+          <option name="timeStamp" value="87" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pManagement/views.py</url>
+          <line>953</line>
+          <option name="timeStamp" value="88" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pManagement/views.py</url>
+          <line>954</line>
+          <option name="timeStamp" value="89" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pManagement/views.py</url>
+          <line>960</line>
+          <option name="timeStamp" value="102" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pManagement/views.py</url>
+          <line>961</line>
+          <option name="timeStamp" value="103" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/receiving/views.py</url>
+          <line>2279</line>
+          <option name="timeStamp" value="104" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/receiving/views.py</url>
+          <line>2280</line>
+          <option name="timeStamp" value="105" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/receiving/views.py</url>
+          <line>1367</line>
+          <option name="timeStamp" value="120" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/receiving/views.py</url>
+          <line>1368</line>
+          <option name="timeStamp" value="121" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/crossdocking/views.py</url>
+          <line>35</line>
+          <option name="timeStamp" value="159" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/crossdocking/views.py</url>
+          <line>36</line>
+          <option name="timeStamp" value="160" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/crossdocking/views.py</url>
+          <line>78</line>
+          <option name="timeStamp" value="168" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/crossdocking/views.py</url>
+          <line>79</line>
+          <option name="timeStamp" value="169" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/crossdocking/views.py</url>
+          <line>112</line>
+          <option name="timeStamp" value="170" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/crossdocking/views.py</url>
+          <line>113</line>
+          <option name="timeStamp" value="171" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/crossdocking/views.py</url>
+          <line>162</line>
+          <option name="timeStamp" value="172" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/crossdocking/views.py</url>
+          <line>163</line>
+          <option name="timeStamp" value="173" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/crossdocking/views.py</url>
+          <line>202</line>
+          <option name="timeStamp" value="174" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/crossdocking/views.py</url>
+          <line>22</line>
+          <option name="timeStamp" value="176" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/crossdocking/views.py</url>
+          <line>203</line>
+          <option name="timeStamp" value="181" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/crossdocking/views.py</url>
+          <line>193</line>
+          <option name="timeStamp" value="182" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/crossdocking/views.py</url>
+          <line>108</line>
+          <option name="timeStamp" value="187" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/shippers/views.py</url>
+          <line>427</line>
+          <option name="timeStamp" value="204" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/receiving/views.py</url>
+          <line>595</line>
+          <option name="timeStamp" value="236" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/shippers/views.py</url>
+          <line>917</line>
+          <option name="timeStamp" value="239" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/shippers/views.py</url>
+          <line>971</line>
+          <option name="timeStamp" value="243" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/crossdocking/views.py</url>
+          <line>438</line>
+          <option name="timeStamp" value="271" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/crossdocking/views.py</url>
+          <line>439</line>
+          <option name="timeStamp" value="272" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/shippers/views.py</url>
+          <line>924</line>
+          <option name="timeStamp" value="273" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/shippers/views.py</url>
+          <line>944</line>
+          <option name="timeStamp" value="275" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/shippers/views.py</url>
+          <line>961</line>
+          <option name="timeStamp" value="276" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/crossdocking/views.py</url>
+          <line>358</line>
+          <option name="timeStamp" value="284" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/shippers/views.py</url>
+          <line>871</line>
+          <option name="timeStamp" value="285" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/shippers/management/commands/updateSchedule.py</url>
+          <line>118</line>
+          <option name="timeStamp" value="329" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/crossdocking/views.py</url>
+          <line>359</line>
+          <option name="timeStamp" value="331" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/receiving/views.py</url>
+          <line>1187</line>
+          <option name="timeStamp" value="347" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/inqueritos/views.py</url>
+          <line>44</line>
+          <option name="timeStamp" value="350" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/inqueritos/views.py</url>
+          <line>45</line>
+          <option name="timeStamp" value="351" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/inqueritos/views.py</url>
+          <line>69</line>
+          <option name="timeStamp" value="352" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/inqueritos/views.py</url>
+          <line>70</line>
+          <option name="timeStamp" value="353" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/inqueritos/views.py</url>
+          <line>71</line>
+          <option name="timeStamp" value="355" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/inqueritos/views.py</url>
+          <line>72</line>
+          <option name="timeStamp" value="356" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/inqueritos/views.py</url>
+          <line>104</line>
+          <option name="timeStamp" value="367" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/inqueritos/views.py</url>
+          <line>90</line>
+          <option name="timeStamp" value="368" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/inqueritos/views.py</url>
+          <line>62</line>
+          <option name="timeStamp" value="369" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/inqueritos/views.py</url>
+          <line>67</line>
+          <option name="timeStamp" value="370" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/inqueritos/views.py</url>
+          <line>103</line>
+          <option name="timeStamp" value="371" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/receiving/views.py</url>
+          <line>3555</line>
+          <option name="timeStamp" value="379" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/receiving/views.py</url>
+          <line>2826</line>
+          <option name="timeStamp" value="413" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/receiving/views.py</url>
+          <line>3069</line>
+          <option name="timeStamp" value="427" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/receiving/views.py</url>
+          <line>3154</line>
+          <option name="timeStamp" value="428" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pManagement/views.py</url>
+          <line>532</line>
+          <option name="timeStamp" value="431" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pManagement/views.py</url>
+          <line>543</line>
+          <option name="timeStamp" value="432" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pManagement/views.py</url>
+          <line>585</line>
+          <option name="timeStamp" value="434" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pManagement/views.py</url>
+          <line>571</line>
+          <option name="timeStamp" value="435" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pManagement/views.py</url>
+          <line>575</line>
+          <option name="timeStamp" value="436" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/receiving/views.py</url>
+          <line>2944</line>
+          <option name="timeStamp" value="439" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/receiving/views.py</url>
+          <line>2908</line>
+          <option name="timeStamp" value="440" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/receiving/views.py</url>
+          <line>3495</line>
+          <option name="timeStamp" value="442" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/receiving/views.py</url>
+          <line>3459</line>
+          <option name="timeStamp" value="454" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/receiving/views.py</url>
+          <line>2758</line>
+          <option name="timeStamp" value="458" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/receiving/views.py</url>
+          <line>2769</line>
+          <option name="timeStamp" value="459" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/crossdocking/views.py</url>
+          <line>928</line>
+          <option name="timeStamp" value="461" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/crossdocking/views.py</url>
+          <line>1010</line>
+          <option name="timeStamp" value="462" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/receiving/views.py</url>
+          <line>566</line>
+          <option name="timeStamp" value="464" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/crossdocking/views.py</url>
+          <line>20</line>
+          <option name="timeStamp" value="472" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+    <watches-manager>
+      <configuration name="Python.DjangoServer">
+        <watch expression="listTableValues" language="Python" />
+      </configuration>
+    </watches-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/visteon$emailWarehouseProduction.coverage" NAME="emailWarehouseProduction Coverage Results" MODIFIED="1643030585814" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/shippers/management/commands" />
+  </component>
+</project>

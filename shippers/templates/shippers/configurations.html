@@ -1,0 +1,154 @@
+{% extends "vware/baseArmazem.html" %}
+{% load static %}
+
+{% block body_title %}
+    <div class="text-primary">
+        <h6><b><i class="fa fa-home text-secondary"></i><a href={% url 'main:main' %}><span
+                class="text-secondary"> Home | </span></a> Configurations Shipping</b></h6>
+    </div>
+
+    <style>
+        .form-control::-webkit-input-placeholder {
+            color: rgba(36, 36, 36, 0.88);
+        }
+
+        .button {
+            width: 35%;
+            height: 70px;
+            display: inline-block;
+            font-family: Arial, "Helvetica", sans-serif;
+            font-size: 45px;
+            color: #fff;
+            text-decoration: none;
+            text-align: center;
+            text-shadow: 1px 1px 0 #7D9EAD, 2px 2px 0 #7D9EAD, 1px 1px 0 #7D9EAD;
+            padding-top: 6px;
+            margin-left: auto;
+            margin-right: auto;
+            left: 30px;
+            position: relative;
+            cursor: pointer;
+            border: none;
+            background: #FBA51A;
+            background-image: linear-gradient(bottom, #E57200 0%, #FBA51A 100%);
+            border-radius: 5px;
+            box-shadow: inset 0px 1px 0px #FBA51A, 0px 5px 0px 0px #cb7b25, 0px 10px 5px #999;
+        }
+
+        .button:active {
+            top: 3px;
+            box-shadow: inset 0px 1px 0px #FBA51A, 0px 2px 0px 0px #E57200, 0px 5px 3px #999;
+        }
+
+        .button:hover, button:focus {
+            outline: none;
+            transform: translateY(0.5px);
+        }
+
+        .containerPrincipal {
+            height: 860px;
+            width: 100%;
+            top: 11px;
+            left: 0px;
+            position: relative;
+            border: 1px solid transparent;
+            border-right: 3px solid black;
+        }
+
+    </style>
+{% endblock %}
+
+{% block body_content %}
+    <div class="containerPrincipal">
+        <div style="position: absolute">
+            </br></br>
+            <div style="background-color: lightgrey">
+                <p style="font-size: 14px"><b>Carregar ficheiro backup disponivel em
+                    "W:\sharedir\MP&L\Warehouse\PWMS\PWMS Backup\"</b></p>
+                <form method="POST" enctype="multipart/form-data" action="{% url 'shippers:uploadDataPortaria' %}">
+                    {% csrf_token %}
+                    <input type="file" accept="" name="ficheiro" id="ficheiro"></br>
+                    <button type="submit" class="btn btn-secondary mt-1">Upload</button>
+                </form>
+            </div>
+        </div>
+        <div style="width: 95%; bottom: 0%; position: absolute; border: 3px solid transparent; text-align: center">
+            <button type="submit" class="button" data-toggle="modal" data-target="#alterarGrupoShipping">
+                Change account Groups
+            </button>
+        </div>
+    </div>
+
+    <form method="POST" class="form" action="{% url 'shippers:changeUserGroups' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal fade" id="alterarGrupoShipping" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">Change account groups</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <label for="username"><h6><b style="color: black">Username</b></h6></label>
+                        <select class="form-control" id="username" name="username" required>
+                            <option value="">Select User</option>
+                            {% for user in users.all %}
+                                <option value="{{ user.username }}">{{ user.username }}</option>
+                            {% endfor %}
+                        </select></br>
+                        <label for="paginas"><h6><b style="color: black">Pages</b></h6></label>
+                        <select class="form-control" name="paginas" id="paginas" required>
+                            <option value="">Select accessable pages</option>
+                            <option value="portaria">Portaria</option>
+                            <option value="portariaReadOnly">Portaria Read Only</option>
+                            <option value="tracking">Tracking</option>
+                            <option value="security">Security</option>
+                            <option value="confirmation">Confirmation</option>
+                            <option value="portaria/tracking">Portaria, Tracking</option>
+                            <option value="portaria/security">Portaria, Security</option>
+                            <option value="portaria/confirmation">Portaria, Confirmation</option>
+                            <option value="portariaReadOnly/tracking">Portaria Read Only, Tracking</option>
+                            <option value="portariaReadOnly/security">Portaria Read Only, Security</option>
+                            <option value="portariaReadOnly/confirmation">Portaria Read Only, Confirmation</option>
+                            <option value="tracking/security">Tracking, Security</option>
+                            <option value="tracking/confirmation">Tracking, Confirmation</option>
+                            <option value="security/confirmation">Security, Confirmation</option>
+                            <option value="portaria/tracking/security">Portaria, Tracking, Security</option>
+                            <option value="portaria/tracking/confirmation">Portaria, Tracking, Confirmation</option>
+                            <option value="portaria/security/confirmation">Portaria, Security, Confirmation</option>
+                            <option value="portariaReadOnly/tracking/security">Portaria Read Only, Tracking, Security
+                            </option>
+                            <option value="portariaReadOnly/tracking/confirmation">Portaria Read Only, Tracking,
+                                Confirmation
+                            </option>
+                            <option value="portariaReadOnly/security/confirmation">Portaria Read Only, Security,
+                                Confirmation
+                            </option>
+                            <option value="tracking/security/confirmation">Tracking, Security, Confirmation</option>
+                            <option value="portaria/tracking/security/confirmation">Portaria, Tracking, Security,
+                                Confirmation
+                            </option>
+                            <option value="portariaReadOnly/tracking/security/confirmation">Portaria Read Only,
+                                Tracking, Security, Confirmation
+                            </option>
+                            <option value="none">Remove access to all Shipping pages</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Create</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        $(document).ready(function () {
+
+        })
+    </script>
+{% endblock %}

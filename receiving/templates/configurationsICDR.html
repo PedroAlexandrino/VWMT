@@ -1,0 +1,646 @@
+{% extends "vware/baseArmazem.html" %}
+{% load static %}
+
+{% block body_title %}
+    <div class="text-primary">
+        <h6><b><i class="fa fa-home text-secondary"></i><a href={% url 'main:main' %}><span
+                class="text-secondary"> Home | </span></a> Configurations Shipping</b></h6>
+    </div>
+
+    <style>
+        hr {
+            display: block;
+            height: 1px;
+            border: 0;
+            border-top: 1px solid #ccc;
+            margin: 1em 0;
+            padding: 0;
+        }
+
+        .form-control::-webkit-input-placeholder {
+            color: rgba(36, 36, 36, 0.88);
+        }
+
+        .button {
+            width: 35%;
+            height: 70px;
+            display: inline-block;
+            font-family: Arial, "Helvetica", sans-serif;
+            font-size: 45px;
+            color: #fff;
+            text-decoration: none;
+            text-align: center;
+            text-shadow: 1px 1px 0 #7D9EAD, 2px 2px 0 #7D9EAD, 1px 1px 0 #7D9EAD;
+            padding-top: 6px;
+            margin-left: auto;
+            margin-right: auto;
+            left: 30px;
+            position: relative;
+            cursor: pointer;
+            border: none;
+            background: #FBA51A;
+            background-image: linear-gradient(bottom, #E57200 0%, #FBA51A 100%);
+            border-radius: 5px;
+            box-shadow: inset 0px 1px 0px #FBA51A, 0px 5px 0px 0px #cb7b25, 0px 10px 5px #999;
+        }
+
+        .button:active {
+            top: 3px;
+            box-shadow: inset 0px 1px 0px #FBA51A, 0px 2px 0px 0px #E57200, 0px 5px 3px #999;
+        }
+
+        .button:hover, button:focus {
+            outline: none;
+            transform: translateY(0.5px);
+        }
+
+        .containerPrincipal {
+            height: 860px;
+            width: 100%;
+            top: 11px;
+            left: 0px;
+            position: relative;
+            border: 1px solid transparent;
+            border-right: 3px solid black;
+        }
+
+    </style>
+{% endblock %}
+
+{% block body_content %}
+    <div class="containerPrincipal">
+        <div style="width: 650px; background-color: white; margin-left: 9%; box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);">
+            <p style="font-size: 35px; text-align: center" class="mb-n2"><b><i>Gestão de alertas</i></b></p>
+            <hr/>
+            <form method="POST" enctype="multipart/form-data" action="{% url 'receiving:removerUtilizadorICDR' %}">
+                {% csrf_token %}
+                <p style="font-size: 19px; margin-left: 10px"><b>Utilizadores</b></p>
+                <input type="text" class="form-control mt-n3" name="utilizador" id="utilizador" style="width: 250px"
+                       list="listaUtilizadores" placeholder="Selecione utilizador"></br>
+                <datalist id="listaUtilizadores">
+                    {% for utilizador in utilizadoresICDR.all %}
+                        <option value={{ utilizador.username }}>{{ utilizador.nome }}</option>
+                    {% endfor %}
+                </datalist>
+                <button type="submit" class="btn btn-primary mt-n2" style="margin-left: 10px">Remover selecionado
+                </button>
+                <button type="button" class="btn btn-primary mt-n2 ml-2" data-toggle="modal"
+                        data-target="#criarNovoUser">
+                    Criar novo
+                </button>
+            </form>
+            </br></br></br>
+            <form method="POST" enctype="multipart/form-data"
+                  action="{% url 'receiving:alterarEstadoTriggerICDR' %}">
+                {% csrf_token %}
+                <p style="font-size: 19px; margin-left: 10px"><b>Alertas</b></p>
+                <select class="form-control mt-n3" name="triggers" id="triggers" style="width: 250px" required></br>
+                    <option value="">Selecione alerta</option>
+                    {% for trigger in triggers.all %}
+                        <option value={{ trigger.nome }}-{{ trigger.estado }}>{{ trigger.nome }}
+                            - {{ trigger.estado }}</option>
+                    {% endfor %}
+                </select>
+                </br>
+                <button type="submit" class="btn btn-primary mt-n2 ml-2">Alterar estado</button>
+                <button type="button" class="btn btn-primary mt-n2 ml-2" data-toggle="modal"
+                        data-target="#adicionarListaAlerta">
+                    Associar lista de distribuição
+                </button>
+                <button type="button" class="btn btn-primary mt-n2 ml-2" data-toggle="modal"
+                        data-target="#removerListaAlerta">
+                    Remover lista de distribuição
+                </button>
+            </form>
+            </br></br></br>
+            <p style="font-size: 19px; margin-left: 10px"><b>Listas de distribuição existentes</b></p>
+            <div class="form-inline">
+                <select class="form-control mt-n3" id="listaUtilizadores" name="listaUtilizadores" style="width: 250px"
+                        required>
+                    <option value="">Selecione lista</option>
+                    {% for lista in listasUsers.all %}
+                        <option value="{{ lista.nome }}">{{ lista.nome }}</option>
+                    {% endfor %}
+                </select>
+                <datalist id="listaComUtilizadores">
+                    {% for lista in listasUsers.all %}
+                        <option value={{ lista.nome }}>{{ lista.nome }}</option>
+                    {% endfor %}
+                </datalist>
+                <input type="text" class="form-control mt-n3" name="utilizadoresPorLista" id="utilizadoresPorLista"
+                       style="width: 250px; margin-left: 50px" placeholder="Utilizadores na lista selecionada"
+                       list="listaUtilizadoresPorLista"></br>
+                <datalist id="listaUtilizadoresPorLista">
+                    {% for utilizador in utilizadoresICDR.all %}
+                        <option value={{ utilizador.username }}>{{ utilizador.nome }}</option>
+                    {% endfor %}
+                </datalist>
+            </div>
+            </br>
+            <button type="submit" class="btn btn-primary mt-n2 ml-2" data-toggle="modal"
+                    data-target="#criarListaUsers">
+                Criar nova lista
+            </button>
+            <button type="submit" class="btn btn-primary mt-n2 ml-2" data-toggle="modal"
+                    data-target="#adicionarAListaUsers">
+                Adicionar user a lista de distribuição
+            </button>
+            <button type="submit" class="btn btn-primary mt-n2 ml-2" data-toggle="modal"
+                    data-target="#removerDeListaUsers">
+                Remover user de lista de distribuição
+            </button>
+            </br></br></br>
+        </div>
+        <div style="background-color: white; width: 35%; position: absolute; right: 9%; top: 0; box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);">
+            <p style="font-size: 35px; text-align: center" class="mb-n2"><b><i>Backup info</i></b></p>
+            <hr/>
+            <p style="font-size: 14px; margin-left: 5px"><b>Carregar ficheiro backup disponivel em
+                "W:\sharedir\MP&L\Warehouse\PWMS\PWMS Backup\"</b></p>
+            </br>
+            <form method="POST" enctype="multipart/form-data" action="{% url 'receiving:uploadDataICDR' %}">
+                {% csrf_token %}
+                <div class="form-inline">
+                    <input type="file" accept="" name="ficheiro" id="ficheiro" style="margin-left: 5px"></br>
+                    <button type="submit" class="btn btn-primary mt-1" style="margin-left: 250px">Upload
+                    </button>
+                </div>
+            </form>
+            </br>
+        </div>
+
+        <div style="width: 95%; bottom: 0%; position: absolute; border: 3px solid transparent; text-align: center">
+            <button type="submit" class="button" data-toggle="modal" data-target="#alterarGrupoShipping">
+                Change account Groups
+            </button>
+        </div>
+        <div style="bottom: 0px; margin-left: 25px; position: absolute">
+            <h6><b><i class="fa fa-chevron-left text-secondary"></i><a href={% url 'receiving:icdr' %}><span
+                    class="text-secondary"> Back </span></a></b></h6>
+        </div>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" action="{% url 'receiving:adicionarListaAlertaICDR' %}">
+        {% csrf_token %}
+        <div class="modal fade" id="adicionarListaAlerta" tabindex="-1" role="dialog"
+             aria-labelledby="myModalLabel">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: rgba(236,144,0,0.86)">
+                        <h4 class="modal-title" id="myModalLabel" style="margin-left: 36%; font-size: 40px"><i>Inserir
+                            dados</i></h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body"
+                         style="background: linear-gradient(to bottom, rgba(236,144,0,0.86) 0%, ghostwhite 100%); ">
+                        <div style="margin-top: 10px; text-align: center">
+                            <div style="text-align: center">
+                                <p style="font-size: 20px"><strong>Alertas</strong></p>
+                                <select class="form-control" id="listaAlerta_adicionar" name="listaAlerta_adicionar"
+                                        required>
+                                    <option value="">Selecionar alerta</option>
+                                    {% for alerta in triggers.all %}
+                                        <option value="{{ alerta.nome }}">{{ alerta.nome }}
+                                            - {{ alerta.estado }}</option>
+                                    {% endfor %}
+                                </select>
+                                </br>
+                            </div>
+                            </br>
+                            </br>
+                            <div style="text-align: center">
+                                <p style="font-size: 20px"><strong>Listas de distribuição</strong></p>
+                                <select class="form-control ui fluid dropdown mt-n3" name="listaEscolhidaAlerta"
+                                        id="listaEscolhidaAlerta" multiple="" required>
+                                    <option value="">Selecionar lista</option>
+                                    {% for lista in listasUsers.all %}
+                                        <option value="{{ lista.nome }}">{{ lista.nome }}</option>
+                                    {% endfor %}
+                                    {% for user in utilizadoresICDR.all %}
+                                        <option value="{{ user.username }}">{{ user.nome }}
+                                            - {{ user.username }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <input type="hidden" name="_configurations" id="_configurations" value="">
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="background-color: ghostwhite">
+                        <button type="submit" class="btn btn-primary">Adicionar</button>
+                        <button type="button" class="btn btn-primary" value="pending" data-dismiss="modal">Fechar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <form method="POST" enctype="multipart/form-data" action="{% url 'receiving:removerListaAlertaICDR' %}">
+        {% csrf_token %}
+        <div class="modal fade" id="removerListaAlerta" tabindex="-1" role="dialog"
+             aria-labelledby="myModalLabel">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: rgba(236,144,0,0.86)">
+                        <h4 class="modal-title" id="myModalLabel" style="margin-left: 36%; font-size: 40px"><i>Inserir
+                            dados</i></h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body"
+                         style="background: linear-gradient(to bottom, rgba(236,144,0,0.86) 0%, ghostwhite 100%); ">
+                        <div style="margin-top: 10px; text-align: center">
+                            <div style="text-align: center">
+                                <p style="font-size: 20px"><strong>Alertas</strong></p>
+                                <select class="form-control" id="listaAlerta_remover" name="listaAlerta_remover"
+                                        required>
+                                    <option value="">Selecionar alerta</option>
+                                    {% for alerta in triggers.all %}
+                                        <option value="{{ alerta.nome }}">{{ alerta.nome }}
+                                            - {{ alerta.estado }}</option>
+                                    {% endfor %}
+                                </select>
+                                </br>
+                            </div>
+                            </br>
+                            </br>
+                            <div style="text-align: center">
+                                <p style="font-size: 20px"><strong>Listas de distribuição</strong></p>
+                                <select class="form-control ui fluid dropdown mt-n3" name="listaEscolhidaAlertaRemover"
+                                        id="listaEscolhidaAlertaRemover" multiple="" required>
+                                    <option value="">Selecionar lista</option>
+                                    {% for lista in listasUsers.all %}
+                                        <option value="{{ lista.nome }}">{{ lista.nome }}</option>
+                                    {% endfor %}
+                                    {% for user in utilizadoresICDR.all %}
+                                        <option value="{{ user.username }}">{{ user.nome }}
+                                            - {{ user.username }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <input type="hidden" name="_configurations" id="_configurations" value="">
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="background-color: ghostwhite">
+                        <button type="submit" class="btn btn-primary">Remover</button>
+                        <button type="button" class="btn btn-primary" value="pending" data-dismiss="modal">Fechar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <form method="POST" enctype="multipart/form-data" action="{% url 'receiving:criarListaUsersICDR' %}">
+        {% csrf_token %}
+        <div class="modal fade" id="criarListaUsers" tabindex="-1" role="dialog"
+             aria-labelledby="myModalLabel">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: rgba(236,144,0,0.86)">
+                        <h4 class="modal-title" id="myModalLabel" style="margin-left: 36%; font-size: 40px"><i>Inserir
+                            dados</i></h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body"
+                         style="background: linear-gradient(to bottom, rgba(236,144,0,0.86) 0%, ghostwhite 100%); ">
+                        <div style="margin-top: 10px; text-align: center">
+                            <div style="text-align: center">
+                                <p style="font-size: 20px"><strong>Nome da lista</strong></p>
+                                <input type="text" class="form-control mt-n3" name="nomeListaUser" id="nomeListaUser"
+                                       style="background-color: floralwhite; text-align: center"
+                                       required>
+                            </div>
+                            </br>
+                            <div style="text-align: center">
+                                <p style="font-size: 20px"><strong>Utilizadores</strong></p>
+                                <select class="form-control ui fluid dropdown mt-n3" name="listaDeUsers"
+                                        id="listaDeUsers" multiple="" required>
+                                    <option value="">Selecionar users</option>
+                                    {% for utilizador in utilizadoresICDR.all %}
+                                        <option value={{ utilizador.username }}>{{ utilizador.nome }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <input type="hidden" name="_configurations" id="_configurations" value="">
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="background-color: ghostwhite">
+                        <button type="submit" class="btn btn-primary">Criar</button>
+                        <button type="button" class="btn btn-primary" value="pending" data-dismiss="modal">Fechar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <form method="POST" enctype="multipart/form-data" action="{% url 'receiving:adicionarUtilizadorListaICDR' %}">
+        {% csrf_token %}
+        <div class="modal fade" id="adicionarAListaUsers" tabindex="-1" role="dialog"
+             aria-labelledby="myModalLabel">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: rgba(236,144,0,0.86)">
+                        <h4 class="modal-title" id="myModalLabel" style="margin-left: 36%; font-size: 40px"><i>Inserir
+                            dados</i></h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body"
+                         style="background: linear-gradient(to bottom, rgba(236,144,0,0.86) 0%, ghostwhite 100%); ">
+                        <div style="margin-top: 10px; text-align: center">
+                            <div style="text-align: center">
+                                <p style="font-size: 20px"><strong>Nome da lista</strong></p>
+                                <select class="form-control" id="lista_adicionar" name="lista_adicionar" required>
+                                    <option value="">Selecionar lista</option>
+                                    {% for lista in listasUsers.all %}
+                                        <option value="{{ lista.nome }}">{{ lista.nome }}</option>
+                                    {% endfor %}
+                                </select>
+                                </br>
+                            </div>
+                            </br>
+                            <div style="text-align: center">
+                                <p style="font-size: 20px"><strong>Utilizadores atuais</strong></p>
+                                <input type="text" class="form-control" name="users_adicionar"
+                                       id="users_adicionar"
+                                       list="users_adicionarLista"></br>
+                                <datalist id="users_adicionarLista">
+                                    {% for utilizador in utilizadoresICDR.all %}
+                                        <option value={{ utilizador.username }}>{{ utilizador.nome }}</option>
+                                    {% endfor %}
+                                </datalist>
+                            </div>
+                            </br>
+                            <div style="text-align: center">
+                                <p style="font-size: 20px"><strong>Utilizadores disponiveis para adicionar</strong></p>
+                                <select class="form-control ui fluid dropdown mt-n3" name="listaDeUsersDisponiveis"
+                                        id="listaDeUsersDisponiveis" multiple="" required>
+                                    <option value="">Selecionar users</option>
+                                    {% for utilizador in utilizadoresICDR.all %}
+                                        <option value={{ utilizador.username }}>{{ utilizador.nome }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <input type="hidden" name="_configurations" id="_configurations" value="">
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="background-color: ghostwhite">
+                        <button type="submit" class="btn btn-primary">Adicionar</button>
+                        <button type="button" class="btn btn-primary" value="pending" data-dismiss="modal">Fechar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <form method="POST" enctype="multipart/form-data" action="{% url 'receiving:removerUtilizadorListaICDR' %}">
+        {% csrf_token %}
+        <div class="modal fade" id="removerDeListaUsers" tabindex="-1" role="dialog"
+             aria-labelledby="myModalLabel">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: rgba(236,144,0,0.86)">
+                        <h4 class="modal-title" id="myModalLabel" style="margin-left: 36%; font-size: 40px"><i>Inserir
+                            dados</i></h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body"
+                         style="background: linear-gradient(to bottom, rgba(236,144,0,0.86) 0%, ghostwhite 100%); ">
+                        <div style="margin-top: 10px; text-align: center">
+                            <div style="text-align: center">
+                                <p style="font-size: 20px"><strong>Nome da lista</strong></p>
+                                <select class="form-control" id="lista_remover" name="lista_remover" required>
+                                    <option value="">Selecionar lista</option>
+                                    {% for lista in listasUsers.all %}
+                                        <option value="{{ lista.nome }}">{{ lista.nome }}</option>
+                                    {% endfor %}
+                                </select>
+                                </br>
+                            </div>
+                            </br>
+                            <div style="text-align: center">
+                                <p style="font-size: 20px"><strong>Utilizadores</strong></p>
+                                <select class="form-control ui fluid dropdown mt-n3" name="listaDeUsersRemover"
+                                        id="listaDeUsersRemover" multiple="" required>
+                                    <option value="">Selecionar users</option>
+                                    {% for utilizador in utilizadoresICDR.all %}
+                                        <option value={{ utilizador.username }}>{{ utilizador.nome }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <input type="hidden" name="_configurations" id="_configurations" value="">
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="background-color: ghostwhite">
+                        <button type="submit" class="btn btn-primary">Remover</button>
+                        <button type="button" class="btn btn-primary" value="pending" data-dismiss="modal">Fechar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <form method="POST" enctype="multipart/form-data" action="{% url 'receiving:criarUserICDR' %}">
+        {% csrf_token %}
+        <div class="modal fade" id="criarNovoUser" name="criarNovoUser" tabindex="-1" role="dialog"
+             aria-labelledby="myModalLabel">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: rgba(236,144,0,0.86)">
+                        <h4 class="modal-title" id="myModalLabel" style="margin-left: 36%; font-size: 40px"><i>Inserir
+                            dados</i></h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body"
+                         style="background: linear-gradient(to bottom, rgba(236,144,0,0.86) 0%, ghostwhite 100%); ">
+                        <div style="margin-top: 10px; text-align: center">
+                            <div style="text-align: center">
+                                <p style="font-size: 20px"><strong>Nome (primeiro e último)</strong></p>
+                                <input type="text" class="form-control mt-n3" name="nomeUser" id="nomeUser"
+                                       style="background-color: floralwhite; text-align: center"
+                                       required>
+                            </div>
+                            </br>
+                            <div style="text-align: center">
+                                <p style="font-size: 20px"><strong>Área</strong></p>
+                                <input type="text" class="form-control mt-n3" name="areaUser" id="areaUser"
+                                       style="background-color: floralwhite; text-align: center" list="listaAreas"
+                                       required>
+                                <datalist id="listaAreas">
+                                    <option value='Main'>Main</option>
+                                    <option value='MPL'>MPL</option>
+                                    <option value='Service'>Service</option>
+                                    <option value='ENG'>ENG</option>
+                                    <option value='QA'>QA</option>
+                                    <option value='VPBEC'>VPBEC</option>
+                                    <option value='PLAST'>PLAST</option>
+                                    <option value='COMPRAS'>COMPRAS</option>
+                                    <option value='MFG'>MFG</option>
+                                    <option value='IT'>IT</option>
+                                    <option value='351E'>351E</option>
+                                    <option value='3515'>3515</option>
+                                </datalist>
+                            </div>
+                            </br>
+                            <div style="text-align: center">
+                                <p style="font-size: 20px"><strong>Email</strong></p>
+                                <input type="email" class="form-control mt-n3" name="emailUser" id="emailUser"
+                                       style="background-color: floralwhite; text-align: center"
+                                       placeholder="user@visteon.com"
+                                       required>
+                            </div>
+                            <input type="hidden" name="_configurations" id="_configurations" value="">
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="background-color: ghostwhite">
+                        <button type="submit" class="btn btn-primary">Criar</button>
+                        <button type="button" class="btn btn-primary" value="pending" data-dismiss="modal">Fechar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <form method="POST" class="form" action="{% url 'receiving:changeUserGroupsICDR' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal fade" id="alterarGrupoShipping" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">Change account groups</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <label for="username"><h6><b style="color: black">Username</b></h6></label>
+                        <select class="form-control" id="username" name="username" required>
+                            <option value="">Select User</option>
+                            {% for user in users.all %}
+                                <option value="{{ user.username }}">{{ user.username }}</option>
+                            {% endfor %}
+                        </select></br>
+                        <label for="paginas"><h6><b style="color: black">Pages</b></h6></label>
+                        <select class="form-control" name="paginas" id="paginas" required>
+                            <option value="">Select accessable pages</option>
+                            <option value="readOnly">Read Only</option>
+                            <option value="tipo1">Tipo 1</option>
+                            <option value="tipo2">Tipo 2</option>
+                            <option value="tipo3">Tipo 3</option>
+                            <option value="tipo1/tipo2">Tipo 1, Tipo 2</option>
+                            <option value="tipo1/tipo3">Tipo 1, Tipo 3</option>
+                            <option value="tipo2/tipo3">Tipo 2, Tipo 3</option>
+                            <option value="tipo1/tipo2/tipo3">Tipo 1, Tipo 2, Tipo 3</option>
+                            <option value="none">Remove access to all ICDR pages</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Create</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        $(document).ready(function () {
+
+            $('select#listaUtilizadores').change(function () {
+                var lista = $(this).val()
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/receiving/searchUsersPorLista/',
+                    data: {
+                        csrfmiddlewaretoken: "{{ csrf_token }}",
+                        'lista': lista,
+                    },
+                    success: function (response) {
+                        console.log(response.listaResposta[0])
+                        $("#listaUtilizadoresPorLista").empty();
+                        for (elem in response.listaResposta[0].split(";")) {
+                            $("<option/>").html(response.listaResposta[0].split(";")[elem]).appendTo("#listaUtilizadoresPorLista");
+                        }
+                    }
+                })
+            });
+
+            $('select#lista_adicionar').change(function () {
+                var lista = $(this).val()
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/receiving/searchUsersPorLista/',
+                    data: {
+                        csrfmiddlewaretoken: "{{ csrf_token }}",
+                        'lista': lista,
+                        'utilizadoresRestantes': ''
+                    },
+                    success: function (response) {
+                        console.log(response.listaResposta[0])
+                        $("#users_adicionarLista").empty();
+                        $("#listaDeUsersDisponiveis").empty();
+                        if (response.listaResposta[0] != null) {
+                            for (elem in response.listaResposta[0].split(";")) {
+                                $("<option/>").html(response.listaResposta[0].split(";")[elem]).appendTo("#users_adicionarLista");
+                            }
+                        }
+                        if (response.listaResposta[1] != null) {
+                            for (elem in response.listaResposta[1].split(";")) {
+                                $("<option/>").html(response.listaResposta[1].split(";")[elem]).appendTo("#listaDeUsersDisponiveis");
+                            }
+                        }
+                    }
+                })
+            });
+
+            $('select#lista_remover').change(function () {
+                var lista = $(this).val()
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/receiving/searchUsersPorLista/',
+                    data: {
+                        csrfmiddlewaretoken: "{{ csrf_token }}",
+                        'lista': lista,
+                    },
+                    success: function (response) {
+                        $("#listaDeUsersRemover").empty();
+                        for (elem in response.listaResposta[0].split(";")) {
+                            $("<option/>").html(response.listaResposta[0].split(";")[elem]).appendTo("#listaDeUsersRemover");
+                        }
+                    }
+                })
+            });
+
+            $('select#listaAlerta_remover').change(function () {
+                var alerta = $(this).val()
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/receiving/searchListasPorAlerta/',
+                    data: {
+                        csrfmiddlewaretoken: "{{ csrf_token }}",
+                        'alerta': alerta,
+                    },
+                    success: function (response) {
+                        $("#listaEscolhidaAlertaRemover").empty();
+                        for (elem in response.listaResposta[0].split(";")) {
+                            $("<option/>").html(response.listaResposta[0].split(";")[elem]).appendTo("#listaEscolhidaAlertaRemover");
+                        }
+                    }
+                })
+            });
+        })
+    </script>
+{% endblock %}

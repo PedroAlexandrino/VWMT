@@ -1,0 +1,271 @@
+{% extends "vware/baseArmazem.html" %}
+{% load static %}
+
+{% block body_title %}
+
+    <div class="text-primary">
+        <h6><b><i class="fa fa-home text-secondary"></i><a href={% url 'main:main' %}><span
+                class="text-secondary"> Home | </span></a> Shippers Tracking</b></h6>
+    </div>
+    <style>
+    </style>
+{% endblock %}
+
+
+{% block body_content %}
+    <div style="margin-top: 20px">
+        <table id="shipping" class="display" style="width:100%">
+            <thead>
+            <tr style="text-align: center">
+                <th>ID</th>
+                <th>Ship Date</th>
+                <th>Ship Time</th>
+                <th>City</th>
+                <th>Country</th>
+                <th>Carrier</th>
+                <th>FOB</th>
+                <th>Mode Of Transport</th>
+                <th>Vehicle ID</th>
+                <th>Total Master Packs</th>
+                <th>Confirmed</th>
+                <th>Item Number</th>
+                <th>Description</th>
+                <th>Qty to Ship</th>
+                <th>Qty Shipped</th>
+                <th>Botao</th>
+                <th>Dado</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for dados in dadosQAD %}
+                {% for gate in gateway.all %}
+                    {% if gate.primeiraMatricula in dados.vehicleID or gate.segundaMatricula in dados.vehicleID %}
+                        {% if gate.estado == 'verde' %}
+                            <tr>
+                                <th>{{ dados.id }}</th>
+                                <th>{{ dados.shipDate }}</th>
+                                <th>{{ dados.shipTime }}</th>
+                                <th>{{ dados.city }}</th>
+                                <th>{{ dados.country }}</th>
+                                <th>{{ dados.carrier }}</th>
+                                <th>{{ dados.fob }}</th>
+                                <th>{{ dados.modeOfTransport }}</th>
+                                <th style="background-color: yellow">{{ dados.vehicleID }}</th>
+                                <th>{{ dados.totalMasterPacks }}</th>
+                                <th>{{ dados.confirmed }}</th>
+                                <th>{{ dados.itemNumber }}</th>
+                                <th>{{ dados.description }}</th>
+                                <th>{{ dados.qtyToShip }}</th>
+                                <th>{{ dados.qtyShipped }}</th>
+                                <th>
+                                    <button class="btn btn-primary btn-xs" style="height: 15px">btn</button>
+                                </th>
+                                <th></th>
+                            </tr>
+                        {% elif gate.estado == 'terminado' %}
+                            <tr>
+                                <th>{{ dados.id }}</th>
+                                <th>{{ dados.shipDate }}</th>
+                                <th>{{ dados.shipTime }}</th>
+                                <th>{{ dados.city }}</th>
+                                <th>{{ dados.country }}</th>
+                                <th>{{ dados.carrier }}</th>
+                                <th>{{ dados.fob }}</th>
+                                <th>{{ dados.modeOfTransport }}</th>
+                                <th style="background-color: limegreen">{{ dados.vehicleID }}</th>
+                                <th>{{ dados.totalMasterPacks }}</th>
+                                <th>{{ dados.confirmed }}</th>
+                                <th>{{ dados.itemNumber }}</th>
+                                <th>{{ dados.description }}</th>
+                                <th>{{ dados.qtyToShip }}</th>
+                                <th>{{ dados.qtyShipped }}</th>
+                                <th>
+                                    <button class="btn btn-primary btn-xs" style="height: 15px">btn</button>
+                                </th>
+                                <th></th>
+                            </tr>
+                        {% endif %}
+                    {% else %}
+                        <tr>
+                            <th>{{ dados.id }}</th>
+                            <th>{{ dados.shipDate }}</th>
+                            <th>{{ dados.shipTime }}</th>
+                            <th>{{ dados.city }}</th>
+                            <th>{{ dados.country }}</th>
+                            <th>{{ dados.carrier }}</th>
+                            <th>{{ dados.fob }}</th>
+                            <th>{{ dados.modeOfTransport }}</th>
+                            <th>{{ dados.vehicleID }}</th>
+                            <th>{{ dados.totalMasterPacks }}</th>
+                            <th>{{ dados.confirmed }}</th>
+                            <th>{{ dados.itemNumber }}</th>
+                            <th>{{ dados.description }}</th>
+                            <th>{{ dados.qtyToShip }}</th>
+                            <th>{{ dados.qtyShipped }}</th>
+                            <th>
+                                <button class="btn btn-primary btn-xs" style="height: 15px">btn</button>
+                            </th>
+                            <th></th>
+                        </tr>
+                    {% endif %}
+                {% empty %}
+                    <tr>
+                        <th>{{ dados.id }}</th>
+                        <th>{{ dados.shipDate }}</th>
+                        <th>{{ dados.shipTime }}</th>
+                        <th>{{ dados.city }}</th>
+                        <th>{{ dados.country }}</th>
+                        <th>{{ dados.carrier }}</th>
+                        <th>{{ dados.fob }}</th>
+                        <th>{{ dados.modeOfTransport }}</th>
+                        <th>{{ dados.vehicleID }}</th>
+                        <th>{{ dados.totalMasterPacks }}</th>
+                        <th>{{ dados.confirmed }}</th>
+                        <th>{{ dados.itemNumber }}</th>
+                        <th>{{ dados.description }}</th>
+                        <th>{{ dados.qtyToShip }}</th>
+                        <th>{{ dados.qtyShipped }}</th>
+                        <th>
+                            <button class="btn btn-primary btn-xs" style="height: 15px">btn</button>
+                        </th>
+                        <th></th>
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+            </tbody>
+            <tfoot></tfoot>
+        </table>
+        <div style="position: absolute; right: 85px; bottom: 0">
+            <a href="#reportIssue" data-toggle="modal" data-target="#reportIssue" class="fas fa-info-circle"
+               style="font-size: 15px; height: 22px"> Help</a>
+        </div>
+    </div>
+    <div style="left: 45%; position: absolute" id="datepicker"></div>
+    <form method="POST" enctype="multipart/form-data" action="{% url 'shippers:reportTracking' %}">
+        {% csrf_token %}
+        <div class="modal fade" id="reportIssue" tabindex="-1" role="dialog"
+             aria-labelledby="myModalLabel">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: rgba(236,144,0,0.86)">
+                        <h4 class="modal-title" id="myModalLabel" style="margin-left: 45%; font-size: 40px"><i>HELP</i>
+                        </h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body"
+                         style="background: linear-gradient(to bottom, rgba(236,144,0,0.86) 0%, ghostwhite 100%); ">
+                        <div style="margin-top: 10px">
+                            <p style="font-size: 20px"><strong>Escreva aqui possíveis erros de utilização desta página
+                                em
+                                específico, ou deixe sugestões de melhoria</strong></p>
+                            <textarea class="form-control mt-n3" name="reportICDR" id="reportICDR" rows="11"
+                                      style="background-color: floralwhite; text-align: center;font-family:sans-serif;font-size:1.5em"
+                                      required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="background-color: ghostwhite">
+                        <button type="submit" id="submitReportICDR" class="btn btn-primary">Submeter</button>
+                        <button type="button" class="btn btn-primary" value="pending" data-dismiss="modal">Fechar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+{% endblock %}
+
+{% block javascript %}
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="/resources/demos/style.css">
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="/myJavascript.js?version=4"></script>
+    <script>
+        $(function () {
+            $("#datepicker").datepicker({
+                dateFormat: 'yy-m-d',
+                inline: true,
+                onSelect: function (dateText, inst) {
+                    var date = $("#datepicker").datepicker("getDate");
+                    var mes = date.getMonth();
+                    if (mes == 0)
+                        mes = "Janeiro"
+                    if (mes == 1)
+                        mes = "Fevereiro"
+                    if (mes == 2)
+                        mes = "Março"
+                    if (mes == 3)
+                        mes = "Abril"
+                    if (mes == 4)
+                        mes = "Maio"
+                    if (mes == 5)
+                        mes = "Junho"
+                    if (mes == 6)
+                        mes = "Julho"
+                    if (mes == 7)
+                        mes = "Agosto"
+                    if (mes == 8)
+                        mes = "Setembro"
+                    if (mes == 9)
+                        mes = "Outubro"
+                    if (mes == 10)
+                        mes = "Novembro"
+                    if (mes == 11)
+                        mes = "Dezembro"
+                    $("#requestDay").val($.datepicker.formatDate("dd-mm-yy", date))
+                    alert($.datepicker.formatDate("dd-mm-yy", date))
+                }
+            });
+        });
+
+        $(document).ready(function () {
+            // Setup - add a text input to each footer cell
+            $('#shipping thead tr').clone(true).appendTo('#shipping tfoot');
+            $('#shipping tfoot tr th').each(function (i) {
+                var title = $(this).text();
+                $(this).html('<input type="text" style="margin-left: -9px; text-align: center" class="form-control" placeholder=' + title + ' />');
+
+                $('input', this).on('keyup change', function () {
+                    if (table.column(i).search() !== this.value) {
+                        table
+                            .column(i)
+                            .search(this.value)
+                            .draw();
+                    }
+                });
+            });
+
+            var table = $('#shipping').DataTable({
+                paging: false,
+                info: false,
+                scrollY: 450,
+                scrollCollapse: true,
+                dom: 'frtipB',
+                float: 'right',
+                buttons: [
+                    'excel', 'pdf', 'print', 'copy'
+                ],
+            });
+            $('input:checkbox').on('change', function () {
+                // Run the search plugin
+                table.draw();
+            });
+
+            $('#shipping tbody').on('click', 'button', function () {
+                var data = table.row($(this).parents('tr')).data();
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/shippers/comparaMatriculas/',
+                    data: {
+                        csrfmiddlewaretoken: "{{ csrf_token }}",
+                        'matricula': data[8]
+                    },
+                    success: function () {
+                        window.location = "{% url 'shippers:tracking'  %}"
+                    }
+                })
+            });
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,395 @@
+{% extends "vware/baseArmazem.html" %}
+{% load static %}
+
+{% block body_title %}
+    <div class="text-primary">
+        <h6><b><i class="fa fa-home text-secondary"></i><a href={% url 'main:main' %}><span
+                class="text-secondary"> Home | </span></a> Configurations</b></h6>
+    </div>
+
+    <style>
+        .containerPrincipal {
+            height: 835px;
+            width: 100%;
+            top: 11px;
+            left: 0px;
+            position: relative;
+            border: 3px solid transparent;
+        }
+    </style>
+{% endblock %}
+
+
+{% block body_content %}
+
+
+    <div class="containerPrincipal">
+
+        <div style="width: 30%; height: 70%; top: 0px; left: 0px; position: absolute; border: 3px solid transparent;">
+            <table id="areaA" class="display" style="width:100%">
+                <thead style="margin-left: -9px">
+                <tr>
+                    <th>BP Dropin Supply</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for storageZone in areaA.all %}
+                    <tr>
+                        <td>{{ storageZone.storageZone }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+                <tfoot>
+                <th>
+                    <button class="btn btn-outline-dark" style="height: 16px; width: 70px; margin-left: -18px"
+                            data-toggle="modal"
+                            data-target="#addAreaA" id="adicionarAreaA">Add new
+                    </button>
+                    </br>
+                    <div id="removeButton">
+                        <button class="btn btn-outline-dark mt-1"
+                                style="height: 16px; width: 70px; margin-left: -18px"
+                                data-toggle="modal" data-target="#removerAreaA" name="removeAreaA" id="removeAreaA">
+                            Delete
+                        </button>
+                    </div>
+                </th>
+                </tfoot>
+            </table>
+        </div>
+        <div style="width: 30%; height: 70%; top: 0px; left: 35%; position: absolute; border: 3px solid transparent;">
+            <table id="areaB" class="display" style="width:100%">
+                <thead style="margin-left: -9px">
+                <tr>
+                    <th>FA Supply</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for storageZone in areaB.all %}
+                    <tr>
+                        <td>{{ storageZone.storageZone }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+                <tfoot>
+                <th>
+                    <button class="btn btn-outline-dark" style="height: 16px; width: 70px; margin-left: -18px"
+                            data-toggle="modal"
+                            data-target="#addAreaB" id="adicionarAreaB">Add new
+                    </button>
+                    </br>
+                    <div id="removeButton">
+                        <button class="btn btn-outline-dark mt-1"
+                                style="height: 16px; width: 70px; margin-left: -18px"
+                                data-toggle="modal" data-target="#removerAreaB" name="removeAreaB"
+                                id="removeAreaB">Delete
+                        </button>
+                    </div>
+                </th>
+                </tfoot>
+            </table>
+        </div>
+        <div style="width: 30%; height: 70%; top: 0px; right: 0%; position: absolute; border: 3px solid transparent;">
+            <table id="kardex" class="display" style="width:100%">
+                <thead style="margin-left: -9px">
+                <tr>
+                    <th>BP SMD Supply</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for storageZone in kardex.all %}
+                    <tr>
+                        <td>{{ storageZone.storageZone }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+                <tfoot>
+                <th>
+                    <button class="btn btn-outline-dark" style="height: 16px; width: 70px; margin-left: -18px"
+                            data-toggle="modal"
+                            data-target="#addKardex" id="adicionarKardex">Add new
+                    </button>
+                    </br>
+                    <div id="removeButton">
+                        <button class="btn btn-outline-dark mt-1"
+                                style="height: 16px; width: 70px; margin-left: -18px"
+                                data-toggle="modal" data-target="#removerKardex" name="removeKardex"
+                                id="removeKardex">Delete
+                        </button>
+                    </div>
+                </th>
+                </tfoot>
+            </table>
+        </div>
+        <form method="POST" enctype="multipart/form-data" action="{% url 'receiving:updateTimers' %}">
+            {% csrf_token %}
+            <div style="width: 30%; height: 25%; top: 70%; left: 35%; position: absolute; border: 3px solid transparent;">
+                <table id="timer" class="display" style="width:100%">
+                    <thead style="margin-left: -9px">
+                    <tr>
+                        <th>Timers (hours)</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for data in data.all %}
+                        <tr>
+                            <td>Red line in Table:</td>
+                            <td><input type="number" id="redLine" name="redLine" value="{{ data.redHour }}"></td>
+                        </tr>
+                        <tr>
+                            <td>Yellow line in Table:</td>
+                            <td><input type="number" id="yellowLine" name="yellowLine" value="{{ data.yellowHour }}"></td>
+                        </tr>
+                        <tr>
+                            <td>Red last Update Time:</td>
+                            <td><input type="number" id="redTime" name="redTime" value="{{ data.lastUpdateRed }}"></td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                    <tfoot>
+                    <th>
+                        <button type="submit" class="btn btn-outline-dark" style="margin-left: -18px"
+                                id="updateTimer">Update timers
+                        </button>
+                        </br>
+                    </th>
+                    </tfoot>
+                </table>
+            </div>
+        </form>
+    </div>
+    <div style="bottom: 0px; margin-left: 25px; position: absolute">
+        <h6><b><i class="fa fa-chevron-left text-secondary"></i><a href={% url 'receiving:mnfgSupply' %}><span
+                class="text-secondary"> Back </span></a></b></h6>
+    </div>
+
+    <form method="POST" class="form" action="{% url 'receiving:createAreaA' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal fade" id="addAreaA" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">Insert storage zone - BP Dropin Supply</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <h6><b>Insert storage zone</b></h6>
+                        <input type="text" name="newAreaA" id="newAreaA"/>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <form method="POST" class="form" action="{% url 'receiving:deleteAreaA' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal fade" id="removerAreaA" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">Delete storage zone - BP Dropin Supply</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="infoAreaA"></p>
+                        <input type="hidden" name="nomeAreaA" id="nomeAreaA" value="{{ nomeAreaA }}"/>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Confirm</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+    <form method="POST" class="form" action="{% url 'receiving:createAreaB' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal fade" id="addAreaB" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">Insert storage zone - FA Supply</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <h6><b>Insert storage zone</b></h6>
+                        <input style="width: 440px" type="text" name="newAreaB" id="newAreaB"/>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+    <form method="POST" class="form" action="{% url 'receiving:deleteAreaB' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal fade" id="removerAreaB" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">Delete storage zone - FA Supply</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="infoAreaB"></p>
+                        <input type="hidden" name="nomeAreaB" id="nomeAreaB" value="{{ nomeAreaB }}"/>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Confirm</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <form method="POST" class="form" action="{% url 'receiving:createKardex' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal fade" id="addKardex" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">Insert storage zone - BP SMD Supply</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <h6><b>Insert storage zone</b></h6>
+                        <input style="width: 440px" type="text" name="newKardex" id="newKardex"/>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+    <form method="POST" class="form" action="{% url 'receiving:deleteKardex' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal fade" id="removerKardex" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">Delete storage zone - BP SMD Supply</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="infoKardex"></p>
+                        <input type="hidden" name="nomeKardex" id="nomeKardex" value="{{ nomeKardex }}"/>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Confirm</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+{% endblock %}
+
+{% block javascript %}
+
+    <script>
+        $(document).ready(function () {
+            var tableAreaA = $('#areaA').DataTable({
+                "searching": false,
+                "info": false,
+                "paging": false,
+                "ordering": false,
+                "scrollCollapse": true,
+                "scrollY": "420px",
+                "select": {
+                    style: 'os',
+                    items: 'cell'
+                },
+            });
+
+            $('#areaA tbody').on('click', 'tr', function () {
+                var storageZone = tableAreaA.row($(this)).data();
+                var modalInfo = "Want to delete " + storageZone + "?";
+                $('#infoAreaA').html(modalInfo);
+                $('#nomeAreaA').val(storageZone);
+                $('#removeButton').on('click', 'button', function () {
+                });
+            });
+        });
+
+        $(document).ready(function () {
+            var tableAreaB = $('#areaB').DataTable({
+                "searching": false,
+                "info": false,
+                "paging": false,
+                "ordering": false,
+                "scrollCollapse": true,
+                "scrollY": "420px",
+                "select": {
+                    style: 'os',
+                    items: 'cell'
+                },
+            });
+            $('#areaB tbody').on('click', 'tr', function () {
+                var storageZone = tableAreaB.row($(this)).data();
+                var modalInfo = "Want to delete " + storageZone + "?";
+                $('#infoAreaB').html(modalInfo);
+                $('#nomeAreaB').val(storageZone);
+                $('#removeButton').on('click', 'button', function () {
+                });
+            });
+        });
+
+        $(document).ready(function () {
+            var tableKardex = $('#kardex').DataTable({
+                "searching": false,
+                "info": false,
+                "paging": false,
+                "ordering": false,
+                "scrollCollapse": true,
+                "scrollY": "420px",
+                "select": {
+                    style: 'os',
+                    items: 'cell'
+                },
+            });
+            $('#kardex tbody').on('click', 'tr', function () {
+                var storageZone = tableKardex.row($(this)).data();
+                var modalInfo = "Want to delete " + storageZone + "?";
+                $('#infoKardex').html(modalInfo);
+                $('#nomeKardex').val(storageZone);
+                $('#removeButton').on('click', 'button', function () {
+                });
+            });
+        });
+
+        $(document).ready(function () {
+            var tableTimer = $('#timer').DataTable({
+                "searching": false,
+                "info": false,
+                "paging": false,
+                "ordering": false,
+                "scrollCollapse": true,
+                "scrollY": "420px",
+            });
+        });
+
+    </script>
+{% endblock %}

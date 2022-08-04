@@ -1,0 +1,1025 @@
+{% extends "vware/baseArmazem.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block body_title %}
+    <div class="text-primary">
+        <h6><b><i class="fa fa-home text-secondary"></i><a href={% url 'main:main' %}><span
+                class="text-secondary"> Home | </span></a> Shipping Operations</b></h6>
+    </div>
+    <style>
+        .containerPrincipal {
+            height: 835px;
+            width: 100%;
+            top: 11px;
+            left: 0px;
+            position: relative;
+            border: 3px solid transparent;
+        }
+
+        .containerCima {
+            height: 400px;
+            width: 100%;
+            top: 17px;
+            left: 0px;
+            position: absolute;
+            border: 3px solid transparent;
+        }
+
+        .containerBaixo {
+            height: 400px;
+            width: 100%;
+            top: 400px;
+            right: 0%;
+            position: absolute;
+            border: 3px solid transparent;
+        }
+
+    </style>
+{% endblock %}
+
+{% block body_content %}
+    <div class="containerPrincipal">
+        <table id="tabelaShippingOperation" class="display" style="width:100%">
+            <thead>
+            <tr>
+                <th>OPERATIONS</th>
+                <th class="text-center">VER SHIPPERS_ IMPRESSAO PICKLIST E CHECKLIST</th>
+                <th class="text-center">REQUISIÇÃO MATERIAL MECALUX</th>
+                <th class="text-center">ASSOCIAÇÃO AO SHIPPER</th>
+                <th class="text-center">OEM_ PALETIZAÇÃO E LABELLING</th>
+                <th class="text-center">PROCESSO DE FATURAÇÃO</th>
+                <th class="text-center">VALIDAÇÃO CHECKLIST</th>
+                <th class="text-center">CARREGAR VEÍCULOS</th>
+                <th class="text-center">CARIMBAR_ASSINAR_ARQUIVAR DOCUMENTOS</th>
+                <th class="text-center">OTHER OPERATIONS</th>
+                <th class="text-center">REQUEST FOR SHIPPER</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>
+                    <div class="text-center">QPS</div>
+                </td>
+                <td id="1" style="text-align: center">
+                    <a class="fas fa-list-alt fa-2x" data-toggle="modal" data-target="#one"></a>
+                </td>
+                <td id="2" style="text-align: center">
+                    <a class="fas fa-list-alt fa-2x" data-toggle="modal" data-target="#two"></a>
+                </td>
+                <td id="3" style="text-align: center">
+                    <a class="fas fa-list-alt fa-2x" data-toggle="modal" data-target="#three"></a>
+                </td>
+                <td id="4" style="text-align: center">
+                    <a class="fas fa-list-alt fa-2x" data-toggle="modal" data-target="#four"></a>
+                </td>
+                <td id="5" style="text-align: center">
+                    <a class="fas fa-list-alt fa-2x" data-toggle="modal" data-target="#five"></a>
+                </td>
+                <td id="6" style="text-align: center">
+                    <a class="fas fa-list-alt fa-2x" data-toggle="modal" data-target="#six"></a>
+                </td>
+                <td id="7" style="text-align: center">
+                    <a class="fas fa-list-alt fa-2x" data-toggle="modal" data-target="#seven"></a>
+                </td>
+                <td id="8" style="text-align: center">
+                    <a class="fas fa-list-alt fa-2x" data-toggle="modal" data-target="#eight"></a>
+                </td>
+                <td id="others" style="text-align: center">
+                    <a class="fas fa-list-alt fa-2x" data-toggle="modal" data-target="#other"></a>
+                </td>
+                <td id="operation" style="text-align: center">
+                    <a class="fas fa-list-alt fa-2x" data-toggle="modal" data-target="#operations"></a>
+                </td>
+                <td>
+                    <div class="fas fa-edit" id="configurations" name="configurations"></div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+
+    <div class="modal fade" id="one" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Shipping Operations</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    {% for row in shippingOperation.all %}
+                        {% if row.one %}
+                            <a href="{{ row.one.url }}"
+                               target="_blank" class="link-primary"><b>{{ row.one.url|slice:'20:' }}
+                            </b></a></br></br>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" value="close" data-dismiss="modal">close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="two" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Shipping Operations</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    {% for row in shippingOperation.all %}
+                        {% if row.two %}
+                            <a href="{{ row.two.url }}"
+                               target="_blank" class="link-primary"><b>{{ row.two.url|slice:'20:' }}
+                            </b></a></br></br>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" value="close" data-dismiss="modal">close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="three" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Shipping Operations</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    {% for row in shippingOperation.all %}
+                        {% if row.three %}
+                            <a href="{{ row.three.url }}"
+                               target="_blank" class="link-primary"><b>{{ row.three.url|slice:'22:' }}
+                            </b></a></br></br>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" value="close" data-dismiss="modal">close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="four" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Shipping Operations</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    {% for row in shippingOperation.all %}
+                        {% if row.four %}
+                            <a href="{{ row.four.url }}"
+                               target="_blank" class="link-primary"><b>{{ row.four.url|slice:'21:' }}
+                            </b></a></br></br>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" value="close" data-dismiss="modal">close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="five" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Shipping Operations</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    {% for row in shippingOperation.all %}
+                        {% if row.five %}
+                            <a href="{{ row.five.url }}"
+                               target="_blank" class="link-primary"><b>{{ row.five.url|slice:'21:' }}
+                            </b></a></br></br>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" value="close" data-dismiss="modal">close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="six" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Shipping Operations</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    {% for row in shippingOperation.all %}
+                        {% if row.six %}
+                            <a href="{{ row.six.url }}"
+                               target="_blank" class="link-primary"><b>{{ row.six.url|slice:'20:' }}
+                            </b></a></br></br>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" value="close" data-dismiss="modal">close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="seven" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Shipping Operations</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    {% for row in shippingOperation.all %}
+                        {% if row.seven %}
+                            <a href="{{ row.seven.url }}"
+                               target="_blank" class="link-primary"><b>{{ row.seven.url|slice:'22:' }}
+                            </b></a></br></br>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" value="close" data-dismiss="modal">close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="eight" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Shipping Operations</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    {% for row in shippingOperation.all %}
+                        {% if row.eight %}
+                            <a href="{{ row.eight.url }}"
+                               target="_blank" class="link-primary"><b>{{ row.eight.url|slice:'22:' }}
+                            </b></a></br></br>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" value="close" data-dismiss="modal">close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="other" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Shipping Operations</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    {% for row in shippingOperation.all %}
+                        {% if row.others %}
+                            <a href="{{ row.others.url }}"
+                               target="_blank" class="link-primary"><b>{{ row.others.url|slice:'23:' }}
+                            </b></a></br></br>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" value="close" data-dismiss="modal">close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="operations" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Shipping Operations</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    {% for row in shippingOperation.all %}
+                        {% if row.requestShippers %}
+                            <a href="{{ row.requestShippers.url }}"
+                               target="_blank" class="link-primary"><b>{{ row.requestShippers.url|slice:'32:' }}
+                            </b></a></br></br>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" value="close" data-dismiss="modal">close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <form method="POST" action="{% url 'vware:configurationShippingOperation' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal fade" id="configurationsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel" style="margin-left: 40%">Shipping Operations</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+
+                        <div class="rounded mx-auto form p-4"
+                             style="background-image: url('{% static "fundo.png" %}'); opacity: 85%">
+                            <div class="row">
+                                <div class="column">
+                                    <p>VER SHIPPERS_ IMPRESSAO PICKLIST E CHECKLIST </p>
+                                    <p>REQUISIÇÃO MATERIAL MECALUX </p>
+                                    <p>ASSOCIAÇÃO AO SHIPPER </p>
+                                    <p>OEM_ PALETIZAÇÃO E LABELLING </p>
+                                    <p>PROCESSO DE FATURAÇÃO </p>
+                                    <p>VALIDAÇÃO CHECKLIST </p>
+                                    <p>CARREGAR VEÍCULOS </p>
+                                    <p>CARIMBAR_ASSINAR_ARQUIVAR DOCUMENTOS </p>
+                                    <p>OTHER OPERATIONS </p>
+                                    <p>REQUEST FOR SHIPPER </p>
+                                </div>
+                                <div class="column" style="margin-left: 50px">
+                                    <input type="file" id="one" name="one" multiple></br>
+                                    <input type="file" id="two" name="two" multiple style="margin-top: 9px"></br>
+                                    <input type="file" id="three" name="three" multiple style="margin-top: 9px"></br>
+                                    <input type="file" id="four" name="four" multiple style="margin-top: 9px"></br>
+                                    <input type="file" id="five" name="five" multiple style="margin-top: 9px"></br>
+                                    <input type="file" id="six" name="six" multiple style="margin-top: 9px"></br>
+                                    <input type="file" id="seven" name="seven" multiple style="margin-top: 9px"></br>
+                                    <input type="file" id="eight" name="eight" multiple style="margin-top: 9px"></br>
+                                    <input type="file" id="other" name="other" multiple style="margin-top: 9px"></br>
+                                    <input type="file" id="requestShipper" name="requestShipper" multiple
+                                           style="margin-top: 9px"></br>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit">Submit</button>
+                        <button type="button" value="close" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+
+        $(document).ready(function () {
+            var tableShippingOperation = $('#tabelaShippingOperation').DataTable({
+                "info": false,
+                "paging": false,
+                "ordering": false,
+                "searching": false,
+                "scrollX": 500,
+            });
+
+            $('#tabelaShippingOperation tbody').on('click', '#configurations', function () {
+                var myModal = new bootstrap.Modal(document.getElementById('configurationsModal'))
+                myModal.show()
+            });
+
+
+            {% comment %}$('#tabelaShippingOperation tbody').on('click', '#2', function () {
+                $('#diretorias').html("");
+                $('#ficheiros').html("");
+                var myModal = new bootstrap.Modal(document.getElementById('shippingOperationModal'))
+                myModal.show()
+
+                //var caminho = "W:\\sharedir\\MP&L\\PROCEDIMENTOS\\Shipping\\QPS Shipping"
+
+                $.ajax({
+                    type: 'GET',
+                    url: '{% url 'vware:two' %}',
+                    data:
+                        {
+                            csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                        },
+                    success: function (response) {
+
+                        if (response.directory[0] != null) {
+                            let diretorias = replaceCommaLine(response.directory.toString());
+                            $('#diretorias').html(diretorias);
+                        }
+                        if (response.files[0] != null) {
+                            let ficheiros = replaceCommaLine(response.files.toString());
+                            $('#ficheiros').html(ficheiros);
+                        }
+
+                        function replaceCommaLine(data) {
+                            //convert string to array and remove whitespace
+                            let dataToArray = data.split(',').map(item => item.trim());
+                            //convert array to string replacing comma with new line
+                            return dataToArray.join("</br>");
+                        }
+
+                        var tableFile = $('#files').DataTable({
+                            "autoWidth": false,
+                            "info": false,
+                            "searching": false,
+                            "paging": false,
+                            "ordering": false,
+                            "destroy": true,
+                            "retrieve": true,
+                            "ajax": {
+                                "url": '{% url 'vware:two' %}',
+                                "dataSrc": "dict"
+                            },
+                            "columns": [{data: "file"}]
+                        });
+
+                        var tableDir = $('#directories').DataTable({
+                            "autoWidth": false,
+                            "info": false,
+                            "searching": false,
+                            "paging": false,
+                            "ordering": false,
+                            "destroy": true,
+                            "retrieve": true,
+                            "ajax": {
+                                "url": '{% url 'vware:two' %}',
+                                "dataSrc": "dictDirectories"
+                            },
+                            "columns": [{data: "directories"}]
+                        });
+                    }
+                });
+            });
+
+            $('#tabelaShippingOperation tbody').on('click', '#3', function () {
+                $('#diretorias').html("");
+                $('#ficheiros').html("");
+                var myModal = new bootstrap.Modal(document.getElementById('shippingOperationModal'))
+                myModal.show()
+
+                //var caminho = "W:\\sharedir\\MP&L\\PROCEDIMENTOS\\Shipping\\QPS Shipping"
+
+                $.ajax({
+                    type: 'GET',
+                    url: '{% url 'vware:three' %}',
+                    data:
+                        {
+                            csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                        },
+                    success: function (response) {
+
+                        if (response.directory[0] != null) {
+                            let diretorias = replaceCommaLine(response.directory.toString());
+                            $('#diretorias').html(diretorias);
+                        }
+                        if (response.files[0] != null) {
+                            let ficheiros = replaceCommaLine(response.files.toString());
+                            $('#ficheiros').html(ficheiros);
+                        }
+
+                        function replaceCommaLine(data) {
+                            //convert string to array and remove whitespace
+                            let dataToArray = data.split(',').map(item => item.trim());
+                            //convert array to string replacing comma with new line
+                            return dataToArray.join("</br>");
+                        }
+
+                        var tableFile = $('#files').DataTable({
+                            "autoWidth": false,
+                            "info": false,
+                            "searching": false,
+                            "paging": false,
+                            "ordering": false,
+                            "destroy": true,
+                            "retrieve": true,
+                            "ajax": {
+                                "url": '{% url 'vware:three' %}',
+                                "dataSrc": "dict"
+                            },
+                            "columns": [{data: "file"}]
+                        });
+
+                        tableFile.ajax.reload()
+
+                        var tableDir = $('#directories').DataTable({
+                            "autoWidth": false,
+                            "info": false,
+                            "searching": false,
+                            "paging": false,
+                            "ordering": false,
+                            "destroy": true,
+                            "retrieve": true,
+                            "ajax": {
+                                "url": '{% url 'vware:three' %}',
+                                "dataSrc": "dictDirectories"
+                            },
+                            "columns": [{data: "directories"}]
+                        });
+                        tableDir.ajax.reload()
+                    }
+                });
+            });
+
+            $('#tabelaShippingOperation tbody').on('click', '#4', function () {
+                $('#diretorias').html("");
+                $('#ficheiros').html("");
+                var myModal = new bootstrap.Modal(document.getElementById('shippingOperationModal'))
+                myModal.show()
+
+                //var caminho = "W:\\sharedir\\MP&L\\PROCEDIMENTOS\\Shipping\\QPS Shipping"
+
+                $.ajax({
+                    type: 'GET',
+                    url: '{% url 'vware:four' %}',
+                    data:
+                        {
+                            csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                        },
+                    success: function (response) {
+
+                        if (response.directory[0] != null) {
+                            let diretorias = replaceCommaLine(response.directory.toString());
+                            $('#diretorias').html(diretorias);
+                        }
+                        if (response.files[0] != null) {
+                            let ficheiros = replaceCommaLine(response.files.toString());
+                            $('#ficheiros').html(ficheiros);
+                        }
+
+                        function replaceCommaLine(data) {
+                            //convert string to array and remove whitespace
+                            let dataToArray = data.split(',').map(item => item.trim());
+                            //convert array to string replacing comma with new line
+                            return dataToArray.join("</br>");
+                        }
+
+                        var tableFile = $('#files').DataTable({
+                            "autoWidth": false,
+                            "info": false,
+                            "searching": false,
+                            "paging": false,
+                            "ordering": false,
+                            "destroy": true,
+                            "retrieve": true,
+                            "ajax": {
+                                "url": '{% url 'vware:four' %}',
+                                "dataSrc": "dict"
+                            },
+                            "columns": [{data: "file"}]
+                        });
+
+                        var tableDir = $('#directories').DataTable({
+                            "autoWidth": false,
+                            "info": false,
+                            "searching": false,
+                            "paging": false,
+                            "ordering": false,
+                            "destroy": true,
+                            "retrieve": true,
+                            "ajax": {
+                                "url": '{% url 'vware:four' %}',
+                                "dataSrc": "dictDirectories"
+                            },
+                            "columns": [{data: "directories"}]
+                        });
+                    }
+                });
+            });
+
+            $('#tabelaShippingOperation tbody').on('click', '#5', function () {
+                $('#diretorias').html("");
+                $('#ficheiros').html("");
+                var myModal = new bootstrap.Modal(document.getElementById('shippingOperationModal'))
+                myModal.show()
+
+                //var caminho = "W:\\sharedir\\MP&L\\PROCEDIMENTOS\\Shipping\\QPS Shipping"
+
+                $.ajax({
+                    type: 'GET',
+                    url: '{% url 'vware:five' %}',
+                    data:
+                        {
+                            csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                        },
+                    success: function (response) {
+
+                        if (response.directory[0] != null) {
+                            let diretorias = replaceCommaLine(response.directory.toString());
+                            $('#diretorias').html(diretorias);
+                        }
+                        if (response.files[0] != null) {
+                            let ficheiros = replaceCommaLine(response.files.toString());
+                            $('#ficheiros').html(ficheiros);
+                        }
+
+                        function replaceCommaLine(data) {
+                            //convert string to array and remove whitespace
+                            let dataToArray = data.split(',').map(item => item.trim());
+                            //convert array to string replacing comma with new line
+                            return dataToArray.join("</br>");
+                        }
+
+                        var tableFile = $('#files').DataTable({
+                            "autoWidth": false,
+                            "info": false,
+                            "searching": false,
+                            "paging": false,
+                            "ordering": false,
+                            "destroy": true,
+                            "retrieve": true,
+                            "ajax": {
+                                "url": '{% url 'vware:five' %}',
+                                "dataSrc": "dict"
+                            },
+                            "columns": [{data: "file"}]
+                        });
+
+                        var tableDir = $('#directories').DataTable({
+                            "autoWidth": false,
+                            "info": false,
+                            "searching": false,
+                            "paging": false,
+                            "ordering": false,
+                            "destroy": true,
+                            "retrieve": true,
+                            "ajax": {
+                                "url": '{% url 'vware:five' %}',
+                                "dataSrc": "dictDirectories"
+                            },
+                            "columns": [{data: "directories"}]
+                        });
+                    }
+                });
+            });
+
+            $('#tabelaShippingOperation tbody').on('click', '#6', function () {
+                $('#diretorias').html("");
+                $('#ficheiros').html("");
+                var myModal = new bootstrap.Modal(document.getElementById('shippingOperationModal'))
+                myModal.show()
+
+                //var caminho = "W:\\sharedir\\MP&L\\PROCEDIMENTOS\\Shipping\\QPS Shipping"
+
+                $.ajax({
+                    type: 'GET',
+                    url: '{% url 'vware:six' %}',
+                    data:
+                        {
+                            csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                        },
+                    success: function (response) {
+
+                        if (response.directory[0] != null) {
+                            let diretorias = replaceCommaLine(response.directory.toString());
+                            $('#diretorias').html(diretorias);
+                        }
+                        if (response.files[0] != null) {
+                            let ficheiros = replaceCommaLine(response.files.toString());
+                            $('#ficheiros').html(ficheiros);
+                        }
+
+                        function replaceCommaLine(data) {
+                            //convert string to array and remove whitespace
+                            let dataToArray = data.split(',').map(item => item.trim());
+                            //convert array to string replacing comma with new line
+                            return dataToArray.join("</br>");
+                        }
+
+                        var tableFile = $('#files').DataTable({
+                            "autoWidth": false,
+                            "info": false,
+                            "searching": false,
+                            "paging": false,
+                            "ordering": false,
+                            "destroy": true,
+                            "retrieve": true,
+                            "ajax": {
+                                "url": '{% url 'vware:six' %}',
+                                "dataSrc": "dict"
+                            },
+                            "columns": [{data: "file"}]
+                        });
+
+                        var tableDir = $('#directories').DataTable({
+                            "autoWidth": false,
+                            "info": false,
+                            "searching": false,
+                            "paging": false,
+                            "ordering": false,
+                            "destroy": true,
+                            "retrieve": true,
+                            "ajax": {
+                                "url": '{% url 'vware:six' %}',
+                                "dataSrc": "dictDirectories"
+                            },
+                            "columns": [{data: "directories"}]
+                        });
+                    }
+                });
+            });
+
+            $('#tabelaShippingOperation tbody').on('click', '#7', function () {
+                $('#diretorias').html("");
+                $('#ficheiros').html("");
+                var myModal = new bootstrap.Modal(document.getElementById('shippingOperationModal'))
+                myModal.show()
+
+                //var caminho = "W:\\sharedir\\MP&L\\PROCEDIMENTOS\\Shipping\\QPS Shipping"
+
+                $.ajax({
+                    type: 'GET',
+                    url: '{% url 'vware:seven' %}',
+                    data:
+                        {
+                            csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                        },
+                    success: function (response) {
+
+                        if (response.directory[0] != null) {
+                            let diretorias = replaceCommaLine(response.directory.toString());
+                            $('#diretorias').html(diretorias);
+                        }
+                        if (response.files[0] != null) {
+                            let ficheiros = replaceCommaLine(response.files.toString());
+                            $('#ficheiros').html(ficheiros);
+                        }
+
+                        function replaceCommaLine(data) {
+                            //convert string to array and remove whitespace
+                            let dataToArray = data.split(',').map(item => item.trim());
+                            //convert array to string replacing comma with new line
+                            return dataToArray.join("</br>");
+                        }
+
+                        var tableFile = $('#files').DataTable({
+                            "autoWidth": false,
+                            "info": false,
+                            "searching": false,
+                            "paging": false,
+                            "ordering": false,
+                            "destroy": true,
+                            "retrieve": true,
+                            "ajax": {
+                                "url": '{% url 'vware:seven' %}',
+                                "dataSrc": "dict"
+                            },
+                            "columns": [{data: "file"}]
+                        });
+
+                        var tableDir = $('#directories').DataTable({
+                            "autoWidth": false,
+                            "info": false,
+                            "searching": false,
+                            "paging": false,
+                            "ordering": false,
+                            "destroy": true,
+                            "retrieve": true,
+                            "ajax": {
+                                "url": '{% url 'vware:seven' %}',
+                                "dataSrc": "dictDirectories"
+                            },
+                            "columns": [{data: "directories"}]
+                        });
+                    }
+                });
+            });
+
+            $('#tabelaShippingOperation tbody').on('click', '#8', function () {
+                $('#diretorias').html("");
+                $('#ficheiros').html("");
+                var myModal = new bootstrap.Modal(document.getElementById('shippingOperationModal'))
+                myModal.show()
+
+                //var caminho = "W:\\sharedir\\MP&L\\PROCEDIMENTOS\\Shipping\\QPS Shipping"
+
+                $.ajax({
+                    type: 'GET',
+                    url: '{% url 'vware:eight' %}',
+                    data:
+                        {
+                            csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                        },
+                    success: function (response) {
+
+                        if (response.directory[0] != null) {
+                            let diretorias = replaceCommaLine(response.directory.toString());
+                            $('#diretorias').html(diretorias);
+                        }
+                        if (response.files[0] != null) {
+                            let ficheiros = replaceCommaLine(response.files.toString());
+                            $('#ficheiros').html(ficheiros);
+                        }
+
+                        function replaceCommaLine(data) {
+                            //convert string to array and remove whitespace
+                            let dataToArray = data.split(',').map(item => item.trim());
+                            //convert array to string replacing comma with new line
+                            return dataToArray.join("</br>");
+                        }
+
+                        var tableFile = $('#files').DataTable({
+                            "autoWidth": false,
+                            "info": false,
+                            "searching": false,
+                            "paging": false,
+                            "ordering": false,
+                            "destroy": true,
+                            "retrieve": true,
+                            "ajax": {
+                                "url": '{% url 'vware:eight' %}',
+                                "dataSrc": "dict"
+                            },
+                            "columns": [{data: "file"}]
+                        });
+
+                        var tableDir = $('#directories').DataTable({
+                            "autoWidth": false,
+                            "info": false,
+                            "searching": false,
+                            "paging": false,
+                            "ordering": false,
+                            "destroy": true,
+                            "retrieve": true,
+                            "ajax": {
+                                "url": '{% url 'vware:eight' %}',
+                                "dataSrc": "dictDirectories"
+                            },
+                            "columns": [{data: "directories"}]
+                        });
+                    }
+                });
+            });
+
+            $('#tabelaShippingOperation tbody').on('click', '#others', function () {
+                $('#diretorias').html("");
+                $('#ficheiros').html("");
+                var myModal = new bootstrap.Modal(document.getElementById('shippingOperationModal'))
+                myModal.show()
+
+                //var caminho = "W:\\sharedir\\MP&L\\PROCEDIMENTOS\\Shipping\\QPS Shipping"
+
+                $.ajax({
+                    type: 'GET',
+                    url: '{% url 'vware:others' %}',
+                    data:
+                        {
+                            csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                        },
+                    success: function (response) {
+
+                        if (response.directory[0] != null) {
+                            let diretorias = replaceCommaLine(response.directory.toString());
+                            $('#diretorias').html(diretorias);
+                        }
+                        if (response.files[0] != null) {
+                            let ficheiros = replaceCommaLine(response.files.toString());
+                            $('#ficheiros').html(ficheiros);
+                        }
+
+                        function replaceCommaLine(data) {
+                            //convert string to array and remove whitespace
+                            let dataToArray = data.split(',').map(item => item.trim());
+                            //convert array to string replacing comma with new line
+                            return dataToArray.join("</br>");
+                        }
+
+                        var tableFile = $('#files').DataTable({
+                            "autoWidth": false,
+                            "info": false,
+                            "searching": false,
+                            "paging": false,
+                            "ordering": false,
+                            "destroy": true,
+                            "retrieve": true,
+                            "ajax": {
+                                "url": '{% url 'vware:others' %}',
+                                "dataSrc": "dict"
+                            },
+                            "columns": [{data: "file"}]
+                        });
+
+                        var tableDir = $('#directories').DataTable({
+                            "autoWidth": false,
+                            "info": false,
+                            "searching": false,
+                            "paging": false,
+                            "ordering": false,
+                            "destroy": true,
+                            "retrieve": true,
+                            "ajax": {
+                                "url": '{% url 'vware:others' %}',
+                                "dataSrc": "dictDirectories"
+                            },
+                            "columns": [{data: "directories"}]
+                        });
+                    }
+                });
+            });
+
+            $('#tabelaShippingOperation tbody').on('click', '#operation', function () {
+                $('#diretorias').html("");
+                $('#ficheiros').html("");
+
+                var myModal = new bootstrap.Modal(document.getElementById('shippingOperationModal'))
+                myModal.show()
+
+                //var caminho = "W:\\sharedir\\MP&L\\PROCEDIMENTOS\\Shipping\\QPS Shipping"
+
+                $.ajax({
+                    type: 'GET',
+                    url: '{% url 'vware:operation' %}',
+                    data:
+                        {
+                            csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                        },
+                    success: function (response) {
+
+                        if (response.directory[0] != null) {
+                            let diretorias = replaceCommaLine(response.directory.toString());
+                            $('#diretorias').html(diretorias);
+                        }
+                        if (response.files[0] != null) {
+                            let ficheiros = replaceCommaLine(response.files.toString());
+                            $('#ficheiros').html(ficheiros);
+                        }
+
+                        function replaceCommaLine(data) {
+                            //convert string to array and remove whitespace
+                            let dataToArray = data.split(',').map(item => item.trim());
+                            //convert array to string replacing comma with new line
+                            return dataToArray.join("</br>");
+                        }
+
+                        tableFile.destroy();
+                        var tableFile = $('#files').DataTable({
+                            "autoWidth": false,
+                            "info": false,
+                            "searching": false,
+                            "paging": false,
+                            "ordering": false,
+                            "destroy": true,
+                            "ajax": {
+                                "url": '{% url 'vware:operation' %}',
+                                "dataSrc": "dict"
+                            },
+                            "columns": [{data: "file"}]
+                        });
+
+                        tableDir.destroy();
+                        var tableDir = $('#directories').DataTable({
+                            "autoWidth": false,
+                            "info": false,
+                            "searching": false,
+                            "paging": false,
+                            "ordering": false,
+                            "destroy": true,
+                            "ajax": {
+                                "url": '{% url 'vware:operation' %}',
+                                "dataSrc": "dictDirectories"
+                            },
+                            "columns": [{data: "directories"}]
+                        });
+                    }
+                });
+            });{% endcomment %}
+        });
+    </script>
+{% endblock %}

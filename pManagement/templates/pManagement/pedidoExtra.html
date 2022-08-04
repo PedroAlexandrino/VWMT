@@ -1,0 +1,121 @@
+{% extends "vware/baseArmazem.html" %}
+{% load static %}
+
+{% block body_title %}
+
+    <div class="text-primary">
+        <h6><b><i class="fa fa-home text-secondary"></i><a href={% url 'pManagement:requests' %}><span
+                class="text-secondary"> Home | </span></a> Customer Packing</b></h6>
+    </div>
+{% endblock %}
+
+
+{% block body_content %}
+    <style>
+
+        .container3 {
+            height: 800px;
+            position: center;
+        }
+
+        .child {
+            margin: 0;
+            position: absolute;
+            width: 1000px;
+            top: 53%;
+            left: 53%;
+            -ms-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%);
+        }
+
+    </style>
+    <br/>
+    <div class="container3">
+        <div class="child">
+            <form method="POST" class="rounded col-xl-5 col-lg-6 col-md-8 col-sm-20 mx-auto form p-4"
+                  style="background-image: url('{% static "fundo.png" %}'); opacity: 85%"
+                  action="{% url 'pManagement:pedidoExtra' %}"
+                  enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="text-center" style="color: black"><h1><b>Create request</b></h1></div>
+                <br/>
+                <table class="table table-borderless mb-n1">
+                    <thead>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <th scope="row" style="color: black"><h6><b>OEM</b></h6></th>
+                        <td><select id="oem" , name="oem">
+                            <option>Select option</option>
+                            {% for client in clientes.all %}
+                                <option value="{{ client.oem }}">{{ client.oem }}</option>
+                            {% endfor %}
+                        </select></td>
+                    </tr>
+                    {% if erro %}
+                        <div class="text-center mb-n2">
+                            <b>{{ erro }}</b>
+                        </div>
+                    {% endif %}
+                    <tr>
+                        <th scope="row" style="color: black"><h6><b>Product</b></h6></th>
+                        <td><input type="text" name="produto" id="produto"/></td>
+                    </tr>
+                    <tr>
+                        <th scope="row" style="color: black"><h6><b>Package</b></h6></th>
+                        <td><input type="text" name="embalagem" id="embalagem"/></td>
+                    </tr>
+                    <tr>
+                        <th scope="row" style="color: black"><h6><b>Quantity</b></h6></th>
+                        <td><input type="number" name="quantidade" id="quantidade"/></td>
+                    </tr>
+                    <tr>
+                        <th scope="row" style="color: black"><h6><b>Link</b></h6></th>
+                        <td><input type="file" name="link" id="link"/></td>
+                    </tr>
+
+                    </tbody>
+                </table>
+                {% if erro2 %}
+                    <div class="text-center">
+                        <b>{{ erro2 }}</b>
+                    </div>
+                {% endif %}
+                <br/>
+                <div class="text-center">
+                    <a href={% url 'pManagement:pedidoExtra' %}>
+                        <button type="submit" class="btn btn-secondary ml-n4" value="Add product" %}>
+                            Submit
+                        </button>
+                    </a>
+                </div>
+                <div class="text-right mb-n3">
+                    <a class="text-dark" href={% url 'pManagement:requests' %}><b>Back</b></a>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        $(document).on('submit', '#post-form', function (e) {
+            e.preventDefault();
+
+            $.ajax({
+                type: 'POST',
+                url: '/createExtra',
+                data: {
+                    oem: $(#oem).val(),
+                    produto: $(#produto).val(),
+                    embalagem: $(#embalagem).val(),
+                    quantidade: $(#quantidade).val(),
+                    link: $(#link).val(),
+                },
+                success: function () {
+
+                }
+            })
+        })
+    </script>
+{% endblock %}

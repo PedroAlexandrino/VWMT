@@ -1,0 +1,353 @@
+{% extends "vware/baseArmazem.html" %}
+{% load static %}
+
+{% block body_title %}
+
+    <div class="text-primary">
+        <h6><b><i class="fa fa-home text-secondary"></i><a href={% url 'main:main' %}><span
+                class="text-secondary"> Home | </span></a> Stock</b></h6>
+    </div>
+    <style>
+        .containerPrincipal {
+            height: 860px;
+            width: 100%;
+            top: 11px;
+            left: 0px;
+            position: relative;
+            border: 1px solid transparent;
+        }
+    </style>
+{% endblock %}
+
+{% block body_content %}
+    <div class="containerPrincipal">
+        <table id="tabelaStock" class="cell-border" style="width:100%">
+            <thead>
+            <tr>
+                <th style="width: 15%">Part-number</th>
+                <th style="width: 40%">Descrição</th>
+                <th style="width: 20%">Link</th>
+                <th style="width: 4%; text-align: center">Expendable</th>
+                <th style="width: 4%; text-align: center">Returnable</th>
+                <th style="width: 9%; text-align: center">Quantidade stock</th>
+                <th style="width: 4%"></th>
+                <td style="display: none"></td>
+            </tr>
+            </thead>
+            <tbody>
+            {% for elem in stockElements.all %}
+                <tr>
+                    <td>{{ elem.partNumber }}</td>
+                    <th>{{ elem.descricao }}</th>
+                    <th>{{ elem.link }}</th>
+                    {% if elem.expendable == 'true' %}
+                        <th style="text-align: center"><input type="checkbox" checked disabled></th>
+                    {% else %}
+                        <th style="text-align: center"><input type="checkbox" disabled></th>
+                    {% endif %}
+
+                    {% if elem.returnable == 'true' %}
+                        <th style="text-align: center"><input type="checkbox" checked disabled></th>
+                    {% else %}
+                        <th style="text-align: center"><input type="checkbox" disabled></th>
+                    {% endif %}
+
+                    <th style="text-align: center"><input style="width: 100px; margin-left: 8px" class=""
+                                                          type="number"
+                                                          name="{{ elem.id }}" id="{{ elem.id }}"
+                                                          value="{{ elem.quantidadeStock }}"></th>
+                    <th>
+                        <div class="form-inline">
+                            <a type="button" id="botaoEdit" title="edit" class="fas fa-pen-square"
+                               style="height: 18px; margin-left: 10px"
+                               data-toggle="modal" data-target="#updateLinha">
+                            </a>
+                            <a type="button" id="botaoDelete" title="delete" class="fas fa-trash-alt"
+                               style="margin-left: 10px; height: 18px"
+                               data-toggle="modal" data-target="#deleteLinha">
+                            </a>
+                        </div>
+                    </th>
+                    <th style="display: none">{{ elem.id }}</th>
+                </tr>
+            {% endfor %}
+            </tbody>
+            <tfoot>
+            <tr>
+                <th>Part-number</th>
+                <th>Descrição</th>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td style="display: none"></td>
+            </tr>
+            </tfoot>
+        </table>
+        <div class="input-group">
+            <a href="#" class="ml-lg-4 btn btn-outline-primary" value="ClearFilters" onclick="ClearFilters()">Limpar filtros</a>
+            <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#addLinha"
+                    style="margin-left: 75%">Adicionar elemento
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal onde é adicionada um novo elemento -->
+    <form method="POST" class="form" action="{% url 'pManagement:criarElementoStock' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal fade" id="addLinha" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: lightgrey">
+                        <h3 class="modal-title" id="myModalLabel" style="margin-left: 25%"><b>NOVO ELEMENTO STOCK</b>
+                        </h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <table class="table table-borderless mb-n1">
+                            <thead>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <th scope="row" style="color: black"><h6><b>PART NUMBER</b></h6></th>
+                                <td><input type="text" class="form-control" name="partNumberNovo" id="partNumberNovo" required/></td>
+                            </tr>
+                            {% if erro %}
+                                <div class="text-center mb-n2">
+                                    <b>{{ erro }}</b>
+                                </div>
+                            {% endif %}
+                            <tr>
+                                <th scope="row" style="color: black"><h6><b>DESCRIÇÃO</b></h6></th>
+                                <td><textarea name="descricaoNovo" id="descricaoNovo" cols="40" required></textarea></td>
+                            </tr>
+                            <tr>
+                                <th scope="row" style="color: black"><h6><b>LINK</b></h6></th>
+                                <td><input type="file" name="linkNovo" id="linkNovo"/></td>
+                            </tr>
+                            <tr>
+                                <th scope="row" style="color: black"><h6><b>EXPENDABLE</b></h6></th>
+                                <td><input type="checkbox" name="expendableNovo" id="expendableNovo"/></td>
+                            </tr>
+                            <tr>
+                                <th scope="row" style="color: black"><h6><b>RETURNABLE</b></h6></th>
+                                <td><input type="checkbox" name="returnableNovo" id="returnableNovo"/></td>
+                            </tr>
+                            <tr>
+                                <th scope="row" style="color: black"><h6><b>QUANTIDADE STOCK</b></h6></th>
+                                <td><input type="number" class="form-control" name="quantidadeNovo" id="quantidadeNovo" required/></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        {% if erro2 %}
+                            <div class="text-center">
+                                <b>{{ erro2 }}</b>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+                        <button type="submit" class="btn btn-primary">Criar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- Modal onde é feito update de cada linha -->
+    <form method="POST" class="form" action="{% url 'pManagement:updateLinhaStock' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal fade" id="updateLinha" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: lightgrey">
+                        <h3 class="modal-title" id="myModalLabel" style="margin-left: 30%"><b>EDITAR ELEMENTO</b></h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+
+                    </div>
+                    <div class="modal-body">
+                        <h3><b>VALORES ATUAIS</b></h3>
+                        <p id="infoEdit"></p></br>
+                        <input type="hidden" id="idEdit" name="idEdit" value="{{ id }}">
+
+                        <h3><b>NOVOS VALORES</b></h3>
+                        <div class="form-inline">
+                            <h6 class="mt-1">Part-number: </h6>
+                            <input placeholder="Novo part number" type="form" name="novoPartNumber"
+                                   id="novoPartNumber" style="margin-left: 16px" class="form-control">
+                        </div>
+                        <div class="form-inline mt-3">
+                            <h6 class="mt-1">Descrição: </h6>
+                            <textarea style="margin-left: 35px" name="novoDescription" id="novoDescription"></textarea>
+                        </div>
+                        <div class="form-inline mt-3">
+                            <h6 class="mt-1">Link: </h6>
+                            <input placeholder="Novo link" type="form" name="novoLink" class="form-control"
+                                   id="novoLink" style="margin-left: 70px">
+                        </div>
+                        <div class="form-inline mt-3">
+                            <h6 class="mt-1">Expendable: </h6>
+                            <input type="checkbox" name="novoValorExpendable" id="novoValorExpendable" style="margin-left: 30px">
+                        </div>
+                        <div class="form-inline mt-3">
+                            <h6 class="mt-1">Returnable: </h6>
+                            <input type="checkbox" name="novoValorReturnable" id="novoValorReturnable" style="margin-left: 33px">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- Modal onde é feito o delete de uma linha especifica -->
+    <form method="POST" class="form" action="{% url 'pManagement:deleteLinhaStock' %}"
+          enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal fade" id="deleteLinha" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: lightgrey">
+                        <h3 class="modal-title" id="myModalLabel" style="margin-left: 30%"><b>APAGAR ELEMENTO</b></h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        </br><p id="infoDelete"></p>
+                        <input type="hidden" id="idDelete" name="idDelete" value="{{ id }}">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+                        <button type="submit" class="btn btn-primary">Apagar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        $(document).ready(function () {
+            $('#tabelaStock').on('change', 'input[type=number]', function () {
+                //Get the cell of the input
+                var cella = $(this).closest('th');
+
+                //update the input value
+                $(this).attr('value', $(this).val());
+                var id = $(this).attr('name')
+                var qty = $(this).attr('value')
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/packing/updateStock/',
+                    data: {
+                        csrfmiddlewaretoken: "{{ csrf_token }}",
+                        id: id,
+                        quantidade: qty
+                    },
+                    success: function () {
+                    }
+                })
+
+                //invalidate the DT cache
+                table.cell($(cell)).invalidate().draw();
+            });
+
+            $('#tabelaStock tbody').on('click', '#botaoEdit', function () {
+
+                var data = table.row($(this).parents('tr')).data();
+
+                var partNumber = data[0]
+                var descricao = data[1]
+                var link = data[2]
+                var expendable = data[3]
+                var returnable = data[4]
+                var quantidade = $(data[5]).val()
+                var modalInfo = "<div class='row'><p style='margin-left: 16px'><b>Part-number:</b></p><p style='margin-left: 30px'>" + partNumber + "</p></div>" +
+                    "<div class='row'><p style='margin-left: 16px'><b>Descrição:</b></p><p style='margin-left: 49px'>" + descricao + "</p></div>" +
+                    "<div class='row'><p style='margin-left: 16px'><b>Link:</b></p><p style='margin-left: 85px'>" + link + "</p></div>" +
+                    "<div class='row'><p style='margin-left: 16px'><b>Expendable:</b></p><p style='margin-left: 39px'>" + expendable + "</p></div>" +
+                    "<div class='row'><p style='margin-left: 16px'><b>Returnable:</b></p><p style='margin-left: 42px'>" + returnable + "</p></div>" +
+                    "<div class='row'><p style='margin-left: 16px'><b>Quantidade:</b></p><p style='margin-left: 38px'>" + quantidade + "</p></div>"
+                $('#infoEdit').html(modalInfo);
+                $('#idEdit').val(data[7])
+
+            });
+
+            $('#tabelaStock tbody').on('click', '#botaoDelete', function () {
+
+                var data = table.row($(this).parents('tr')).data();
+
+                var partNumber = data[0]
+                var descricao = data[1]
+                var link = data[2]
+                var expendable = data[3]
+                var returnable = data[4]
+                var quantidade = $(data[5]).val()
+                var modalInfo = "<div class='row'><p style='margin-left: 16px'><b>Part-number:</b></p><p style='margin-left: 30px'>" + partNumber + "</p></div>" +
+                    "<div class='row'><p style='margin-left: 16px'><b>Descrição:</b></p><p style='margin-left: 49px'>" + descricao + "</p></div>" +
+                    "<div class='row'><p style='margin-left: 16px'><b>Link:</b></p><p style='margin-left: 85px'>" + link + "</p></div>" +
+                    "<div class='row'><p style='margin-left: 16px'><b>Expendable:</b></p><p style='margin-left: 39px'>" + expendable + "</p></div>" +
+                    "<div class='row'><p style='margin-left: 16px'><b>Returnable:</b></p><p style='margin-left: 42px'>" + returnable + "</p></div>" +
+                    "<div class='row'><p style='margin-left: 16px'><b>Quantidade:</b></p><p style='margin-left: 38px'>" + quantidade + "</p></div>"
+                $('#infoDelete').html(modalInfo);
+                $('#idDelete').val(data[7])
+
+            });
+
+            var table = $('#tabelaStock').DataTable({
+                orderCellsTop: true,
+                fixedHeader: true,
+                "scrollY": 488,
+                "paging": false,
+                "info": false,
+                select: {
+                    style: 'os',
+                    selector: 'th:first-child',
+                    blurable: true
+                },
+                order: [[0, 'asc']],
+
+                initComplete: function () {
+                    this.api().columns([0, 1]).every(function () {
+                        var column = this;
+                        var select = $('<select class="form-control" style="margin-left: -18px" id="selected"><option value=""></option></select>')
+                            .appendTo($(column.footer()).empty())
+                            .on('change', function () {
+                                var val = $.fn.dataTable.util.escapeRegex(
+                                    $(this).val()
+                                );
+
+                                column
+                                    .search(val ? '^' + val + '$' : '', true, false)
+                                    .draw();
+                            });
+
+                        column.data().unique().sort().each(function (d, j) {
+                            console.log(column.data().unique().sort());
+                            select.append('<option value="' + d + '">' + d + '</option>')
+                        });
+                    });
+                },
+            });
+        });
+
+        function ClearFilters() {
+            $('.form-control').val('');  // Clear ext and select inputs with classname form-control
+            $('#chk').prop('checked', false).change();  // Clear checkbox and trigger change event
+
+            var table = $('#tabelaStock').DataTable();
+            table
+                .search('')
+                .columns().search('')
+                .draw();
+        }
+    </script>
+{% endblock %}

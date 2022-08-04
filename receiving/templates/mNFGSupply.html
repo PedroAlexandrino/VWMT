@@ -1,0 +1,962 @@
+{% extends "vware/baseArmazem.html" %}
+{% load static %}
+
+{% block body_title %}
+    <div class="text-primary">
+        <h6><b><i class="fa fa-home text-secondary"></i><a href={% url 'main:main' %}><span
+                class="text-secondary"> Home | </span></a> MNFG Supply</b></h6>
+    </div>
+
+    <style>
+        .containerPrincipal {
+            height: 860px;
+            width: 100%;
+            top: 11px;
+            left: 0px;
+            position: relative;
+            border: 1px solid transparent;
+        }
+
+        .containerFASupply {
+            height: 415px;
+            width: 50%;
+            top: 0px;
+            left: 0px;
+            position: absolute;
+            border: 3px solid transparent;
+        }
+
+        .containerBPDropinSupply {
+            height: 415px;
+            width: 50%;
+            top: 0px;
+            left: 50%;
+            position: absolute;
+            border-left: 3px solid black;
+        }
+
+        .containerBPSMDSupply {
+            height: 423px;
+            width: 50%;
+            top: 415px;
+            left: 0%;
+            position: absolute;
+            border-top: 3px solid black;
+        }
+
+        .containerPending {
+            height: 423px;
+            width: 50%;
+            top: 415px;
+            left: 50%;
+            position: absolute;
+            border-top: 3px solid black;
+            border-left: 3px solid black;
+        }
+    </style>
+{% endblock %}
+
+
+{% block body_content %}
+    <div class="containerPrincipal">
+        <div class="containerFASupply" style="text-align: center">
+            </br>
+            <div class="form-inline">
+                <p class="mb-n5" id="countTotalFA"></p>
+                <button type="button" class="btn btn-twitter" style="transform: scale(1.5); margin-left: 38%">
+                    <a style="color: white" href="{% url 'receiving:faSupply' %}">FA Supply</a>
+                </button>
+                <p class="mb-n5" style="margin-left: 23%; background-color: #ff0000" id="countRedFA"></p>
+                <p class="mb-n5" style="margin-left: 5%; background-color: #FFD700" id="countYellowFA"></p>
+            </div>
+
+            </br></br>
+            <table id="FASupply" class="display compact" style="width:100%">
+                <thead style="margin-left: -9px">
+                <tr>
+                    <th>WID</th>
+                    <th>Task Type</th>
+                    <th>Part</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Quantity Expected</th>
+                    <th>Created</th>
+                    <th>Created</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for line in dadosQAD.all %}
+                    {% for areaB in areaB.all %}
+                        {% if line.wtsk_from_stor_zone == areaB.storageZone %}
+                            <tr>
+                                <td>{{ line.wtsk_wave_id }}</td>
+                                <td>{{ line.wtsk_task_type }}</td>
+                                <td>{{ line.wtsk_from_part }}</td>
+                                <td>{{ line.wtsk_from_stor_zone }}</td>
+                                <td>{{ line.wtsk_to_loc }}</td>
+                                <td>{{ line.wtsk_qty_exp }}</td>
+                                <td>{{ line.wtsk_create_date }}</td>
+                                <td>{{ line.wtsk_create_time }}</td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="containerBPDropinSupply" style="text-align: center">
+            </br>
+            <div class="form-inline">
+                <p class="mb-n5" id="countTotalBPDropin"></p>
+                <button type="button" class="btn btn-twitter" style="transform: scale(1.5); margin-left: 35%">
+                    <a style="color: white" href="{% url 'receiving:bpDropinSupply' %}">BP Dropin Supply</a>
+                </button>
+                <p class="mb-n5" style="margin-left: 20%; background-color: #ff0000" id="countRedBPDropin"></p>
+                <p class="mb-n5" style="margin-left: 5%; background-color: #FFD700" id="countYellowBPDropin"></p>
+            </div>
+
+            </br></br>
+            <table id="BPDropinSupply" class="display compact" style="width:100%">
+                <thead style="margin-left: -9px">
+                <tr>
+                    <th>WID</th>
+                    <th>Task Type</th>
+                    <th>Part</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Quantity Expected</th>
+                    <th>Created</th>
+                    <th>Created</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for line in dadosQAD.all %}
+                    {% for areaA in areaA.all %}
+                        {% if line.wtsk_from_stor_zone == areaA.storageZone %}
+                            <tr>
+                                <td>{{ line.wtsk_wave_id }}</td>
+                                <td>{{ line.wtsk_task_type }}</td>
+                                <td>{{ line.wtsk_from_part }}</td>
+                                <td>{{ line.wtsk_from_stor_zone }}</td>
+                                <td>{{ line.wtsk_to_loc }}</td>
+                                <td>{{ line.wtsk_qty_exp }}</td>
+                                <td>{{ line.wtsk_create_date }}</td>
+                                <td>{{ line.wtsk_create_time }}</td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="containerBPSMDSupply" style="text-align: center">
+            </br>
+            <div class="form-inline">
+                <p class="mb-n5" id="countTotalBPSmd"></p>
+                <button type="button" class="btn btn-twitter" style="transform: scale(1.5); margin-left: 35%">
+                    <a style="color: white" href="{% url 'receiving:bpSMDSupply' %}">BP SMD Supply</a>
+                </button>
+                <p class="mb-n5" style="margin-left: 20%; background-color: #ff0000" id="countRedBPSmd"></p>
+                <p class="mb-n5" style="margin-left: 5%; background-color: #FFD700" id="countYellowBPSmd"></p>
+            </div>
+
+            </br></br>
+            <table id="BPSMDSupply" class="display compact" style="width:100%">
+                <thead style="margin-left: -9px">
+                <tr>
+                    <th>WID</th>
+                    <th>Task Type</th>
+                    <th>Part</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Quantity Expected</th>
+                    <th>Created</th>
+                    <th>Created</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for line in dadosQAD.all %}
+                    {% for kardex in kardex.all %}
+                        {% if line.wtsk_from_stor_zone == kardex.storageZone %}
+                            <tr>
+                                <td>{{ line.wtsk_wave_id }}</td>
+                                <td>{{ line.wtsk_task_type }}</td>
+                                <td>{{ line.wtsk_from_part }}</td>
+                                <td>{{ line.wtsk_from_stor_zone }}</td>
+                                <td>{{ line.wtsk_to_loc }}</td>
+                                <td>{{ line.wtsk_qty_exp }}</td>
+                                <td>{{ line.wtsk_create_date }}</td>
+                                <td>{{ line.wtsk_create_time }}</td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="containerPending">
+            </br>
+            <div style="width: 100%; margin-bottom: -40px; margin-top: -10px" class="form-inline">
+                <p class="mb-n5">Total: {{ elementosFA|length }}</p>
+                <p style="margin-left: 14%">
+                <h3><b> FA Table</b></h3></p>
+
+                <button type="button" class="btn btn-twitter"
+                        style="transform: scale(1.5); position: relative; margin-left: 16%">
+                    <a style="color: white" href="{% url 'receiving:pending' %}">Pending</a>
+                </button>
+
+                <p style="margin-left: 14%">
+                <h3><b> BP Table</b></h3></p>
+                <p class="mb-n5" style="margin-left: 13%">Total: {{ elementosBP|length }}</p>
+            </div>
+            </br></br></br>
+            <div style="width: 100%" class="form-inline">
+                <div style="width: 49%">
+                    <table id="tableFAPending" class="display compact" style="width:100%">
+                        <thead style="margin-left: -9px">
+                        <tr>
+                            <th>Item</th>
+                            <th>Qty Remain</th>
+                            <th>Created</th>
+                            <th>Created</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for val in elementosFA %}
+                            <tr>
+                                <td>{{ val.item }}</td>
+                                <td style="text-align: center">{{ val.qtyRemaining }}</td>
+                                <td style="text-align: center">{{ val.date }}</td>
+                                <td style="text-align: center">{{ val.time }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style="width: 49%; margin-left: 2%">
+                    <table id="tableBPPending" class="display compact" style="width:100%">
+                        <thead style="margin-left: -9px">
+                        <tr>
+                            <th>Item</th>
+                            <th>Qty Remain</th>
+                            <th>Created</th>
+                            <th>Created</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for val in elementosBP %}
+                            <tr>
+                                <td>{{ val.item }}</td>
+                                <td style="text-align: center">{{ val.qtyRemaining }}</td>
+                                <td style="text-align: center">{{ val.date }}</td>
+                                <td style="text-align: center">{{ val.time }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <form method="POST" enctype="multipart/form-data" action="{% url 'receiving:uploadTaskBrowse' %}">
+            {% csrf_token %}
+            <div class="form-inline">
+                <div class="form-inline" style="bottom: 0px; margin-left: 10px; position: absolute">
+                    <button type="submit" name="updateInfo" id="updateInfo" class="btn btn-primary">Update Info</button>
+                    {% for data in data.all %}
+                        <h4 style="margin-left: 20px">Last update: {{ data }}</h4>
+                        <input type="hidden" id="lastData" value="{{ data }}">
+                        <input type="hidden" id="hourRed" value="{{ data.redHour }}">
+                        <input type="hidden" id="hourYellow" value="{{ data.yellowHour }}">
+                        <input type="hidden" id="lastUpdateRed" value="{{ data.lastUpdateRed }}">
+                    {% endfor %}
+                </div>
+            </div>
+        </form>
+        <div style="position: absolute; right: 85px; bottom: 0">
+            <a href="#reportIssue" data-toggle="modal" data-target="#reportIssue" class="fas fa-info-circle"
+               style="font-size: 15px; height: 22px"> Help</a>
+        </div>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" action="{% url 'receiving:reportMNFGSupply' %}">
+        {% csrf_token %}
+        <div class="modal fade" id="reportIssue" tabindex="-1" role="dialog"
+             aria-labelledby="myModalLabel">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: rgba(236,144,0,0.86)">
+                        <p class="modal-title" id="myModalLabel" style="margin-left: 45%; font-size: 40px"><i>HELP</i>
+                        </p>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body"
+                         style="background: linear-gradient(to bottom, rgba(236,144,0,0.86) 0%, ghostwhite 100%); ">
+                        <div style="margin-top: 10px">
+                            <p style="font-size: 20px"><strong>Escreva aqui possíveis erros de utilização desta página
+                                em
+                                específico, ou deixe sugestões de melhoria</strong></p>
+                            <textarea class="form-control mt-n3" name="reportICDR" id="reportICDR" rows="11"
+                                      style="background-color: floralwhite; text-align: center;font-family:sans-serif;font-size:1.5em"
+                                      required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="background-color: ghostwhite">
+                        <button type="submit" id="submitReportICDR" class="btn btn-primary">Submeter</button>
+                        <button type="button" class="btn btn-primary" value="pending" data-dismiss="modal">Fechar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        $(document).ready(function () {
+            const lastData = document.getElementById('lastData').value
+            const hourRed = document.getElementById('hourRed').value
+            const hourYellow = document.getElementById('hourYellow').value
+            const lastUpdateRed = document.getElementById('lastUpdateRed').value
+            if (new Date().getHours() - new Date(lastData).getHours() >= lastUpdateRed) {
+                $('h4').css({
+                    'background-color': '#ff0000',
+                    'color': 'white',
+                });
+            }
+
+            setInterval(function () {
+                location.reload()
+                $.ajax({
+                    type: 'POST',
+                    url: '/receiving/uploadTaskBrowse/',
+                    data: {
+                        csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                    },
+                    success: function () {
+                    }
+                })
+            }, 60000);
+
+            var countFAred = 0
+            var countFAyellow = 0
+            var totalFA = 0
+
+            $('#FASupply').DataTable({
+                "info": false,
+                "paging": false,
+                "searching": false,
+                "scrollY": "270px",
+                "order": [[6, "asc"], [7, "asc"]],
+                "columnDefs": [
+                    {
+                        targets: [6],
+                        render: function (data, type, row) {
+                            return data.substr(0, 10);
+                        }
+                    },
+                    {
+                        targets: [5],
+                        render: function (data, type, row) {
+                            return data.substr(0, data.length - 11);
+                        }
+                    }
+                ],
+                "createdRow": function (row, data, index, cells) {
+                    totalFA += 1
+                    if (data[0] != "0") {
+
+                        $('td', cells[0]).css({
+                            'background-color': '#0000FF',
+                        });
+                        $(cells[0]).css({
+                            'background-color': '#0000FF',
+                            'color': 'white',
+
+                        });
+                    }
+                    if (moment().startOf('day').diff(moment(data[6], 'YYYY-MM-DD'), 'days') == 0) {
+                        if (moment().diff(moment(data[7], 'HH:mm:ss'), 'hours') == hourYellow && moment().diff(moment(data[7], 'HH:mm:ss'), 'hours') <= hourRed) {
+                            countFAyellow += 1
+                            $('td', cells[1]).css({
+                                'background-color': '#FFD700',
+                            });
+                            $(cells[1]).css({
+                                'background-color': '#FFD700',
+                                'color': 'black',
+                            });
+                            $('td', cells[2]).css({
+                                'background-color': '#FFD700',
+                            });
+                            $(cells[2]).css({
+                                'background-color': '#FFD700',
+                                'color': 'black',
+                            });
+                            $('td', cells[3]).css({
+                                'background-color': '#FFD700',
+                            });
+                            $(cells[3]).css({
+                                'background-color': '#FFD700',
+                                'color': 'black',
+                            });
+                            $('td', cells[4]).css({
+                                'background-color': '#FFD700',
+                            });
+                            $(cells[4]).css({
+                                'background-color': '#FFD700',
+                                'color': 'black',
+                            });
+                            $('td', cells[5]).css({
+                                'background-color': '#FFD700',
+                            });
+                            $(cells[5]).css({
+                                'background-color': '#FFD700',
+                                'color': 'black',
+                            });
+                            $('td', cells[6]).css({
+                                'background-color': '#FFD700',
+                            });
+                            $(cells[6]).css({
+                                'background-color': '#FFD700',
+                                'color': 'black',
+                            });
+                            $('td', cells[7]).css({
+                                'background-color': '#FFD700',
+                            });
+                            $(cells[7]).css({
+                                'background-color': '#FFD700',
+                                'color': 'black',
+                            });
+                        }
+                        if (moment().diff(moment(data[7], 'HH:mm:ss'), 'hours') >= hourRed) {
+                            countFAred += 1
+                            $('td', cells[1]).css({
+                                'background-color': '#ff0000',
+                            });
+                            $(cells[1]).css({
+                                'background-color': '#ff0000',
+                                'color': 'white',
+                            });
+                            $('td', cells[2]).css({
+                                'background-color': '#ff0000',
+                            });
+                            $(cells[2]).css({
+                                'background-color': '#ff0000',
+                                'color': 'white',
+                            });
+                            $('td', cells[3]).css({
+                                'background-color': '#ff0000',
+                            });
+                            $(cells[3]).css({
+                                'background-color': '#ff0000',
+                                'color': 'white',
+                            });
+                            $('td', cells[4]).css({
+                                'background-color': '#ff0000',
+                            });
+                            $(cells[4]).css({
+                                'background-color': '#ff0000',
+                                'color': 'white',
+                            });
+                            $('td', cells[5]).css({
+                                'background-color': '#ff0000',
+                            });
+                            $(cells[5]).css({
+                                'background-color': '#ff0000',
+                                'color': 'white',
+                            });
+                            $('td', cells[6]).css({
+                                'background-color': '#ff0000',
+                            });
+                            $(cells[6]).css({
+                                'background-color': '#ff0000',
+                                'color': 'white',
+                            });
+                            $('td', cells[7]).css({
+                                'background-color': '#ff0000',
+                            });
+                            $(cells[7]).css({
+                                'background-color': '#ff0000',
+                                'color': 'white',
+                            });
+                        }
+                    } else {
+                        countFAred += 1
+                        $('td', cells[1]).css({
+                            'background-color': '#ff0000',
+                        });
+                        $(cells[1]).css({
+                            'background-color': '#ff0000',
+                            'color': 'white',
+                        });
+                        $('td', cells[2]).css({
+                            'background-color': '#ff0000',
+                        });
+                        $(cells[2]).css({
+                            'background-color': '#ff0000',
+                            'color': 'white',
+                        });
+                        $('td', cells[3]).css({
+                            'background-color': '#ff0000',
+                        });
+                        $(cells[3]).css({
+                            'background-color': '#ff0000',
+                            'color': 'white',
+                        });
+                        $('td', cells[4]).css({
+                            'background-color': '#ff0000',
+                        });
+                        $(cells[4]).css({
+                            'background-color': '#ff0000',
+                            'color': 'white',
+                        });
+                        $('td', cells[5]).css({
+                            'background-color': '#ff0000',
+                        });
+                        $(cells[5]).css({
+                            'background-color': '#ff0000',
+                            'color': 'white',
+                        });
+                        $('td', cells[6]).css({
+                            'background-color': '#ff0000',
+                        });
+                        $(cells[6]).css({
+                            'background-color': '#ff0000',
+                            'color': 'white',
+                        });
+                        $('td', cells[7]).css({
+                            'background-color': '#ff0000',
+                        });
+                        $(cells[7]).css({
+                            'background-color': '#ff0000',
+                            'color': 'white',
+                        });
+                    }
+                }
+            });
+
+            $('#countRedFA').text("Red's: " + countFAred)
+            $('#countYellowFA').text("Yellow's: " + countFAyellow)
+            $('#countTotalFA').text("Total:  " + totalFA)
+            var countBPDropinRed = 0
+            var countBPDropinYellow = 0
+            var totalBPDropin = 0
+
+            $('#BPDropinSupply').DataTable({
+                "info": false,
+                "paging": false,
+                "searching": false,
+                "scrollY": "270px",
+                "order": [[6, "asc"], [7, "asc"]],
+                "columnDefs": [
+                    {
+                        targets: [6],
+                        render: function (data, type, row) {
+                            return data.substr(0, 10);
+                        }
+                    },
+                    {
+                        targets: [5],
+                        render: function (data, type, row) {
+                            return data.substr(0, data.length - 11);
+                        }
+                    }
+                ],
+                "createdRow": function (row, data, index, cells) {
+                    totalBPDropin += 1
+                    if (data[0] != "0") {
+
+                        $('td', cells[0]).css({
+                            'background-color': '#0000FF',
+                        });
+                        $(cells[0]).css({
+                            'background-color': '#0000FF',
+                            'color': 'white',
+
+                        });
+                    }
+                    if (moment().startOf('day').diff(moment(data[6], 'YYYY-MM-DD'), 'days') == 0) {
+                        if (moment().diff(moment(data[7], 'HH:mm:ss'), 'hours') == hourYellow && moment().diff(moment(data[7], 'HH:mm:ss'), 'hours') <= hourRed) {
+                            countBPDropinYellow += 1
+                            $('td', cells[1]).css({
+                                'background-color': '#FFD700',
+                            });
+                            $(cells[1]).css({
+                                'background-color': '#FFD700',
+                                'color': 'black',
+                            });
+                            $('td', cells[2]).css({
+                                'background-color': '#FFD700',
+                            });
+                            $(cells[2]).css({
+                                'background-color': '#FFD700',
+                                'color': 'black',
+                            });
+                            $('td', cells[3]).css({
+                                'background-color': '#FFD700',
+                            });
+                            $(cells[3]).css({
+                                'background-color': '#FFD700',
+                                'color': 'black',
+                            });
+                            $('td', cells[4]).css({
+                                'background-color': '#FFD700',
+                            });
+                            $(cells[4]).css({
+                                'background-color': '#FFD700',
+                                'color': 'black',
+                            });
+                            $('td', cells[5]).css({
+                                'background-color': '#FFD700',
+                            });
+                            $(cells[5]).css({
+                                'background-color': '#FFD700',
+                                'color': 'black',
+                            });
+                            $('td', cells[6]).css({
+                                'background-color': '#FFD700',
+                            });
+                            $(cells[6]).css({
+                                'background-color': '#FFD700',
+                                'color': 'black',
+                            });
+                            $('td', cells[7]).css({
+                                'background-color': '#FFD700',
+                            });
+                            $(cells[7]).css({
+                                'background-color': '#FFD700',
+                                'color': 'black',
+                            });
+                        }
+                        if (moment().diff(moment(data[7], 'HH:mm:ss'), 'hours') >= hourRed) {
+                            countBPDropinRed += 1
+                            $('td', cells[1]).css({
+                                'background-color': '#ff0000',
+                            });
+                            $(cells[1]).css({
+                                'background-color': '#ff0000',
+                                'color': 'white',
+                            });
+                            $('td', cells[2]).css({
+                                'background-color': '#ff0000',
+                            });
+                            $(cells[2]).css({
+                                'background-color': '#ff0000',
+                                'color': 'white',
+                            });
+                            $('td', cells[3]).css({
+                                'background-color': '#ff0000',
+                            });
+                            $(cells[3]).css({
+                                'background-color': '#ff0000',
+                                'color': 'white',
+                            });
+                            $('td', cells[4]).css({
+                                'background-color': '#ff0000',
+                            });
+                            $(cells[4]).css({
+                                'background-color': '#ff0000',
+                                'color': 'white',
+                            });
+                            $('td', cells[5]).css({
+                                'background-color': '#ff0000',
+                            });
+                            $(cells[5]).css({
+                                'background-color': '#ff0000',
+                                'color': 'white',
+                            });
+                            $('td', cells[6]).css({
+                                'background-color': '#ff0000',
+                            });
+                            $(cells[6]).css({
+                                'background-color': '#ff0000',
+                                'color': 'white',
+                            });
+                            $('td', cells[7]).css({
+                                'background-color': '#ff0000',
+                            });
+                            $(cells[7]).css({
+                                'background-color': '#ff0000',
+                                'color': 'white',
+                            });
+                        }
+                    } else {
+                        countBPDropinRed += 1
+                        $('td', cells[1]).css({
+                            'background-color': '#ff0000',
+                        });
+                        $(cells[1]).css({
+                            'background-color': '#ff0000',
+                            'color': 'white',
+                        });
+                        $('td', cells[2]).css({
+                            'background-color': '#ff0000',
+                        });
+                        $(cells[2]).css({
+                            'background-color': '#ff0000',
+                            'color': 'white',
+                        });
+                        $('td', cells[3]).css({
+                            'background-color': '#ff0000',
+                        });
+                        $(cells[3]).css({
+                            'background-color': '#ff0000',
+                            'color': 'white',
+                        });
+                        $('td', cells[4]).css({
+                            'background-color': '#ff0000',
+                        });
+                        $(cells[4]).css({
+                            'background-color': '#ff0000',
+                            'color': 'white',
+                        });
+                        $('td', cells[5]).css({
+                            'background-color': '#ff0000',
+                        });
+                        $(cells[5]).css({
+                            'background-color': '#ff0000',
+                            'color': 'white',
+                        });
+                        $('td', cells[6]).css({
+                            'background-color': '#ff0000',
+                        });
+                        $(cells[6]).css({
+                            'background-color': '#ff0000',
+                            'color': 'white',
+                        });
+                        $('td', cells[7]).css({
+                            'background-color': '#ff0000',
+                        });
+                        $(cells[7]).css({
+                            'background-color': '#ff0000',
+                            'color': 'white',
+                        });
+                    }
+                }
+            });
+
+            $('#countRedBPDropin').text("Red's: " + countBPDropinRed)
+            $('#countYellowBPDropin').text("Yellow's: " + countBPDropinYellow)
+            $('#countTotalBPDropin').text("Total: " + totalBPDropin)
+            var countBPSmdRed = 0
+            var countBPSmdYellow = 0
+            var totalBPSmd = 0
+
+            $('#BPSMDSupply').DataTable({
+                "info": false,
+                "paging": false,
+                "searching": false,
+                "scrollY": "270px",
+                "order": [[6, "asc"], [7, "asc"]],
+                "columnDefs": [
+                    {
+                        targets: [6],
+                        render: function (data, type, row) {
+                            return data.substr(0, 10);
+                        }
+                    },
+                    {
+                        targets: [5],
+                        render: function (data, type, row) {
+                            return data.substr(0, data.length - 11);
+                        }
+                    }
+                ],
+                "createdRow": function (row, data, index, cells) {
+                    totalBPSmd += 1
+                    if (data[0] != "0") {
+
+                        $('td', cells[0]).css({
+                            'background-color': '#0000FF',
+                        });
+                        $(cells[0]).css({
+                            'background-color': '#0000FF',
+                            'color': 'white',
+
+                        });
+                    }
+                    if (moment().startOf('day').diff(moment(data[6], 'YYYY-MM-DD'), 'days') == 0) {
+                        if (moment().diff(moment(data[7], 'HH:mm:ss'), 'hours') == hourYellow && moment().diff(moment(data[7], 'HH:mm:ss'), 'hours') <= hourRed) {
+                            countBPSmdYellow += 1
+                            $('td', cells[1]).css({
+                                'background-color': '#FFD700',
+                            });
+                            $(cells[1]).css({
+                                'background-color': '#FFD700',
+                                'color': 'black',
+                            });
+                            $('td', cells[2]).css({
+                                'background-color': '#FFD700',
+                            });
+                            $(cells[2]).css({
+                                'background-color': '#FFD700',
+                                'color': 'black',
+                            });
+                            $('td', cells[3]).css({
+                                'background-color': '#FFD700',
+                            });
+                            $(cells[3]).css({
+                                'background-color': '#FFD700',
+                                'color': 'black',
+                            });
+                            $('td', cells[4]).css({
+                                'background-color': '#FFD700',
+                            });
+                            $(cells[4]).css({
+                                'background-color': '#FFD700',
+                                'color': 'black',
+                            });
+                            $('td', cells[5]).css({
+                                'background-color': '#FFD700',
+                            });
+                            $(cells[5]).css({
+                                'background-color': '#FFD700',
+                                'color': 'black',
+                            });
+                            $('td', cells[6]).css({
+                                'background-color': '#FFD700',
+                            });
+                            $(cells[6]).css({
+                                'background-color': '#FFD700',
+                                'color': 'black',
+                            });
+                            $('td', cells[7]).css({
+                                'background-color': '#FFD700',
+                            });
+                            $(cells[7]).css({
+                                'background-color': '#FFD700',
+                                'color': 'black',
+                            });
+                        }
+                        if (moment().diff(moment(data[7], 'HH:mm:ss'), 'hours') >= hourRed) {
+                            countBPSmdRed += 1
+                            $('td', cells[1]).css({
+                                'background-color': '#ff0000',
+                            });
+                            $(cells[1]).css({
+                                'background-color': '#ff0000',
+                                'color': 'white',
+                            });
+                            $('td', cells[2]).css({
+                                'background-color': '#ff0000',
+                            });
+                            $(cells[2]).css({
+                                'background-color': '#ff0000',
+                                'color': 'white',
+                            });
+                            $('td', cells[3]).css({
+                                'background-color': '#ff0000',
+                            });
+                            $(cells[3]).css({
+                                'background-color': '#ff0000',
+                                'color': 'white',
+                            });
+                            $('td', cells[4]).css({
+                                'background-color': '#ff0000',
+                            });
+                            $(cells[4]).css({
+                                'background-color': '#ff0000',
+                                'color': 'white',
+                            });
+                            $('td', cells[5]).css({
+                                'background-color': '#ff0000',
+                            });
+                            $(cells[5]).css({
+                                'background-color': '#ff0000',
+                                'color': 'white',
+                            });
+                            $('td', cells[6]).css({
+                                'background-color': '#ff0000',
+                            });
+                            $(cells[6]).css({
+                                'background-color': '#ff0000',
+                                'color': 'white',
+                            });
+                            $('td', cells[7]).css({
+                                'background-color': '#ff0000',
+                            });
+                            $(cells[7]).css({
+                                'background-color': '#ff0000',
+                                'color': 'white',
+                            });
+                        }
+                    } else {
+                        countBPSmdRed += 1
+                        $('td', cells[1]).css({
+                            'background-color': '#ff0000',
+                        });
+                        $(cells[1]).css({
+                            'background-color': '#ff0000',
+                            'color': 'white',
+                        });
+                        $('td', cells[2]).css({
+                            'background-color': '#ff0000',
+                        });
+                        $(cells[2]).css({
+                            'background-color': '#ff0000',
+                            'color': 'white',
+                        });
+                        $('td', cells[3]).css({
+                            'background-color': '#ff0000',
+                        });
+                        $(cells[3]).css({
+                            'background-color': '#ff0000',
+                            'color': 'white',
+                        });
+                        $('td', cells[4]).css({
+                            'background-color': '#ff0000',
+                        });
+                        $(cells[4]).css({
+                            'background-color': '#ff0000',
+                            'color': 'white',
+                        });
+                        $('td', cells[5]).css({
+                            'background-color': '#ff0000',
+                        });
+                        $(cells[5]).css({
+                            'background-color': '#ff0000',
+                            'color': 'white',
+                        });
+                        $('td', cells[6]).css({
+                            'background-color': '#ff0000',
+                        });
+                        $(cells[6]).css({
+                            'background-color': '#ff0000',
+                            'color': 'white',
+                        });
+                        $('td', cells[7]).css({
+                            'background-color': '#ff0000',
+                        });
+                        $(cells[7]).css({
+                            'background-color': '#ff0000',
+                            'color': 'white',
+                        });
+                    }
+                }
+            });
+
+            $('#countRedBPSmd').text("Red's: " + countBPSmdRed)
+            $('#countYellowBPSmd').text("Yellow's: " + countBPSmdYellow)
+            $('#countTotalBPSmd').text("Total: " + totalBPSmd)
+
+            $('#tableFAPending').DataTable({
+                "info": false,
+                "paging": false,
+                "searching": false,
+                "scrollY": "270px",
+                "order": [[2, "asc"], [3, "asc"]],
+            });
+
+            $('#tableBPPending').DataTable({
+                "info": false,
+                "paging": false,
+                "searching": false,
+                "scrollY": "270px",
+                "order": [[2, "asc"], [3, "asc"]],
+            });
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,246 @@
+{% extends "vware/baseArmazem.html" %}
+{% load static %}
+
+{% block body_title %}
+    <div class="text-primary">
+        <h6><b><i class="fa fa-home text-secondary"></i><a href={% url 'main:main' %}><span
+                class="text-secondary"> Home | </span></a> Configurations</b></h6>
+    </div>
+
+    <style>
+        .containerPrincipal {
+            height: 815px;
+            width: 100%;
+            top: 11px;
+            left: 0px;
+            position: relative;
+            border: 3px solid transparent;
+        }
+    </style>
+{% endblock %}
+
+
+{% block body_content %}
+
+
+    <div class="containerPrincipal">
+
+        <div style="width: 49%; height: 100%; top: 30px; left: 0px; position: absolute; border: 3px solid transparent;">
+            <table id="areaA" class="display" style="width:100%">
+                <thead style="margin-left: -9px">
+                <tr>
+                    <th>Line</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for storageZone in areaA.all %}
+                    <tr>
+                        <td>{{ storageZone.storageZone }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+                <tfoot>
+                <th>
+                    <button class="btn btn-outline-dark" style="height: 16px; width: 70px; margin-left: -18px"
+                            data-toggle="modal"
+                            data-target="#addLinha" id="addLine">Add new
+                    </button>
+                    </br>
+                    <div id="removeButton">
+                        <button class="btn btn-outline-dark mt-1"
+                                style="height: 16px; width: 70px; margin-left: -18px"
+                                data-toggle="modal" data-target="#removerLinha" name="removeLine" id="removeLine">Delete
+                        </button>
+                    </div>
+                </th>
+                </tfoot>
+            </table>
+        </div>
+        <div style="width: 46%; height: 100%; top: 43px; right: 0px; position: absolute; border: 3px solid transparent;">
+            <table id="areaB" class="display" style="width:100%">
+                <thead style="margin-left: -9px">
+                <tr>
+                    <th>Area B</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for storageZone in areaB.all %}
+                    <tr>
+                        <td>{{ storageZone.storageZone }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+                <tfoot>
+                <th>
+                    <button class="btn btn-outline-dark" style="height: 16px; width: 70px; margin-left: -18px"
+                            data-toggle="modal"
+                            data-target="#addJustificacao" id="addJustification">Add new
+                    </button>
+                    </br>
+                    <div id="removeButton">
+                        <button class="btn btn-outline-dark mt-1"
+                                style="height: 16px; width: 70px; margin-left: -18px"
+                                data-toggle="modal" data-target="#removerJustificacao" name="removeJustification"
+                                id="removeJustification">Delete
+                        </button>
+                    </div>
+                </th>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+    <div style="width: 95%; bottom: 0%; position: absolute; border: 3px solid transparent; text-align: center">
+        <button type="submit" class="button" data-toggle="modal" data-target="#criarContaReceiving">
+            Create account
+        </button>
+    </div>
+
+
+    <form method="POST" class="form" action="{% url 'receiving:createLine' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal fade" id="addLinha" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">Insert new Line</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <h6><b>Insert line</b></h6>
+                        <input type="text" name="newLine" id="newLine"/>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <form method="POST" class="form" action="{% url 'receiving:deleteLine' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal fade" id="removerLinha" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">Remove Line</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="infoLine"></p>
+                        <input type="hidden" name="nome2" id="nome2" value="{{ nome2 }}"/>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Confirm</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+    <form method="POST" class="form" action="{% url 'receiving:createJustification' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal fade" id="addJustificacao" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">Insert new Justification</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <h6><b>Insert Justification</b></h6>
+                        <input style="width: 440px" type="text" name="newJustification" id="newJustification"/>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+    <form method="POST" class="form" action="{% url 'receiving:deleteJustification' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal fade" id="removerJustificacao" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">Remove Justification</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="infoJustification"></p>
+                        <input type="hidden" name="nome3" id="nome3" value="{{ nome3 }}"/>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Confirm</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+{% endblock %}
+
+{% block javascript %}
+
+    <script>
+        $(document).ready(function () {
+            var tableAreaA = $('#areaA').DataTable({
+                "searching": false,
+                "info": false,
+                "paging": false,
+                "ordering": false,
+                "scrollCollapse": true,
+                "scrollY": "500px",
+                "select": {
+                    style: 'os',
+                    items: 'cell'
+                },
+            });
+
+            $('#areaA tbody').on('click', 'tr', function () {
+                var nome = tableLine.row($(this)).data();
+                var modalInfo = "Want to delete " + nome + "?";
+                $('#infoLine').html(modalInfo);
+                $('#nome2').val(nome);
+                $('#removeButton').on('click', 'button', function () {
+                });
+            });
+        });
+
+        $(document).ready(function () {
+            var tableAreaB = $('#areaB').DataTable({
+                "searching": false,
+                "info": false,
+                "paging": false,
+                "ordering": false,
+                "scrollCollapse": true,
+                "scrollY": "500px",
+                "select": {
+                    style: 'os',
+                    items: 'cell'
+                },
+            });
+            $('#areaB tbody').on('click', 'tr', function () {
+                var nome = tableJustification.row($(this)).data();
+                var modalInfo = "Want to delete " + nome + "?";
+                $('#infoJustification').html(modalInfo);
+                $('#nome3').val(nome);
+                $('#removeButton').on('click', 'button', function () {
+                });
+            });
+        });
+
+    </script>
+{% endblock %}

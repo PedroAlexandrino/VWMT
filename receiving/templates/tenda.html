@@ -1,0 +1,217 @@
+{% extends "vware/baseArmazem.html" %}
+{% load static %}
+
+{% block body_title %}
+    <div class="text-primary">
+        <h6><b><i class="fa fa-home text-secondary"></i><a href={% url 'main:main' %}><span
+                class="text-secondary"> Home | </span></a> Tenda</b></h6>
+    </div>
+
+    <style>
+        .dataTable tfoot th {
+            text-align: center;
+        }
+
+        .containerPrincipal {
+            height: 835px;
+            width: 100%;
+            top: 11px;
+            left: 0px;
+            position: relative;
+            border: 3px solid transparent;
+        }
+
+        .column_left {
+            border-left: 2px solid black;
+        }
+    </style>
+{% endblock %}
+
+
+{% block body_content %}
+    <div class="containerPrincipal">
+        <table id="tabelaTenda" class="display" style="width:100%">
+            <thead style="margin-left: -9px">
+            <tr>
+                <th>Item Number</th>
+                <th>Description</th>
+                <th style="text-align: center">Qty on Hand - WHOUT</th>
+                <th style="text-align: center">Qt</th>
+                <th style="text-align: center">Qty on Hand - not WHOUT<p style="font-size: 10px">(Not WHOUT, not QUALITY and serialized)</p></th>
+                <th style="text-align: center">Qt</th>
+                <th class="column_left" style="text-align: center">Unit Cost</th>
+                <th style="text-align: center">Total Cost<p style="font-size: 10px">(WHOUT)</p></th>
+                <th class="column_left" style="text-align: center; width: 10%">1 day Consumption {{ elementos.0.diaAtual }}</th>
+                <th style="text-align: center; width: 10%">2 day Consumption {{ elementos.0.diaSeguinte }}</th>
+                <th style="text-align: center; width: 10%">3 day Consumption {{ elementos.0.diaAposDiaSeguinte }}</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for val in elementos %}
+                <tr>
+                    <td>{{ val.itemNumber }}</td>
+                    <td>{{ val.descricao }}</td>
+                    <td style="text-align: center">{{ val.qtyOnHand }}</td>
+                    <td style="text-align: center">{{ val.serialsWHOUT }}</td>
+                    <td style="text-align: center">{{ val.qtyOnHandNotWHOUT }}</td>
+                    <td style="text-align: center">{{ val.serialsNotWHOUT }}</td>
+                    <td class="column_left" style="text-align: center">{{ val.unitCost }}</td>
+                    <td style="text-align: center">{{ val.totalCost }}</td>
+                    <td class="column_left" style="text-align: center">{{ val.consumptionValue }}</td>
+                    <td style="text-align: center">{{ val.consumptionValueDiaSeguinte }}</td>
+                    <td style="text-align: center">{{ val.consumptionValueDiaAposDiaSeguinte }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            <tfoot>
+            <tr>
+                <th>{{ elementos|length }}</th>
+                <th>{{ elementos|length }}</th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th class="column_left"></th>
+                <th></th>
+                <th class="column_left"></th>
+                <th></th>
+                <th></th>
+            </tr>
+            </tfoot>
+        </table>
+        <div class="form-inline">
+            <form method="GET" enctype="multipart/form-data" action="{% url 'receiving:updateTenda' %}">
+                <div class="mt-n3" style="position: absolute; right: 30px">
+                    <button class="btn btn-primary" id="uploadFullTable">Upload full table</button>
+                </div>
+            </form>
+            <form method="GET" enctype="multipart/form-data" action="{% url 'receiving:uploadTendaCosts' %}">
+                <div class="mt-n3" style="position: absolute; left: 62%">
+                    <button class="btn btn-primary" id="uploadFullTable">Upload table costs</button>
+                </div>
+            </form>
+            <div class="mt-1" style="position: absolute; left: 50%">
+                <button onclick="window.location = '{% url 'receiving:tenda' %}'" class="btn btn-primary">Upload half
+                    table
+                </button>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block javascript %}
+    <script>
+        $(document).ready(function () {
+            var numberRenderer = $.fn.dataTable.render.number( ',', '', 0, ''  ).display;
+            var numberRenderer2 = $.fn.dataTable.render.number( ',', '.', 2, '€'  ).display;
+
+            var tabelaTenda = $('#tabelaTenda').DataTable({
+                "info": false,
+                "paging": false,
+                "searching": false,
+                "scrollY": "600px",
+                dom: 'frtipB',
+                float: 'right',
+                buttons: [
+                    'excel', 'pdf', 'print', 'copy'
+                ],
+                "footerCallback": function (row, data, start, end, display) {
+                    var api = this.api();
+
+                    // Remove the formatting to get integer data for summation
+                    var intVal = function (i) {
+                        return typeof i === 'string' ?
+                            i.replace(/[\$,]/g, '') * 1 :
+                            typeof i === 'number' ?
+                                i : 0;
+                    };
+
+                    total3 = api
+                        .column(2)
+                        .data()
+                        .reduce(function (a, b) {
+                            return intVal(a) + intVal(b);
+                        }, 0);
+                    total4 = api
+                        .column(3)
+                        .data()
+                        .reduce(function (a, b) {
+                            return intVal(a) + intVal(b);
+                        }, 0);
+                    total5 = api
+                        .column(4)
+                        .data()
+                        .reduce(function (a, b) {
+                            return intVal(a) + intVal(b);
+                        }, 0);
+                    total6 = api
+                        .column(5)
+                        .data()
+                        .reduce(function (a, b) {
+                            return intVal(a) + intVal(b);
+                        }, 0);
+                    total8 = api
+                        .column(7)
+                        .data()
+                        .reduce(function (a, b) {
+                            if (typeof a === 'string') {
+                                a = a.replace(/[^\d.-]/g, '') * 1;
+                            }
+                            if (b === '-') {
+                                b = 0;
+                            }
+                            return intVal(a) + intVal(b);
+                        }, 0);
+                    total9 = api
+                        .column(8)
+                        .data()
+                        .reduce(function (a, b) {
+                            return intVal(a) + intVal(b);
+                        }, 0);
+                    total10 = api
+                        .column(9)
+                        .data()
+                        .reduce(function (a, b) {
+                            return intVal(a) + intVal(b);
+                        }, 0);
+                    total11 = api
+                        .column(10)
+                        .data()
+                        .reduce(function (a, b) {
+                            return intVal(a) + intVal(b);
+                        }, 0);
+
+                    // Update footer
+                    $(api.column(2).footer()).html(
+                        numberRenderer(total3)
+                    );
+                    $(api.column(3).footer()).html(
+                        total4
+                    );
+                    $(api.column(4).footer()).html(
+                        numberRenderer(total5)
+                    );
+                    $(api.column(5).footer()).html(
+                        total6
+                    );
+                    $(api.column(7).footer()).html(
+                        numberRenderer2(total8)
+                    );
+                    $(api.column(8).footer()).html(
+                        numberRenderer(total9)
+                    );
+                    $(api.column(9).footer()).html(
+                        numberRenderer(total10)
+                    );
+                    $(api.column(10).footer()).html(
+                        numberRenderer(total11)
+                    );
+                },
+            });
+            $(document).on('click', '#uploadFullTable', function () {
+                alert("Pode demorar uns instantes. Por favor aguarde")
+            });
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,376 @@
+{% extends "vware/baseArmazem.html" %}
+{% load static %}
+
+{% block body_title %}
+
+    <div class="text-primary" xmlns="http://www.w3.org/1999/html">
+        <h6><b><i class="fa fa-home text-secondary"></i><a href={% url 'main:main' %}><span
+                class="text-secondary"> Home | </span></a> Expendable Package</b></h6>
+    </div>
+{% endblock %}
+
+
+{% block body_content %}
+    <!-- trata do ficheiro xlxs inserido -->
+    <div class="containerPath mt-4" style="margin-left: 30px">
+        <div class="path" id="uploadClass">
+            <div class="mt-3">
+                {% if erro %}
+                    <br/>
+                    <div class="text-center">
+                        <h1><b>{{ erro }}</b></h1>
+                    </div>
+                    <br/>
+                {% endif %}
+                <table id="example" class="cell-border" style="width:100%">
+                    <thead>
+                    <tr>
+                        <th>Part-number</th>
+                        <th>Description</th>
+                        <td>Link</td>
+                        <td>Stock</td>
+                        <td></td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for partNumber in partnumbers.all %}
+                        <tr>
+                            <td style="width: 15%">{{ partNumber.pn }}</td>
+                            <td style="width: 50%">{{ partNumber.descricao }}</td>
+                            <th>{{ partNumber.link }}</th>
+                            <th style="width: 10%"><input style="width: 70px; margin-left: 8px" class=""
+                                                          type="number"
+                                                          name="{{ partNumber.id }}" id="{{ partNumber.id }}"
+                                                          value="{{ partNumber.quantidade }}"></th>
+                            <th style="width: 7%">
+                                <div class="form-inline">
+                                    <a type="button" id="botaoEdit" title="edit" class="fas fa-pen-square"
+                                       style="height: 18px; margin-left: 10px"
+                                       data-toggle="modal" data-target="#updateLinha">
+                                    </a>
+                                    <a type="button" id="botaoDelete" title="delete" class="fas fa-trash-alt"
+                                       style="margin-left: 10px; height: 18px"
+                                       data-toggle="modal" data-target="#deleteLinha">
+                                    </a>
+                                </div>
+                            </th>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <th>Part-number</th>
+                        <th>Descrição</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                    </tfoot>
+                </table>
+
+                <div class="ml-lg-4 input-group">
+                    <a href="#" class="btn btn-outline-primary" value="ClearFilters" onclick="ClearFilters()">Clear filters</a>
+                    <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#addLinha" style="margin-left: 75%">Add new
+                        row
+                    </button>
+                </div>
+
+                <div class="form-inline" style="width: 570px">
+                    <h4 class="mt-3">IMPORT XLSX FILE:</h4>
+                    <input style="margin-left: 20px" type="file" name="myfile" id="myfile"
+                           title="Schedule Data"></br>
+                </div>
+                <button  class="btn btn-outline-primary" style="margin-left: 154px" type="submit">Upload</button>
+                {% if erro2 %}
+                    <b>{{ erro2 }}</b></br>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Modal onde é adicionada uma nova linha -->
+    <form method="POST" class="form" action="{% url 'pManagement:createExpendable' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal fade" id="addLinha" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title" id="myModalLabel"><b>Create new row</b></h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <table class="table table-borderless mb-n1">
+                            <thead>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <th scope="row" style="color: black"><h6><b>Part-number</b></h6></th>
+                                <td><input type="text" name="partNumberNovo" id="partNumberNovo"/></td>
+                            </tr>
+                            {% if erro %}
+                                <div class="text-center mb-n2">
+                                    <b>{{ erro }}</b>
+                                </div>
+                            {% endif %}
+                            <tr>
+                                <th scope="row" style="color: black"><h6><b>Description</b></h6></th>
+                                <td><input type="text" name="descricaoNovo" id="descricaoNovo"/></td>
+                            </tr>
+                            <tr>
+                                <th scope="row" style="color: black"><h6><b>Quantity</b></h6></th>
+                                <td><input type="number" name="quantidadeNovo" id="quantidadeNovo"/></td>
+                            </tr>
+                            <tr>
+                                <th scope="row" style="color: black"><h6><b>Link</b></h6></th>
+                                <td><input type="file" name="linkNovo" id="linkNovo"/></td>
+                            </tr>
+
+                            </tbody>
+                        </table>
+                        {% if erro2 %}
+                            <div class="text-center">
+                                <b>{{ erro2 }}</b>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Create</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+    <!-- Modal onde é feito o delete de uma linha especifica -->
+    <form method="POST" class="form" action="{% url 'pManagement:deleteLinhaExpendable' %}"
+          enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal fade" id="deleteLinha" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title" id="myModalLabel"><b>Delete this row?</b></h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="infoDelete"></p></br>
+                        <input type="hidden" id="partNumberDelete" name="partNumberDelete" value="{{ partNumber }}">
+                        <input type="hidden" id="descricaoDelete" name="descricaoDelete" value="{{ descricao }}">
+                        <input type="hidden" id="linkDelete" name="linkDelete" value="{{ link }}">
+                        <input type="hidden" id="quantidadeDelete" name="quantidadeDelete" value="{{ quantidade }}">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- Modal onde é feito update de cada linha -->
+    <form method="POST" class="form" action="{% url 'pManagement:updateLinhaExpendable' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal fade" id="updateLinha" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title" id="myModalLabel"><b>Edit Row</b></h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+
+                    </div>
+                    <div class="modal-body">
+                        <h3><b>Actual Values</b></h3>
+                        <p id="infoEdit"></p></br>
+                        <input type="hidden" id="partNumberEdit" name="partNumberEdit" value="{{ partNumber }}">
+                        <input type="hidden" id="descricaoEdit" name="descricaoEdit" value="{{ descricao }}">
+                        <input type="hidden" id="linkEdit" name="linkEdit" value="{{ link }}">
+                        <input type="hidden" id="quantidadeEdit" name="quantidadeEdit" value="{{ quantidade }}">
+
+                        <h3><b>Replace by</b></h3>
+                        <div class="form-inline">
+                            <h6 class="mt-1">Part number: </h6>
+                            <input placeholder="New part number" type="form" name="novoPartNumber"
+                                   id="novoPartNumber" style="margin-left: 16px">
+                        </div>
+
+                        <div class="form-inline mt-3">
+                            <h6 class="mt-1">Description: </h6>
+                            <input placeholder="New description" type="form" name="novoDescription"
+                                   id="novoDescription" style="margin-left: 21px; width: 350px">
+                        </div>
+                        <div class="form-inline mt-3">
+                            <h6 class="mt-1">Link: </h6>
+                            <input placeholder="New link" type="form" name="novoLink"
+                                   id="novoLink" style="margin-left: 67px">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+{% endblock %}
+
+{% block javascript %}
+    <script>
+
+        $('.clearable.example .ui.selection.dropdown')
+            .dropdown({
+                clearable: true
+            })
+        ;
+        $('.clearable.example .ui.inline.dropdown')
+            .dropdown({
+                clearable: true,
+                placeholder: 'any'
+            })
+        ;
+
+        $(document).ready(function () {
+
+            // Setup - add a text input to each footer cell
+            $('#example thead th').each(function (i) {
+                var title = $('#example thead th').eq($(this).index()).text();
+                $(this).html('<input class="form-control" style="margin-left: -18px" type="text" placeholder="Search ' + title + '" data-index="' + i + '" />');
+            });
+
+            $('#example').on('change', 'input', function () {
+                //Get the cell of the input
+                var cella = $(this).closest('th');
+
+                //update the input value
+                $(this).attr('value', $(this).val());
+                var nome = $(this).attr('name')
+                var qty = $(this).attr('value')
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/packing/uploadExpendable',
+                    data: {
+                        csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                        nome: nome,
+                        quantidade: qty
+                    },
+                    success: function () {
+                        console.log("sucess")
+                    }
+                })
+
+
+                //invalidate the DT cache
+                table.cell($(cell)).invalidate().draw();
+
+            });
+
+            var table = $('#example').DataTable({
+                orderCellsTop: true,
+                fixedHeader: true,
+                "scrollY": 488,
+                "paging": false,
+                "info": false,
+                select: {
+                    style: 'os',
+                    selector: 'th:first-child',
+                    blurable: true
+                },
+                order: [[0, 'asc']],
+                dom: 'Bfrtip',
+                buttons: [
+                    'print', 'excel'
+                ],
+
+                initComplete: function () {
+                    this.api().columns([0, 1]).every(function () {
+                        var column = this;
+                        var select = $('<select class="form-control" style="margin-left: -18px" id="selected"><option value=""></option></select>')
+                            .appendTo($(column.footer()).empty())
+                            .on('change', function () {
+                                var val = $.fn.dataTable.util.escapeRegex(
+                                    $(this).val()
+                                );
+
+                                column
+                                    .search(val ? '^' + val + '$' : '', true, false)
+                                    .draw();
+                            });
+
+                        column.data().unique().sort().each(function (d, j) {
+                            console.log(column.data().unique().sort());
+                            select.append('<option value="' + d + '">' + d + '</option>')
+                        });
+                    });
+                },
+            });
+
+            // Filter event handler
+            $(table.table().container()).on('keyup', 'thead input', function () {
+                table
+                    .column($(this).data('index'))
+                    .search(this.value)
+                    .draw();
+            });
+
+
+            $('#example tbody').on('click', '#botaoDelete', function () {
+
+                var data = table.row($(this).parents('tr')).data();
+
+                var partNumber = data[0]
+                var descricao = data[1]
+                var link = data[2]
+                var quantidade = $(data[3]).val()
+                var modalInfo = "<p>" + "<b>Part-number:</b>&emsp;&emsp;" + partNumber + "</b>" +
+                    "<p>" + "<b>Descrição:</b> &emsp;&emsp;&emsp;" + descricao + "</p>" +
+                    "<p>" + "<b>Link:</b>&emsp;" + link + "</p>" +
+                    "<p>" + "<b>Quantidade:</b>&emsp;&emsp;<b>" + quantidade + "</b></p>"
+                $('#infoDelete').html(modalInfo);
+                $('#partNumberDelete').val(partNumber);
+                $('#descricaoDelete').val(descricao);
+                $('#linkDelete').val(link);
+                $('#quantidadeDelete').val(quantidade);
+
+            });
+
+            $('#example tbody').on('click', '#botaoEdit', function () {
+
+                var data = table.row($(this).parents('tr')).data();
+
+                var partNumber = data[0]
+                var descricao = data[1]
+                var link = data[2]
+                var quantidade = $(data[3]).val()
+                var modalInfo = "<p>" + "<b>Part-number:</b>&emsp;&emsp;" + partNumber + "</b>" +
+                    "<p>" + "<b>Description:</b>&nbsp;&nbsp;&nbsp;&emsp;&emsp;" + descricao + "</p>" +
+                    "<p>" + "<b>Link:</b>&emsp;" + link + "</p>" +
+                    "<p>" + "<b>Stock:</b>&nbsp;&nbsp;&emsp;&emsp;&emsp;&emsp;&emsp;<b>" + quantidade + "</b></p>"
+                $('#infoEdit').html(modalInfo);
+                $('#partNumberEdit').val(partNumber);
+                $('#descricaoEdit').val(descricao);
+                $('#linkEdit').val(link);
+                $('#quantidadeEdit').val(quantidade);
+
+            });
+        });
+
+        function ClearFilters() {
+            $('.form-control').val('');  // Clear ext and select inputs with classname form-control
+            $('#chk').prop('checked', false).change();  // Clear checkbox and trigger change event
+
+            var table = $('#example').DataTable();
+            table
+                .search('')
+                .columns().search('')
+                .draw();
+        }
+    </script>
+{% endblock %}

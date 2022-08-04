@@ -1,0 +1,317 @@
+{% extends "vware/baseArmazem.html" %}
+{% load static %}
+
+{% block body_title %}
+
+    <div class="text-primary">
+        <h6><b><i class="fa fa-home text-secondary"></i><a href={% url 'main:main' %}><span
+                class="text-secondary"> Home | </span></a> Shippers Tracking</b></h6>
+    </div>
+    <style>
+    </style>
+{% endblock %}
+
+
+{% block body_content %}
+    <!--  -->
+    <table id="tabelaFiltrada" class="display" style="width:100%">
+        <thead>
+        <tr>
+            <th></th>
+            <th>Ship-From</th>
+            <th>Type</th>
+            <th>ID</th>
+            <th>Ship-To</th>
+            <th>Name</th>
+            <th>City</th>
+            <th>State</th>
+            <th>Country</th>
+            <th>Ship Date</th>
+            <th>Ship Time</th>
+            <th>Carrier</th>
+            <th>Ship Via</th>
+            <th>FOB</th>
+            <th>Mode Of Transport</th>
+            <th>Vehicle ID</th>
+            <th>MBOL</th>
+            <th>Pre-Shipper ID</th>
+            <th>Total Master Packs</th>
+            <th>Loaded Master Packs</th>
+            <th>In Process</th>
+            <th>Confirmed</th>
+            <th>Cancelled</th>
+            <th>Inv Mov</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for element in tabela.all %}
+            {% if not element.name == 'Name' %}
+                <tr>
+                    <td>
+                        <div>
+                            <a type="button" class="fas fa-plus-circle" id="botaoFilho"></a>
+                        </div>
+                    </td>
+                    <td>{{ element.shipFrom }}</td>
+                    <td>{{ element.type }}</td>
+                    <td>{{ element.idShipper }}</td>
+                    <td>{{ element.shipTo }}</td>
+                    <td>{{ element.name }}</td>
+                    <td>{{ element.city }}</td>
+                    <td>{{ element.state }}</td>
+                    <td>{{ element.country }}</td>
+                    <td>{{ element.shipDate }}</td>
+                    <td>{{ element.shipTime }}</td>
+                    <td>{{ element.carrier }}</td>
+                    <td>{{ element.shipVia }}</td>
+                    <td>{{ element.fob }}</td>
+                    <td>{{ element.transportMode }}</td>
+                    <td>{{ element.vehicleId }}</td>
+                    <td>{{ element.mbol }}</td>
+                    <td>{{ element.preShipper }}</td>
+                    <td>{{ element.totalMasterPacks }}</td>
+                    <td>{{ element.loadedMasterPacks }}</td>
+                    <td>{{ element.inProcess }}</td>
+                    <td>{{ element.confirmed }}</td>
+                    <td>{{ element.cancelled }}</td>
+                    <td>{{ element.invMov }}</td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+        </tbody>
+        <tfoot>
+        <tr>
+            <th></th>
+        </tr>
+        </tfoot>
+    </table>
+
+    <table id="tabelaChildEscondida" class="display" style="display: none">
+        <thead>
+        <tr>
+            <th>Ship-From</th>
+            <th>Type</th>
+            <th>Pré-Shipper/Shipper</th>
+            <th>Sort Name</th>
+            <th>Ship-To</th>
+            <th>Ship-To/Dock</th>
+            <th>Ship Date</th>
+            <th>Item Number</th>
+            <th>Description</th>
+            <th>Qty to Ship</th>
+            <th>Qty Shipped</th>
+            <th>UM</th>
+            <th>Site</th>
+            <th>Location</th>
+            <th>Lot/Serial</th>
+            <th>Reference</th>
+            <th>Order</th>
+            <th>Line</th>
+            <th>MBOL</th>
+            <th>Confirmed</th>
+            <th>Inv Mov</th>
+            <th>ID</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for element in tabelaFilha.all %}
+            {% if not element.quantityToShip == 'Qty to Ship' %}
+                <tr>
+                    <td>{{ element.shipFrom }}</td>
+                    <td>{{ element.type }}</td>
+                    <td>{{ element.idShipper }}</td>
+                    <td>{{ element.sortName }}</td>
+                    <td>{{ element.shipTo }}</td>
+                    <td>{{ element.shipToDock }}</td>
+                    <td>{{ element.shipDate }}</td>
+                    <td>{{ element.itemNumber }}</td>
+                    <td>{{ element.description }}</td>
+                    <td>{{ element.quantityToShip }}</td>
+                    <td>{{ element.quantityShipped }}</td>
+                    <td>{{ element.um }}</td>
+                    <td>{{ element.site }}</td>
+                    <td>{{ element.location }}</td>
+                    <td>{{ element.lotSerial }}</td>
+                    <td>{{ element.reference }}</td>
+                    <td>{{ element.order }}</td>
+                    <td>{{ element.line }}</td>
+                    <td>{{ element.mbol }}</td>
+                    <td>{{ element.confirmed }}</td>
+                    <td>{{ element.invMov }}</td>
+                    <td>{{ element.idGrande }}</td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+        </tbody>
+        <tfoot>
+        <tr>
+            <th></th>
+        </tr>
+        </tfoot>
+    </table>
+
+    <div>
+        <form method="POST" enctype="multipart/form-data" action="{% url 'shippers:uploadDataExcel' %}">
+            {% csrf_token %}
+            <div style="margin-left: 0px">
+                <button class="btn btn-outline-primary mt-3" type="submit">Update</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        $(document).ready(function () {
+            var tableEscondida = $('#tabelaChildEscondida').DataTable({
+                paging: false,
+                searching: false,
+                info: false,
+                scrollY: 100,
+                scrollCollapse: true,
+                dom: 'frtipB',
+                buttons: [
+                    'excel'
+                ],
+                fixedHeader: {
+                    header: true,
+                    headerOffset: 45,
+                },
+                scrollX: true,
+                columnDefs: [
+                    {
+                        targets: [2, 3],
+                        render: function (data, type, row) {
+                            return data.substr(0, 10);
+                        }
+                    }]
+            });
+
+            var table = $('#tabelaFiltrada').DataTable({
+                paging: false,
+                searching: false,
+                info: false,
+                scrollY: 670,
+                scrollCollapse: true,
+                dom: 'frtipB',
+                buttons: [
+                    'excel'
+                ],
+                fixedHeader: {
+                    header: true,
+                    headerOffset: 45,
+                },
+                scrollX: true,
+                columnDefs: [
+                    {
+                        targets: [2, 3],
+                        render: function (data, type, row) {
+                            return data.substr(0, 10);
+                        }
+                    }]
+            });
+
+
+            // Add event listener for opening and closing details
+            $('#tabelaFiltrada tbody').on('click', '#botaoUpdate', function () {
+                var data = table.row(this).data();
+                $.ajax({
+                    type: 'GET',
+                    url: '/shippers/getDataFicheiro',
+                    data: {
+                        dataAtualFicheiro: data[9]
+                    },
+                    success: function (response) {
+
+                    }
+                });
+            });
+
+
+            // Add event listener for opening and closing details
+            $('#tabelaFiltrada tbody').on('click', '#botaoFilho', function () {
+                var tr = $(this).closest('tr');
+                var row = table.row(tr);
+                var rowData = row.data()
+
+                if (row.child.isShown()) {
+                    // This row is already open - close it
+                    row.child.hide();
+                    tr.removeClass('shown');
+                } else {
+                    // Open this row
+                    var final = '<table id="tabelaChild" class="display" style="margin-left: 50px">' + '<thead><tr><th>Ship-From</th>' + '<th>Type</th>' +
+                        '<th>ID</th>' + '<th>Sort-name</th>' + '<th>Ship-To</th>' + '<th>Ship-to/Dock</th>' +
+                        '<th>Ship Date</th>' + '<th>Item Number</th>' + '<th>Description</th>' +
+                        '<th>Qty to Ship</th>' + '<th>Qty Shipped</th>' + '<th>UM</th>' + '<th>Site</th>' +
+                        '<th>Location</th>' + '<th>Lot/Serial</th>' + '<th>Reference</th>' + '<th>Order</th>' +
+                        '<th>Line</th>' + '<th>MBOL</th>' + '<th>Confirmed</th>' + '<th>Inv Mov</th>' +
+                        '<th>ID</th></tr></thead>'
+
+                    $.ajax({
+                        type: 'GET',
+                        url: '/shippers/getChildValues',
+                        data: {
+                            shipperID: rowData[3]
+                        },
+                        success: function (response) {
+                            global_lista = response["filteredTableValues"]
+
+                            for (elem in global_lista) {
+                                final += '<tr>' +
+                                    '<td>' + global_lista[elem].shipFrom + '</td>' +
+                                    '<td>' + global_lista[elem].type + '</td>' +
+                                    '<td>' + global_lista[elem].idShipper + '</td>' +
+                                    '<td>' + global_lista[elem].sortName + '</td>' +
+                                    '<td>' + global_lista[elem].shipTo + '</td>' +
+                                    '<td>' + global_lista[elem].shipToDock + '</td>' +
+                                    '<td>' + global_lista[elem].shipDate.substring(0, 10) + '</td>' +
+                                    '<td>' + global_lista[elem].itemNumber + '</td>' +
+                                    '<td>' + global_lista[elem].description + '</td>' +
+                                    '<td>' + global_lista[elem].quantityToShip + '</td>' +
+                                    '<td>' + global_lista[elem].quantityShipped + '</td>' +
+                                    '<td>' + global_lista[elem].um + '</td>' +
+                                    '<td>' + global_lista[elem].site + '</td>' +
+                                    '<td>' + global_lista[elem].location + '</td>' +
+                                    '<td>' + global_lista[elem].lotSerial + '</td>' +
+                                    '<td>' + global_lista[elem].reference + '</td>' +
+                                    '<td>' + global_lista[elem].order + '</td>' +
+                                    '<td>' + global_lista[elem].line + '</td>' +
+                                    '<td>' + global_lista[elem].mbol + '</td>' +
+                                    '<td>' + global_lista[elem].confirmed + '</td>' +
+                                    '<td>' + global_lista[elem].invMov + '</td>' +
+                                    '<td>' + global_lista[elem].idGrande + '</td>' +
+                                    '</tr>'
+                            }
+                            final += '</table>';
+                            row.child(final).show();
+                            var tableChild = $('#tabelaChild').DataTable({
+                                paging: false,
+                                searching: false,
+                                info: false,
+                                ordering: false,
+                                destroy: true,
+                            });
+                            tr.addClass('shown');
+                        }
+                    });
+                }
+            });
+        });
+
+        /* Formatting function for row details - modify as you need */
+        function format(d) {
+            // `d` is the original data object for the row
+            var final = ""
+            for (elem in d) {
+                final += '<tr>' +
+                    '<td>Full name:</td>' +
+                    '<td>' + elem.idShipper + '</td>' +
+                    '</tr>'
+            }
+            return '<table style="margin-left: 50px">' +
+                final +
+                '</table>';
+        }
+    </script>
+{% endblock %}

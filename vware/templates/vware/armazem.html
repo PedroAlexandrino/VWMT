@@ -1,0 +1,208 @@
+{% extends "vware/baseArmazem.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+
+{% block head_title %}
+    <title xmlns="http://www.w3.org/1999/html">ARMAZEM | vPROJECT</title>
+{% endblock %}
+
+{% block head_css %}
+{% endblock %}
+
+{% block head_scripts %}
+{% endblock %}
+
+
+{% block body_title %}
+    <div class="text-primary">
+        <h6><b><i class="fas fa-warehouse text-secondary"></i><a href={% url 'vware:armazem' %}><span
+                class="text-secondary"> Home | </span></a> Shipping: Table</b></h6>
+    </div>
+{% endblock %}
+
+
+{% block body_content %}
+    <div class="row clearfix">
+        <div class="col-xl-12 col-lg-12 col-md-12">
+            <table id="example" class="table-borderless table-striped display nowrap" width="100%">
+                <p><span> </span></p>
+                <thead>
+                <tr style="font-size: x-small; color: #666666">
+                    <th>OEM</th>
+                    <th>QPS Shipping</th>
+                    <th>QPS Manufatura</th>
+                    <th>Checklist</th>
+                    <th>Inspeção Dedicada</th>
+                    <th>Cross Docking</th>
+                    <th>Engenharia</th>
+                    <th>Serviços</th>
+                    <th>Guide Lines</th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalJS">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content" role="document"></div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+{% block body_scripts %}
+{% endblock %}
+
+
+{% block javascript %}
+    <script>
+        function simulateKeyPress(character) {
+            jQuery.event.trigger({type: 'keypress', which: character.charCodeAt(0)});
+        }
+
+        function iconsSuperiores() {
+            var token = '{{csrf_token}}';
+            var reorderGroup = '';
+            var rowGroupDataSrc = 0;
+            var ordemArray = {};
+
+
+            var table = $('#example').DataTable({
+                scrollY: '80vh',
+                paging: false,
+                searching: true,
+                ajax: function (data, callback, settings) {
+                    $.ajax({
+                        headers: {"X-CSRFToken": '{{csrf_token}}'},
+                        url: "{% url 'vware:armazem_tabelaParent' %}",
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function (data) {
+                            callback(data);
+                        }
+                    });
+                },
+                order: [0, 'asc'],
+                buttons: [
+                    {
+                        extend: 'print',
+                        autoClose: 'true',
+                        text: '',
+                        tag: 'span',
+                        className: 'btn btn-secondary btn-sm fas fa-print',
+                        titleAttr: 'Imprimir',
+                    },
+                    {
+                        extend: 'pdfHtml5',
+                        autoClose: 'true',
+                        text: '',
+                        tag: 'span',
+                        className: 'btn btn-secondary btn-sm fas fa-file-pdf',
+                        titleAttr: 'PDF',
+                    },
+                    {
+                        extend: 'excelHtml5',
+                        autoClose: 'true',
+                        text: '',
+                        tag: 'span',
+                        className: 'btn btn-secondary btn-sm fas fa-file-excel',
+                        titleAttr: 'Excel',
+                    },
+                    {
+                        extend: 'copyHtml5',
+                        autoClose: 'true',
+                        text: '',
+                        tag: 'span',
+                        className: 'btn btn-secondary btn-sm fas fa-copy',
+                        titleAttr: 'Copiar tabela',
+                    }
+                ],
+                dom: 'Bfrtip',
+                pageLength: 40,
+                columns: [
+                    {"data": "oem"},
+                    {"data": "qpsShipping"},
+                    {"data": "qpsManufatura"},
+                    {"data": "checklist"},
+                    {"data": "inspecaoDedicada"},
+                    {"data": "crossDocking"},
+                    {"data": "engenharia"},
+                    {"data": "servicos"},
+                    {"data": "guideLines"},
+                ],
+                select: {
+                    style: 'multi',
+                    selector: 'td:first-child'
+                }
+            });
+        }
+
+        var openModal = function () {
+            var token = '{{csrf_token}}';
+            var btn = $(this);
+            $.ajax({
+                headers: {"X-CSRFToken": token},
+                url: btn.attr("data-url"),
+                type: 'get',
+                dataType: 'json',
+                beforeSend: function () {
+                    $('#modalJS').modal('show');
+                },
+                success: function (data) {
+                    $('#modalJS .modal-content').html(data.html_form);
+                }
+            });
+        };
+
+        var confirmModal = function () {
+            var token = '{{csrf_token}}';
+            var form = $(this);
+
+            $.ajax({
+                headers: {"X-CSRFToken": token},
+                url: form.attr('data-url'),
+                data: {"jsonPedidos": jsonPedido},
+                type: form.attr('method'),
+                dataType: 'json',
+                success: function (data) {
+                    if (data.form_is_valid) {
+                        showPedidoToast();
+                        jsonPedido = {};
+                        location.reload();
+                    } else {
+                        jsonPedido = {};
+                        $('#modalJS .modal-content').html(data.html_form);
+                        location.reload();
+                    }
+                }
+            });
+            return false;
+        };
+
+        $(document).ready(function () {
+            iconsSuperiores();
+            $('#modalJS').on("submit", ".update-form", confirmModal);
+            $('#example').on("click", ".show-form-modal", openModal);
+        });
+    </script>
+{% endblock %}
+
+{% comment %}
+Envio de dados para o servidor em formato json
+
+
+{% block javascript %}
+    <script>
+        function simulateKeyPress(character) {
+          jQuery.event.trigger({ type : 'keypress', which : character.charCodeAt(0) });
+        }
+
+        function minhaTabela(){
+        }
+
+    </script>
+{% endblock %}
+{% endcomment %}

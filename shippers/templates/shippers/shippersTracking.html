@@ -1,0 +1,93 @@
+{% extends "vware/baseArmazem.html" %}
+{% load static %}
+
+{% block body_title %}
+
+    <div class="text-primary">
+        <h6><b><i class="fa fa-home text-secondary"></i><a href={% url 'main:main' %}><span
+                class="text-secondary"> Home | </span></a> Shippers Tracking</b></h6>
+    </div>
+    <style>
+    </style>
+{% endblock %}
+
+
+{% block body_content %}
+
+    <!--  -->
+    <table id="tabelaFiltrada" class="display" style="width:100%">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Ship Date</th>
+            <th>Ship Time</th>
+            <th>Name</th>
+            <th>City</th>
+            <th>Carrier</th>
+            <th>Mode of Transport</th>
+            <th>Vehicle ID</th>
+            <th>Item Number</th>
+            <th>Description</th>
+            <th>Qty to Ship</th>
+            <th>Qty Shipped</th>
+            <th>In Process</th>
+            <th>Confirmed</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for element in tabelaFiltrada.all %}
+            {% if not element.itemNumber == None and not element.description == None and not element.quantityToShip == None and not element.quantityShipped == None and not element.quantityToShip == 'Qty to Ship' %}
+                <tr>
+                    <td>{{ element.idComum }}</td>
+                    <td>{{ element.shipDate }}</td>
+                    <td>{{ element.shipTime }}</td>
+                    <td>{{ element.name }}</td>
+                    <td>{{ element.city }}</td>
+                    <td>{{ element.carrier }}</td>
+                    <td>{{ element.modeOfTransport }}</td>
+                    <td>{{ element.vehicleID }}</td>
+                    <td>{{ element.itemNumber }}</td>
+                    <td>{{ element.description }}</td>
+                    <td>{{ element.quantityToShip }}</td>
+                    <td>{{ element.quantityShipped }}</td>
+                    <td>{{ element.inProcess }}</td>
+                    <td>{{ element.confirmed }}</td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+        </tbody>
+        </tbody>
+        <tfoot>
+        <tr>
+            <th></th>
+        </tr>
+        </tfoot>
+    </table>
+
+    <div class="mt-4 form-inline">
+        <form method="POST" enctype="multipart/form-data" action="{% url 'shippers:uploadFiles' %}">
+            {% csrf_token %}
+            <div style="margin-left: 50px">
+                <button class="btn btn-outline-primary mt-3" type="submit">Update</button>
+            </div>
+        </form>
+    </div>
+
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        $(document).ready(function () {
+            var path = $("#pathDefault").val();
+            $("#textPath").val(path);
+        });
+
+        var table = $('#tabelaFiltrada').DataTable({
+            paging: false,
+            searching: false,
+            info: false,
+            scrollY: 720,
+            scrollCollapse: true,
+        });
+    </script>
+{% endblock %}

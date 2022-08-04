@@ -1,0 +1,1281 @@
+{% extends "vware/baseArmazem.html" %}
+{% load static %}
+
+{% block body_title %}
+    <div class="text-primary">
+        <h6><b><i class="fa fa-home text-secondary"></i><a href={% url 'main:main' %}><span
+                class="text-secondary"> Home | </span></a> Configurations TPM</b></h6>
+    </div>
+
+    <style>
+        .form-control::-webkit-input-placeholder {
+            color: rgba(36, 36, 36, 0.88);
+        }
+
+        .ui::-webkit-input-placeholder {
+            color: rgba(36, 36, 36, 0.88);
+        }
+
+        .button {
+            width: 35%;
+            height: 70px;
+            display: inline-block;
+            font-family: Arial, "Helvetica", sans-serif;
+            font-size: 45px;
+            color: #fff;
+            text-decoration: none;
+            text-align: center;
+            text-shadow: 1px 1px 0 #7D9EAD, 2px 2px 0 #7D9EAD, 1px 1px 0 #7D9EAD;
+            padding-top: 6px;
+            margin-left: auto;
+            margin-right: auto;
+            left: 30px;
+            position: relative;
+            cursor: pointer;
+            border: none;
+            background: #FBA51A;
+            background-image: linear-gradient(bottom, #E57200 0%, #FBA51A 100%);
+            border-radius: 5px;
+            box-shadow: inset 0px 1px 0px #FBA51A, 0px 5px 0px 0px #cb7b25, 0px 10px 5px #999;
+        }
+
+        .button:active {
+            top: 3px;
+            box-shadow: inset 0px 1px 0px #FBA51A, 0px 2px 0px 0px #E57200, 0px 5px 3px #999;
+        }
+
+        .button:hover, button:focus {
+            outline: none;
+            transform: translateY(0.5px);
+        }
+
+        .containerPrincipal {
+            height: 860px;
+            width: 100%;
+            top: 11px;
+            left: 0px;
+            position: relative;
+            border: 1px solid transparent;
+            border-right: 3px solid black;
+        }
+
+        .containerP1 {
+            height: 20%;
+            width: 15%;
+            top: 0px;
+            left: 0px;
+            position: absolute;
+            border: 3px solid transparent;
+            border-right: 3px solid black;
+        }
+
+        .containerP2 {
+            height: 20%;
+            width: 15%;
+            top: 20%;
+            left: 0px;
+            position: absolute;
+            border-top: 3px solid black;
+            border-right: 3px solid black;
+        }
+
+        .containerP3 {
+            height: 20%;
+            width: 15%;
+            top: 40%;
+            left: 0px;
+            position: absolute;
+            border-top: 3px solid black;
+            border-right: 3px solid black;
+        }
+
+        .containerP4 {
+            height: 20%;
+            width: 15%;
+            top: 60%;
+            left: 0px;
+            position: absolute;
+            border-top: 3px solid black;
+            border-right: 3px solid black;
+            border-bottom: 3px solid black;
+        }
+
+        .containerP5 {
+            height: 20%;
+            width: 15%;
+            top: 0px;
+            left: 15%;
+            position: absolute;
+            border-right: 3px solid black;
+        }
+
+        .containerP6 {
+            height: 20%;
+            width: 15%;
+            top: 20%;
+            left: 15%;
+            position: absolute;
+            border-top: 3px solid black;
+            border-right: 3px solid black;
+        }
+
+        .containerP7 {
+            height: 20%;
+            width: 15%;
+            top: 40%;
+            left: 15%;
+            position: absolute;
+            border-top: 3px solid black;
+            border-right: 3px solid black;
+        }
+
+        .containerP8 {
+            height: 20%;
+            width: 15%;
+            top: 60%;
+            left: 15%;
+            position: absolute;
+            border-top: 3px solid black;
+            border-bottom: 3px solid black;
+            border-right: 3px solid black;
+        }
+
+        .containerSub {
+            height: 20%;
+            width: 15.2%;
+            top: 60%;
+            left: 30%;
+            position: absolute;
+            border-right: 3px solid black;
+            border-top: 3px solid black;
+            border-bottom: 3px solid black;
+        }
+
+        .containerMostrar {
+            height: 60%;
+            width: 30%;
+            top: 40%;
+            right: 0%;
+            position: absolute;
+            border: 3px solid transparent;
+        }
+
+        .containerTempos {
+            height: 40%;
+            width: 70%;
+            top: 0%;
+            right: 0%;
+            position: absolute;
+            border: 3px solid transparent;
+        }
+    </style>
+{% endblock %}
+
+{% block body_content %}
+    <div class="containerPrincipal">
+        <div class="containerP1" style="text-align: center">
+            <p>
+            <h1>Receções Físicas</h1></p>
+            <div class="mr-auto" style="margin-top: 20%">
+                <button type="button" class="btn btn-primary btn-xs" id="addNewItem1">New Item</button>
+                <button data-toggle="modal" class="btn btn-secondary btn-xs" id="removeItem1">Remove Item</button>
+            </div>
+        </div>
+        <div class="containerP2" style="text-align: center">
+            <p>
+            <h1>Smart</h1></p>
+            <div class="mr-auto" style="margin-top: 20%">
+                <button type="button" class="btn btn-primary btn-xs" id="addNewItem2">New Item</button>
+                <button data-toggle="modal" class="btn btn-secondary btn-xs" id="removeItem2">Remove Item</button>
+            </div>
+        </div>
+        <div class="containerP3" style="text-align: center">
+            <p>
+            <h1>Kardex</h1></p>
+            <div class="mr-auto" style="margin-top: 20%">
+                <button type="button" class="btn btn-primary btn-xs" id="addNewItem3">New Item</button>
+                <button data-toggle="modal" class="btn btn-secondary btn-xs" id="removeItem3">Remove Item</button>
+            </div>
+        </div>
+        <div class="containerP4" style="text-align: center">
+            <p>
+            <h1>Area A</h1></p>
+            <div class="mr-auto" style="margin-top: 20%">
+                <button type="button" class="btn btn-primary btn-xs" id="addNewItem4">New Item</button>
+                <button data-toggle="modal" class="btn btn-secondary btn-xs" id="removeItem4">Remove Item</button>
+            </div>
+        </div>
+        <div class="containerP5" style="text-align: center">
+            <p>
+            <h1>Area B</h1></p>
+            <div class="mr-auto" style="margin-top: 20%">
+                <button type="button" class="btn btn-primary btn-xs" id="addNewItem5">New Item</button>
+                <button data-toggle="modal" class="btn btn-secondary btn-xs" id="removeItem5">Remove Item</button>
+            </div>
+        </div>
+        <div class="containerP6" style="text-align: center">
+            <p>
+            <h1>Area B embalagens/Mecalux</h1></p>
+            <div class="mr-auto" style="margin-top: 10%">
+                <button type="button" class="btn btn-primary btn-xs" id="addNewItem6">New Item</button>
+                <button data-toggle="modal" class="btn btn-secondary btn-xs" id="removeItem6">Remove Item</button>
+            </div>
+        </div>
+        <div class="containerP7" style="text-align: center">
+            <p>
+            <h1>Empilhadores</h1></p>
+            <div class="mr-auto" style="margin-top: 20%">
+                <button type="button" class="btn btn-primary btn-xs" id="addNewItem7">New Item</button>
+                <button data-toggle="modal" class="btn btn-secondary btn-xs" id="removeItem7">Remove Item</button>
+            </div>
+        </div>
+        <div class="containerP8" style="text-align: center">
+            <p>
+            <h1>Doca</h1></p>
+            <div class="mr-auto" style="margin-top: 20%">
+                <button type="button" class="btn btn-primary btn-xs" id="addNewItem8">New Item</button>
+                <button data-toggle="modal" class="btn btn-secondary btn-xs" id="removeItem8">Remove Item</button>
+            </div>
+        </div>
+        <div class="containerSub" style="text-align: center">
+            <p>
+            <h1>Sub Items</h1></p>
+            <div class="mr-auto" style="margin-top: 20%">
+                <button type="button" class="btn btn-primary btn-xs" id="addNewSubItemButton">New Sub Item</button>
+                <button data-toggle="modal" class="btn btn-secondary btn-xs" id="removeSubItemButton">Remove Sub Item
+                </button>
+            </div>
+        </div>
+        <div class="containerMostrar">
+            <form method="POST" class="form" action="{% url 'receiving:habilitarQuadrados' %}"
+                  enctype="multipart/form-data">
+                {% csrf_token %}
+                <table id="habilitarQuadrados" class="compact" style="width:85%">
+                    <thead style="margin-left: -9px">
+                    <tr>
+                        <th>Áreas</th>
+                        <th>Mostrar</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>Receções Físicas</td>
+                        <td>
+                            <select style="margin-left: -30px" class="form-control" name="1" id="1">
+                                <option value="" hidden>{{ habilitados.all.0.valor }}</option>
+                                <option value="Sim">Sim</option>
+                                <option value="Não">Não</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Smart</td>
+                        <td>
+                            <select style="margin-left: -30px" class="form-control" name="2" id="2">
+                                <option value="" hidden>{{ habilitados.all.1.valor }}</option>
+                                <option value="Sim">Sim</option>
+                                <option value="Não">Não</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Kardex</td>
+                        <td>
+                            <select style="margin-left: -30px" class="form-control" name="3" id="3">
+                                <option value="" hidden>{{ habilitados.all.2.valor }}</option>
+                                <option value="Sim">Sim</option>
+                                <option value="Não">Não</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Area A</td>
+                        <td>
+                            <select style="margin-left: -30px" class="form-control" name="4" id="4">
+                                <option value="" hidden>{{ habilitados.all.3.valor }}</option>
+                                <option value="Sim">Sim</option>
+                                <option value="Não">Não</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Area B</td>
+                        <td>
+                            <select style="margin-left: -30px" class="form-control" name="5" id="5">
+                                <option value="" hidden>{{ habilitados.all.4.valor }}</option>
+                                <option value="Sim">Sim</option>
+                                <option value="Não">Não</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Area B embalagens/Mecalux</td>
+                        <td>
+                            <select style="margin-left: -30px" class="form-control" name="6" id="6">
+                                <option value="" hidden>{{ habilitados.all.5.valor }}</option>
+                                <option value="Sim">Sim</option>
+                                <option value="Não">Não</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Empilhadores</td>
+                        <td>
+                            <select style="margin-left: -30px" class="form-control" name="7" id="7">
+                                <option value="" hidden>{{ habilitados.all.6.valor }}</option>
+                                <option value="Sim">Sim</option>
+                                <option value="Não">Não</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Doca</td>
+                        <td>
+                            <select style="margin-left: -30px" class="form-control" name="8" id="8">
+                                <option value="" hidden>{{ habilitados.all.7.valor }}</option>
+                                <option value="Sim">Sim</option>
+                                <option value="Não">Não</option>
+                            </select>
+                        </td>
+                    </tr>
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <td colspan="2" style="text-align: center">
+                            <button type="submit" class="btn btn-outline-dark" id="updateMostrar">Update</button>
+                            </br>
+                        </td>
+                    </tr>
+                    </tfoot>
+                </table>
+            </form>
+        </div>
+        <div class="containerTempos">
+            <form method="POST" class="form" action="{% url 'receiving:definirTempos' %}"
+                  enctype="multipart/form-data">
+                {% csrf_token %}
+                <table id="definirTempos" class="compact" style="width:100%">
+                    <thead style="margin-left: -9px">
+                    <tr>
+                        <th></th>
+                        <th>Tempo final turno 4</th>
+                        <th>Tempo inicio turno 1</th>
+                        <th>Tempo final turno 1</th>
+                        <th>Tempo inicio turno 2</th>
+                        <th>Tempo final turno 2</th>
+                        <th>Tempo inicio turno 4</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>Áreas</td>
+                        <td style="text-align: center"><input type="time" name="final4"
+                                                              value="{{ tempos.all.2.final }}"></td>
+                        <td style="text-align: center"><input type="time" name="inicio1"
+                                                              value="{{ tempos.all.0.inicio }}"></td>
+                        <td style="text-align: center"><input type="time" name="final1"
+                                                              value="{{ tempos.all.0.final }}"></td>
+                        <td style="text-align: center"><input type="time" name="inicio2"
+                                                              value="{{ tempos.all.1.inicio }}"></td>
+                        <td style="text-align: center"><input type="time" name="final2"
+                                                              value="{{ tempos.all.1.final }}"></td>
+                        <td style="text-align: center"><input type="time" name="inicio4"
+                                                              value="{{ tempos.all.2.inicio }}"></td>
+                    </tr>
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <td colspan="7" style="text-align: center">
+                            <button type="submit" class="btn btn-outline-dark" id="updateTempos">Update</button>
+                        </td>
+                    </tr>
+                    </tfoot>
+                </table>
+            </form>
+        </div>
+
+    </div>
+    <div style="width: 95%; bottom: 0%; position: absolute; border: 3px solid transparent; text-align: center">
+        <button type="submit" class="button" data-toggle="modal" data-target="#alterarGrupoReceiving">
+            Change account Groups
+        </button>
+    </div>
+    <div style="bottom: 0px; margin-left: 25px; position: absolute">
+        <h6><b><i class="fa fa-chevron-left text-secondary"></i><a href={% url 'receiving:tpm' %}><span
+                class="text-secondary"> Back </span></a></b></h6>
+    </div>
+
+    <!-- MODAL ONDE É ADICIONADO UM NOVO ITEM A QUALQUER POSIÇÃO -->
+    <form method="POST" class="form" action="{% url 'receiving:addNewItemReceivingPos' %}"
+          enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal fade" id="addLinha" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title" id="myModalLabel" style="margin-left: 30%"><b>Create new item</b></h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-inline">
+                            <input class="form-control" style="width: 470px" type="text" id="itemAdd"
+                                   name="itemAdd"
+                                   value="{{ itemAdd }}" placeholder="Escrever aqui nome do item" required>
+                        </div>
+                        <input type="hidden" id="posicaoModal" name="posicaoModal" value="{{ posicaoModal }}">
+                        <select class="form-control ui fluid dropdown mt-3" style="margin-left: 45px; width: 375px"
+                                name="subItemTipo"
+                                id="subItemTipo">
+                            <option value="">Selecionar opção caso item tenha sub items</option>
+                            {% for tipo in tipoSubItems.all %}
+                                <option value="{{ tipo }}">{{ tipo }}</option>
+                            {% endfor %}
+                            <option value="Novo">Novo</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Create</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- MODAL ONDE É ADICIONADO UM NOVO SUB ITEM -->
+    <form method="POST" class="form" action="{% url 'receiving:addNewSubItem' %}"
+          enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal fade" id="addSubItem" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title" id="myModalLabel" style="margin-left: 30%"><b>Create new sub item</b>
+                        </h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <select class="form-control ui fluid dropdown" style="margin-left: 45px; width: 375px"
+                                name="subItemTipo"
+                                id="subItemTipo" multiple="" required>
+                            <option value="">Selecionar tipo/os sub item</option>
+                            {% for tipo in tipoSubItems.all %}
+                                <option value="{{ tipo }}">{{ tipo }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="form-inline ui input focus mt-3">
+                            <input style="width: 470px" type="text" id="itemAdd"
+                                   name="itemAdd"
+                                   value="{{ itemAdd }}" placeholder="Escrever aqui nome de sub item" required>
+                        </div>
+                        <input type="hidden" id="posicaoModal" name="posicaoModal" value="{{ posicaoModal }}">
+                        <select class="form-control ui fluid dropdown mt-3" style="margin-left: 45px; width: 375px" name="usar"
+                                id="usar"
+                                required>
+                            <option value="">Selecionar tipo de restrições</option>
+                            <option value="Stop" style="background-color: red">Não usar o equipamento quando o item
+                                apresenta problemas
+                            </option>
+                            <option value="Continue">Solicitar de imediato reparação e/ou atribuir severidade</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Create</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+    <!-- MODAL ONDE É ELIMINADO UM OU MAIS ITEMS PARA CADA POSIÇÃO -->
+    <div class="modal fade" id="deleteListModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="myModalLabel" style="margin-left: 30%"><b>Available items</b></h3>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table" id="deleteListTable1" style="width: 100%">
+                        <thead>
+                        <tr>
+                            <td></td>
+                            <td>Items</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for element in posicao1.all %}
+                            <tr>
+                                <td></td>
+                                <td>{{ element.item }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" id="deleteItemsModal1">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="deleteListModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="myModalLabel" style="margin-left: 30%"><b>Available items</b></h3>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table" id="deleteListTable2" style="width: 100%">
+                        <thead>
+                        <tr>
+                            <td></td>
+                            <td>Items</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for element in posicao2.all %}
+                            <tr>
+                                <td></td>
+                                <td>{{ element.item }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" id="deleteItemsModal2">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="deleteListModal3" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="myModalLabel" style="margin-left: 30%"><b>Available items</b></h3>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table" id="deleteListTable3" style="width: 100%">
+                        <thead>
+                        <tr>
+                            <td></td>
+                            <td>Items</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for element in posicao3.all %}
+                            <tr>
+                                <td></td>
+                                <td>{{ element.item }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" id="deleteItemsModal3">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="deleteListModal4" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="myModalLabel" style="margin-left: 30%"><b>Available items</b></h3>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table" id="deleteListTable4" style="width: 100%">
+                        <thead>
+                        <tr>
+                            <td></td>
+                            <td>Items</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for element in posicao4.all %}
+                            <tr>
+                                <td></td>
+                                <td>{{ element.item }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" id="deleteItemsModal4">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="deleteListModal5" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="myModalLabel" style="margin-left: 30%"><b>Available items</b></h3>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table" id="deleteListTable5" style="width: 100%">
+                        <thead>
+                        <tr>
+                            <td></td>
+                            <td>Items</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for element in posicao5.all %}
+                            <tr>
+                                <td></td>
+                                <td>{{ element.item }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" id="deleteItemsModal5">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="deleteListModal6" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="myModalLabel" style="margin-left: 30%"><b>Available items</b></h3>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table" id="deleteListTable6" style="width: 100%">
+                        <thead>
+                        <tr>
+                            <td></td>
+                            <td>Items</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for element in posicao6.all %}
+                            <tr>
+                                <td></td>
+                                <td>{{ element.item }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" id="deleteItemsModal6">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="deleteListModal7" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="myModalLabel" style="margin-left: 30%"><b>Available items</b></h3>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table" id="deleteListTable7" style="width: 100%">
+                        <thead>
+                        <tr>
+                            <td></td>
+                            <td>Items</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for element in posicao7.all %}
+                            <tr>
+                                <td></td>
+                                <td>{{ element.item }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" id="deleteItemsModal7">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="deleteListModal8" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="myModalLabel" style="margin-left: 30%"><b>Available items</b></h3>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table" id="deleteListTable8" style="width: 100%">
+                        <thead>
+                        <tr>
+                            <td></td>
+                            <td>Items</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for element in posicao8.all %}
+                            <tr>
+                                <td></td>
+                                <td>{{ element.item }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" id="deleteItemsModal8">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL ONDE É ELIMINADO UM OU MAIS SUB ITEM -->
+    <div class="modal fade" id="deleteListSubItems" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="myModalLabel" style="margin-left: 30%"><b>Available sub items</b></h3>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table" id="tableDeleteListSubItems" style="width: 100%">
+                        <thead>
+                        <tr>
+                            <td></td>
+                            <td>Sub items</td>
+                            <td>Tipo</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for element in subItems.all %}
+                            <tr>
+                                <td></td>
+                                <td>{{ element.item }}</td>
+                                <td>{{ element.tipo }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" id="deleteSubItems">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form method="POST" class="form" action="{% url 'receiving:changeUserGroups' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal fade" id="alterarGrupoReceiving" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">Change account groups</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <label for="username"><h6><b style="color: black">Username</b></h6></label>
+                        <select class="form-control" id="username" name="username" required>
+                            <option value="">Select User</option>
+                            {% for user in users.all %}
+                                <option value="{{ user.username }}">{{ user.username }}</option>
+                            {% endfor %}
+                        </select></br>
+                        <label for="paginas"><h6><b style="color: black">Pages</b></h6></label>
+                        <select class="form-control" name="paginas" id="paginas" required>
+                            <option value="">Select accessable pages</option>
+                            <option value="lineRequest">Line Request</option>
+                            <option value="mnfgSupply">MNFG Supply</option>
+                            <option value="tpm">TPM</option>
+                            <option value="lineRequest/mnfgSupply">Line Request, MNFG Supply</option>
+                            <option value="lineRequest/tpm">Line Request, TPM</option>
+                            <option value="mnfgSupply/tpm">MNFG Supply, TPM</option>
+                            <option value="lineRequest/mnfgSupply/tpm">Line Request, MNFG Supply, TPM</option>
+                            <option value="none">Remove access to all Receiving pages</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Create</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        $(document).ready(function () {
+            $('#habilitarQuadrados').DataTable({
+                "info": false,
+                "paging": false,
+                "searching": false,
+                "ordering": false,
+            });
+            $('#definirTempos').DataTable({
+                "info": false,
+                "paging": false,
+                "searching": false,
+                "ordering": false,
+            });
+
+////////TABELA DE REMOVE SUB ITEM///////
+            $('#tableDeleteListSubItems').DataTable({
+                "info": false,
+                "paging": false,
+                "searching": false,
+                "ordering": false,
+                "scrollCollapse": true,
+                "scrollY": "500px",
+                "columnDefs": [{
+                    orderable: false,
+                    className: 'select-checkbox',
+                    targets: 0
+                }],
+                "select": {
+                    style: 'multi',
+                    selector: 'td:first-child'
+                },
+            });
+            $('#deleteListSubItems').on('shown.bs.modal', function (e) {
+                $.fn.dataTable.tables({visible: true, api: true}).columns.adjust();
+            });
+        });
+
+        ////////// NEW SUB ITEM ///////////////////////////
+        $(document).on('click', '#addNewSubItemButton', function () {
+            var myModal = new bootstrap.Modal(document.getElementById('addSubItem'))
+            myModal.show()
+        })
+
+        ////////// NEW ITEM ///////////////////////////
+        $(document).on('click', '#addNewItem1', function () {
+            var myModal = new bootstrap.Modal(document.getElementById('addLinha'))
+            var position = "1"
+            myModal.show()
+            $('#posicaoModal').val(position)
+        })
+        $(document).on('click', '#addNewItem2', function () {
+            var myModal = new bootstrap.Modal(document.getElementById('addLinha'))
+            var position = "2"
+            myModal.show()
+            $('#posicaoModal').val(position)
+        })
+        $(document).on('click', '#addNewItem3', function () {
+            var myModal = new bootstrap.Modal(document.getElementById('addLinha'))
+            var position = "3"
+            myModal.show()
+            $('#posicaoModal').val(position)
+        })
+        $(document).on('click', '#addNewItem4', function () {
+            var myModal = new bootstrap.Modal(document.getElementById('addLinha'))
+            var position = "4"
+            myModal.show()
+            $('#posicaoModal').val(position)
+        })
+        $(document).on('click', '#addNewItem5', function () {
+            var myModal = new bootstrap.Modal(document.getElementById('addLinha'))
+            var position = "5"
+            myModal.show()
+            $('#posicaoModal').val(position)
+        })
+        $(document).on('click', '#addNewItem6', function () {
+            var myModal = new bootstrap.Modal(document.getElementById('addLinha'))
+            var position = "6"
+            myModal.show()
+            $('#posicaoModal').val(position)
+        })
+        $(document).on('click', '#addNewItem7', function () {
+            var myModal = new bootstrap.Modal(document.getElementById('addLinha'))
+            var position = "7"
+            myModal.show()
+            $('#posicaoModal').val(position)
+        })
+        $(document).on('click', '#addNewItem8', function () {
+            var myModal = new bootstrap.Modal(document.getElementById('addLinha'))
+            var position = "8"
+            myModal.show()
+            $('#posicaoModal').val(position)
+        })
+
+        //////// CLICK EM REMOVE ITEM ///////////////////////////
+        $(document).on('click', '#removeItem1', function () {
+            var myModal = new bootstrap.Modal(document.getElementById('deleteListModal1'))
+            var position = "1"
+            myModal.show()
+            $('#posicaoModal').val(position)
+        })
+        $(document).on('click', '#removeItem2', function () {
+            var myModal = new bootstrap.Modal(document.getElementById('deleteListModal2'))
+            var position = "1"
+            myModal.show()
+            $('#posicaoModal').val(position)
+        })
+        $(document).on('click', '#removeItem3', function () {
+            var myModal = new bootstrap.Modal(document.getElementById('deleteListModal3'))
+            var position = "3"
+            myModal.show()
+            $('#posicaoModal').val(position)
+        })
+        $(document).on('click', '#removeItem4', function () {
+            var myModal = new bootstrap.Modal(document.getElementById('deleteListModal4'))
+            var position = "4"
+            myModal.show()
+            $('#posicaoModal').val(position)
+        })
+        $(document).on('click', '#removeItem5', function () {
+            var myModal = new bootstrap.Modal(document.getElementById('deleteListModal5'))
+            var position = "5"
+            myModal.show()
+            $('#posicaoModal').val(position)
+        })
+        $(document).on('click', '#removeItem6', function () {
+            var myModal = new bootstrap.Modal(document.getElementById('deleteListModal6'))
+            var position = "6"
+            myModal.show()
+            $('#posicaoModal').val(position)
+        })
+        $(document).on('click', '#removeItem7', function () {
+            var myModal = new bootstrap.Modal(document.getElementById('deleteListModal7'))
+            var position = "7"
+            myModal.show()
+            $('#posicaoModal').val(position)
+        })
+        $(document).on('click', '#removeItem8', function () {
+            var myModal = new bootstrap.Modal(document.getElementById('deleteListModal8'))
+            var position = "8"
+            myModal.show()
+            $('#posicaoModal').val(position)
+        })
+
+        $(document).on('click', '#removeSubItemButton', function () {
+            var myModal = new bootstrap.Modal(document.getElementById('deleteListSubItems'))
+            myModal.show()
+        })
+
+        ////////ELIMINA OS ITEMS SELECIONADOS NA TABELA REMOVE ITEM///////
+        var delete1 = $('#deleteListTable1').DataTable({
+            "info": false,
+            "paging": false,
+            "searching": false,
+            "ordering": false,
+            "columnDefs": [{
+                orderable: false,
+                className: 'select-checkbox',
+                targets: 0
+            }],
+            "select": {
+                style: 'multi',
+                selector: 'td:first-child'
+            },
+        });
+        $(document).on('click', '#deleteItemsModal1', function () {
+            var selectedItems = []
+            $.each(delete1.rows('.selected').nodes(), function () {
+                var data = delete1.row(this).data();
+                selectedItems.push(data[1])
+            });
+            $.ajax({
+                type: 'POST',
+                url: '/receiving/deleteSelectedItems/',
+                data: {
+                    csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                    'items[]': JSON.stringify(selectedItems),
+                    'posicao': '1'
+                },
+                success: function () {
+                    window.location.reload();
+                }
+            })
+        });
+        var delete2 = $('#deleteListTable2').DataTable({
+            "info": false,
+            "paging": false,
+            "searching": false,
+            "ordering": false,
+            "columnDefs": [{
+                orderable: false,
+                className: 'select-checkbox',
+                targets: 0
+            }],
+            "select": {
+                style: 'multi',
+                selector: 'td:first-child'
+            },
+        });
+        $(document).on('click', '#deleteItemsModal2', function () {
+            var selectedItems = []
+            $.each(delete2.rows('.selected').nodes(), function () {
+                var data = delete2.row(this).data();
+                selectedItems.push(data[1])
+            });
+            $.ajax({
+                type: 'POST',
+                url: '/receiving/deleteSelectedItems/',
+                data: {
+                    csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                    'items[]': JSON.stringify(selectedItems),
+                    'posicao': '2'
+                },
+                success: function () {
+                    window.location.reload();
+                }
+            })
+        });
+        var delete3 = $('#deleteListTable3').DataTable({
+            "info": false,
+            "paging": false,
+            "searching": false,
+            "ordering": false,
+            "columnDefs": [{
+                orderable: false,
+                className: 'select-checkbox',
+                targets: 0
+            }],
+            "select": {
+                style: 'multi',
+                selector: 'td:first-child'
+            },
+        });
+        $(document).on('click', '#deleteItemsModal3', function () {
+            var selectedItems = []
+            $.each(delete3.rows('.selected').nodes(), function () {
+                var data = delete3.row(this).data();
+                selectedItems.push(data[1])
+            });
+            $.ajax({
+                type: 'POST',
+                url: '/receiving/deleteSelectedItems/',
+                data: {
+                    csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                    'items[]': JSON.stringify(selectedItems),
+                    'posicao': '3'
+                },
+                success: function () {
+                    window.location.reload();
+                }
+            })
+        });
+        var delete4 = $('#deleteListTable4').DataTable({
+            "info": false,
+            "paging": false,
+            "searching": false,
+            "ordering": false,
+            "columnDefs": [{
+                orderable: false,
+                className: 'select-checkbox',
+                targets: 0
+            }],
+            "select": {
+                style: 'multi',
+                selector: 'td:first-child'
+            },
+        });
+        $(document).on('click', '#deleteItemsModal4', function () {
+            var selectedItems = []
+            $.each(delete4.rows('.selected').nodes(), function () {
+                var data = delete4.row(this).data();
+                selectedItems.push(data[1])
+            });
+            $.ajax({
+                type: 'POST',
+                url: '/receiving/deleteSelectedItems/',
+                data: {
+                    csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                    'items[]': JSON.stringify(selectedItems),
+                    'posicao': '4'
+                },
+                success: function () {
+                    window.location.reload();
+                }
+            })
+        });
+        var delete5 = $('#deleteListTable5').DataTable({
+            "info": false,
+            "paging": false,
+            "searching": false,
+            "ordering": false,
+            "columnDefs": [{
+                orderable: false,
+                className: 'select-checkbox',
+                targets: 0
+            }],
+            "select": {
+                style: 'multi',
+                selector: 'td:first-child'
+            },
+        });
+        $(document).on('click', '#deleteItemsModal5', function () {
+            var selectedItems = []
+            $.each(delete5.rows('.selected').nodes(), function () {
+                var data = delete5.row(this).data();
+                selectedItems.push(data[1])
+            });
+            $.ajax({
+                type: 'POST',
+                url: '/receiving/deleteSelectedItems/',
+                data: {
+                    csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                    'items[]': JSON.stringify(selectedItems),
+                    'posicao': '5'
+                },
+                success: function () {
+                    window.location.reload();
+                }
+            })
+        });
+        var delete6 = $('#deleteListTable6').DataTable({
+            "info": false,
+            "paging": false,
+            "searching": false,
+            "ordering": false,
+            "columnDefs": [{
+                orderable: false,
+                className: 'select-checkbox',
+                targets: 0
+            }],
+            "select": {
+                style: 'multi',
+                selector: 'td:first-child'
+            },
+        });
+        $(document).on('click', '#deleteItemsModal6', function () {
+            var selectedItems = []
+            $.each(delete6.rows('.selected').nodes(), function () {
+                var data = delete6.row(this).data();
+                selectedItems.push(data[1])
+            });
+            $.ajax({
+                type: 'POST',
+                url: '/receiving/deleteSelectedItems/',
+                data: {
+                    csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                    'items[]': JSON.stringify(selectedItems),
+                    'posicao': '6'
+                },
+                success: function () {
+                    window.location.reload();
+                }
+            })
+        });
+        var delete7 = $('#deleteListTable7').DataTable({
+            "info": false,
+            "paging": false,
+            "searching": false,
+            "ordering": false,
+            "columnDefs": [{
+                orderable: false,
+                className: 'select-checkbox',
+                targets: 0
+            }],
+            "select": {
+                style: 'multi',
+                selector: 'td:first-child'
+            },
+        });
+        $(document).on('click', '#deleteItemsModal7', function () {
+            var selectedItems = []
+            $.each(delete7.rows('.selected').nodes(), function () {
+                var data = delete7.row(this).data();
+                selectedItems.push(data[1])
+            });
+            $.ajax({
+                type: 'POST',
+                url: '/receiving/deleteSelectedItems/',
+                data: {
+                    csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                    'items[]': JSON.stringify(selectedItems),
+                    'posicao': '7'
+                },
+                success: function () {
+                    window.location.reload();
+                }
+            })
+        });
+        var delete8 = $('#deleteListTable8').DataTable({
+            "info": false,
+            "paging": false,
+            "searching": false,
+            "ordering": false,
+            "columnDefs": [{
+                orderable: false,
+                className: 'select-checkbox',
+                targets: 0
+            }],
+            "select": {
+                style: 'multi',
+                selector: 'td:first-child'
+            },
+        });
+        $(document).on('click', '#deleteItemsModal8', function () {
+            var selectedItems = []
+            $.each(delete8.rows('.selected').nodes(), function () {
+                var data = delete8.row(this).data();
+                selectedItems.push(data[1])
+            });
+            $.ajax({
+                type: 'POST',
+                url: '/receiving/deleteSelectedItems/',
+                data: {
+                    csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                    'items[]': JSON.stringify(selectedItems),
+                    'posicao': '8'
+                },
+                success: function () {
+                    window.location.reload();
+                }
+            })
+        });
+        $(document).on('click', '#deleteSubItems', function () {
+            var selectedItems = []
+            $.each(tableDeleteListSubItems.rows('.selected').nodes(), function () {
+                var data = tableDeleteListSubItems.row(this).data();
+                selectedItems.push(data[1])
+            });
+            $.ajax({
+                type: 'POST',
+                url: '/receiving/deleteSelectedSubItems/',
+                data: {
+                    csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                    'items[]': JSON.stringify(selectedItems),
+                },
+                success: function () {
+                    window.location.reload();
+                }
+            })
+        });
+
+    </script>
+{% endblock %}

@@ -1,0 +1,1003 @@
+{% extends "vware/baseArmazem.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block body_title %}
+    <div class="text-primary">
+        <h6><b><i class="fa fa-home text-secondary"></i><a href={% url 'main:main' %}><span
+                class="text-secondary"> Home | </span></a> Non Production Operations</b></h6>
+    </div>
+    <style>
+        .containerPrincipal {
+            height: 875px;
+            width: 100%;
+            top: 11px;
+            left: 0px;
+            position: relative;
+            border: 3px solid transparent;
+        }
+
+        .containerCima {
+            height: 465px;
+            width: 100%;
+            top: 2px;
+            left: 0px;
+            position: absolute;
+            border: 3px solid transparent;
+        }
+
+        .containerBaixo {
+            height: 400px;
+            width: 100%;
+            top: 470px;
+            right: 0%;
+            position: absolute;
+            border: 3px solid transparent;
+        }
+    </style>
+{% endblock %}
+
+{% block body_content %}
+    <div class="containerPrincipal">
+        <div class="containerCima">
+            <p style="text-align: center; font-size: x-large; margin-bottom: -1px; background-color: orange"><b>NON
+                PRODUCTION</b></p>
+            <table id="tabelaProcedimentos" class="display compact"
+                   style="width:100%; background-color: rgba(123,255,243,0.13)">
+                <thead>
+                <tr>
+                    <th class="text-center">PROCEDIMENTOS</th>
+                    <th class="text-center">PROCESSAMENTO 1295/6</th>
+                    <th class="text-center">RECEBIMENTOS MATERIAIS</th>
+                    <th class="text-center">MATERIAL OBSOLETO OU SCRAP</th>
+                    <th class="text-center">REQUISIÇÃO DE MATERIAL DE CONSIGNAÇÃO</th>
+                    <th class="text-center">PROCESSAMENTO IMPRESSÃO 1621</th>
+                    <th class="text-center">CÂMARA REFRIGERAÇÃO / ENTREGA MATERIAIS</th>
+                    <th class="text-center">VERIFICAÇÃO 5 DOS BATCHES</th>
+                    <th class="text-center">SERVIÇO EXTERNO COMPRAS DE BAIXO VALOR</th>
+                    <th class="text-center">PROCESSAMENTO DE 2308 FORNECIMENTO E CRÉDITOS</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>
+                        <div class="text-center"><b>DOCUMENTAÇÃO</b></div>
+                    </td>
+                    <td id="1" style="text-align: center">
+                        {% for doc in procedimentos.all %}
+                            {% if doc.docOne %}
+                                <a href="{{ doc.docOne.url }}">PR-ANP-00001</a>
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td id="2" style="text-align: center">
+                        {% for doc in procedimentos.all %}
+                            {% if doc.docTwo %}
+                                <a href="{{ doc.docTwo.url }}">PR-ANP-00002</a>
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td id="3" style="text-align: center">
+                        {% for doc in procedimentos.all %}
+                            {% if doc.docThree %}
+                                <a href="{{ doc.docThree.url }}">PR-ANP-00003</a>
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td id="4" style="text-align: center">
+                        {% for doc in procedimentos.all %}
+                            {% if doc.docFour %}
+                                <a href="{{ doc.docFour.url }}">PR-ANP-00004</a>
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td id="5" style="text-align: center">
+                        {% for doc in procedimentos.all %}
+                            {% if doc.docFive %}
+                                <a href="{{ doc.docFive.url }}">PR-ANP-00005</a>
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td id="6" style="text-align: center">
+                        {% for doc in procedimentos.all %}
+                            {% if doc.docSix %}
+                                <a href="{{ doc.docSix.url }}">PR-ANP-00006</a>
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td id="7" style="text-align: center">
+                        {% for doc in procedimentos.all %}
+                            {% if doc.docSeven %}
+                                <a href="{{ doc.docSeven.url }}">PR-ANP-00007</a>
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td id="8" style="text-align: center">
+                        {% for doc in procedimentos.all %}
+                            {% if doc.docEight %}
+                                <a href="{{ doc.docEight.url }}">PR-ANP-00008</a>
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td id="9" style="text-align: center">
+                        {% for doc in procedimentos.all %}
+                            {% if doc.docNine %}
+                                <a href="{{ doc.docNine.url }}">PR-ANP-00009</a>
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td>
+                        <div class="fas fa-edit" id="configurationsDocumentacao"
+                             name="configurationsDocumentacao"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="text-center"><b>ANEXOS</b></div>
+                    </td>
+                    <td id="1" style="text-align: center">
+                        <a class="fas fa-list-alt fa-2x" data-toggle="modal" data-target="#anexoOne"></a>
+                    </td>
+                    <td id="2" style="text-align: center">
+                        <a class="fas fa-list-alt fa-2x" data-toggle="modal" data-target="#anexoTwo"></a>
+                    </td>
+                    <td id="3" style="text-align: center">
+                        <a class="fas fa-list-alt fa-2x" data-toggle="modal" data-target="#anexoThree"></a>
+                    </td>
+                    <td id="4" style="text-align: center">
+                        <a class="fas fa-list-alt fa-2x" data-toggle="modal" data-target="#anexoFour"></a>
+                    </td>
+                    <td id="5" style="text-align: center">
+                        <a class="fas fa-list-alt fa-2x" data-toggle="modal" data-target="#anexoFive"></a>
+                    </td>
+                    <td id="6" style="text-align: center">
+                        <a class="fas fa-list-alt fa-2x" data-toggle="modal" data-target="#anexoSix"></a>
+                    </td>
+                    <td id="7" style="text-align: center">
+                        <a class="fas fa-list-alt fa-2x" data-toggle="modal" data-target="#anexoSeven"></a>
+                    </td>
+                    <td id="8" style="text-align: center">
+                        <a class="fas fa-list-alt fa-2x" data-toggle="modal" data-target="#anexoEight"></a>
+                    </td>
+                    <td id="9" style="text-align: center">
+                        <a class="fas fa-list-alt fa-2x" data-toggle="modal" data-target="#anexoNine"></a>
+                    </td>
+                    <td>
+                        <div class="fas fa-edit" id="configurationAnexos" name="configurationAnexos"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="text-center"><b>QPS</b></div>
+                    </td>
+                    <td id="1" style="text-align: center">
+                        <a class="fas fa-list-alt fa-2x" data-toggle="modal" data-target="#qpsOne"></a>
+                    </td>
+                    <td id="2" style="text-align: center">
+                        {% if procedimentos.all.qpsTwo.value != "" %}
+                            <a class="fas fa-list-alt fa-2x" data-toggle="modal" data-target="#qpsTwo"></a>
+                        {% endif %}
+                    </td>
+                    <td id="3" style="text-align: center">
+                        <a class="fas fa-list-alt fa-2x" data-toggle="modal" data-target="#qpsThree"></a>
+                    </td>
+                    <td id="4" style="text-align: center">
+                        <a class="fas fa-list-alt fa-2x" data-toggle="modal" data-target="#qpsFour"></a>
+                    </td>
+                    <td id="5" style="text-align: center">
+                        <a class="fas fa-list-alt fa-2x" data-toggle="modal" data-target="#qpsFive"></a>
+                    </td>
+                    <td id="6" style="text-align: center">
+                        <a class="fas fa-list-alt fa-2x" data-toggle="modal" data-target="#qpsSix"></a>
+                    </td>
+                    <td id="7" style="text-align: center">
+                        <a class="fas fa-list-alt fa-2x" data-toggle="modal" data-target="#qpsSeven"></a>
+                    </td>
+                    <td id="8" style="text-align: center">
+                        <a class="fas fa-list-alt fa-2x" data-toggle="modal" data-target="#qpsEight"></a>
+                    </td>
+                    <td id="9" style="text-align: center">
+                        <a class="fas fa-list-alt fa-2x" data-toggle="modal" data-target="#qpsNine"></a>
+                    </td>
+                    <td>
+                        <div class="fas fa-edit" id="configurationQps" name="configurationQps"></div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="containerBaixo">
+            <table id="tabelaOthers" class="display" style="width:100%; background-color: rgba(123,255,243,0.13)">
+                <thead>
+                <tr>
+                    <th class="text-center">OTHERS</th>
+                    <th class="text-center">FORMULÁRIO SERVIÇO EXTERNO</th>
+                    <th class="text-center">FORMULÁRIO NEW ITEMS APPROVAL</th>
+                    <th class="text-center">REGISTO ESPONTÂNEO</th>
+                    <th class="text-center">SUMÁRIO DE COMPRAS URGENTE</th>
+                    <th class="text-center">PAYMENT REQUEST DETAILS</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>
+                        <div class="text-center"><b>TEMPLATES</b></div>
+                    </td>
+                    <td id="1" style="text-align: center">
+                        {% for other in others.all %}
+                            {% if other.one %}
+                                <a href="{{ other.one.url }}">{{ other.one.url|slice:'18:' }}</a>
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td id="2" style="text-align: center">
+                        {% for other in others.all %}
+                            {% if other.two %}
+                                <a href="{{ other.two.url }}">{{ other.two.url|slice:'18:' }}</a>
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td id="3" style="text-align: center">
+                        {% for other in others.all %}
+                            {% if other.three %}
+                                <a href="{{ other.three.url }}">{{ other.three.url|slice:'20:' }}</a>
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td id="4" style="text-align: center">
+                        {% for other in others.all %}
+                            {% if other.four %}
+                                <a href="{{ other.four.url }}">{{ other.four.url|slice:'19:' }}</a>
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td id="5" style="text-align: center">
+                        {% for other in others.all %}
+                            {% if other.five %}
+                                <a href="{{ other.five.url }}">{{ other.five.url|slice:'19:' }}</a>
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td>
+                        <div class="fas fa-edit" id="configurationOthers" name="configurationOthers"></div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <form method="POST" action="{% url 'vware:configurationDocumentacao' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal fade" id="configurationsDocumentacaoModal" tabindex="-1" role="dialog"
+                 aria-labelledby="myModalLabel">
+                <div class="modal-dialog modal-xl" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title" id="myModalLabel" style="margin-left: 40%">Non Production
+                                Operations -
+                                Documentação</h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="rounded col-md-9 mx-auto form p-4"
+                                 style="background-image: url('{% static "fundo.png" %}'); opacity: 85%">
+                                <div class="row">
+                                    <div class="column">
+                                        <p>PROCESSAMENTO 1295/6</p>
+                                        <p>RECEBIMENTOS MATERIAIS</p>
+                                        <p>MATERIAL OBSOLETO OU SCRAP</p>
+                                        <p>REQUISIÇÃO DE MATERIAL DE CONSIGNAÇÃO</p>
+                                        <p>PROCESSAMENTO IMPRESSÃO 1621</p>
+                                        <p>CÂMARA REFRIGERAÇÃO / ENTREGA MATERIAIS</p>
+                                        <p>VERIFICAÇÃO 5 DOS BATCHES</p>
+                                        <p>SERVIÇO EXTERNO COMPRAS DE BAIXO VALOR</p>
+                                        <p>PROCESSAMENTO DE 2308 FORNECIMENTO E CRÉDITOS</p>
+                                    </div>
+                                    <div class="column" style="margin-left: 50px">
+                                        <input type="file" id="oneDoc" name="oneDoc"></br>
+                                        <input type="file" id="twoDoc" name="twoDoc" style="margin-top: 9px"></br>
+                                        <input type="file" id="threeDoc" name="threeDoc"
+                                               style="margin-top: 9px"></br>
+                                        <input type="file" id="fourDoc" name="fourDoc" style="margin-top: 9px"></br>
+                                        <input type="file" id="fiveDoc" name="fiveDoc" style="margin-top: 9px"></br>
+                                        <input type="file" id="sixDoc" name="sixDoc" style="margin-top: 9px"></br>
+                                        <input type="file" id="sevenDoc" name="sevenDoc"
+                                               style="margin-top: 9px"></br>
+                                        <input type="file" id="eightDoc" name="eightDoc"
+                                               style="margin-top: 9px"></br>
+                                        <input type="file" id="nineDoc" name="nineDoc" style="margin-top: 9px"></br>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit">Submit</button>
+                            <button type="button" value="close" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <form method="POST" action="{% url 'vware:configurationAnexos' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal fade" id="configurationsAnexosModal" tabindex="-1" role="dialog"
+                 aria-labelledby="myModalLabel">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title" id="myModalLabel" style="margin-left: 30%">Non Production
+                                Operations -
+                                Anexos</h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="rounded mx-auto form p-4"
+                                 style="background-image: url('{% static "fundo.png" %}'); opacity: 85%">
+                                <div class="row">
+                                    <div class="column">
+                                        <p>PROCESSAMENTO 1295/6</p>
+                                        <p>RECEBIMENTOS MATERIAIS</p>
+                                        <p>MATERIAL OBSOLETO OU SCRAP</p>
+                                        <p>REQUISIÇÃO DE MATERIAL DE CONSIGNAÇÃO</p>
+                                        <p>PROCESSAMENTO IMPRESSÃO 1621</p>
+                                        <p>CÂMARA REFRIGERAÇÃO / ENTREGA MATERIAIS</p>
+                                        <p>VERIFICAÇÃO 5 DOS BATCHES</p>
+                                        <p>SERVIÇO EXTERNO COMPRAS DE BAIXO VALOR</p>
+                                        <p>PROCESSAMENTO DE 2308 FORNECIMENTO E CRÉDITOS</p>
+                                    </div>
+                                    <div class="column" style="margin-left: 50px">
+                                        <input type="file" id="oneAnexo" name="oneAnexo" multiple></br>
+                                        <input type="file" id="twoAnexo" name="twoAnexo" multiple
+                                               style="margin-top: 9px"></br>
+                                        <input type="file" id="threeAnexo" name="threeAnexo" multiple
+                                               style="margin-top: 9px"></br>
+                                        <input type="file" id="fourAnexo" name="fourAnexo" multiple
+                                               style="margin-top: 9px"></br>
+                                        <input type="file" id="fiveAnexo" name="fiveAnexo" multiple
+                                               style="margin-top: 9px"></br>
+                                        <input type="file" id="sixAnexo" name="sixAnexo" multiple
+                                               style="margin-top: 9px"></br>
+                                        <input type="file" id="sevenAnexo" name="sevenAnexo" multiple
+                                               style="margin-top: 9px"></br>
+                                        <input type="file" id="eightAnexo" name="eightAnexo" multiple
+                                               style="margin-top: 9px"></br>
+                                        <input type="file" id="nineAnexo" name="nineAnexo" multiple
+                                               style="margin-top: 9px"></br>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit">Submit</button>
+                            <button type="button" value="close" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <form method="POST" action="{% url 'vware:configurationQps' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal fade" id="configurationsQpsModal" tabindex="-1" role="dialog"
+                 aria-labelledby="myModalLabel">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title" id="myModalLabel" style="margin-left: 30%">Non Production
+                                Operations -
+                                QPS</h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="rounded mx-auto form p-4"
+                                 style="background-image: url('{% static "fundo.png" %}'); opacity: 85%">
+                                <div class="row">
+                                    <div class="column">
+                                        <p>PROCESSAMENTO 1295/6</p>
+                                        <p>RECEBIMENTOS MATERIAIS</p>
+                                        <p>MATERIAL OBSOLETO OU SCRAP</p>
+                                        <p>REQUISIÇÃO DE MATERIAL DE CONSIGNAÇÃO</p>
+                                        <p>PROCESSAMENTO IMPRESSÃO 1621</p>
+                                        <p>CÂMARA REFRIGERAÇÃO / ENTREGA MATERIAIS</p>
+                                        <p>VERIFICAÇÃO 5 DOS BATCHES</p>
+                                        <p>SERVIÇO EXTERNO COMPRAS DE BAIXO VALOR</p>
+                                        <p>PROCESSAMENTO DE 2308 FORNECIMENTO E CRÉDITOS</p>
+                                    </div>
+                                    <div class="column" style="margin-left: 50px">
+                                        <input type="file" id="oneQps" name="oneQps" multiple></br>
+                                        <input type="file" id="twoQps" name="twoQps" multiple
+                                               style="margin-top: 9px"></br>
+                                        <input type="file" id="threeQps" name="threeQps" multiple
+                                               style="margin-top: 9px"></br>
+                                        <input type="file" id="fourQps" name="fourQps" multiple
+                                               style="margin-top: 9px"></br>
+                                        <input type="file" id="fiveQps" name="fiveQps" multiple
+                                               style="margin-top: 9px"></br>
+                                        <input type="file" id="sixQps" name="sixQps" multiple
+                                               style="margin-top: 9px"></br>
+                                        <input type="file" id="sevenQps" name="sevenQps" multiple
+                                               style="margin-top: 9px"></br>
+                                        <input type="file" id="eightQps" name="eightQps" multiple
+                                               style="margin-top: 9px"></br>
+                                        <input type="file" id="nineQps" name="nineQps" multiple
+                                               style="margin-top: 9px"></br>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit">Submit</button>
+                            <button type="button" value="close" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <form method="POST" action="{% url 'vware:configurationOthers' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal fade" id="configurationsOthersModal" tabindex="-1" role="dialog"
+                 aria-labelledby="myModalLabel">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title" id="myModalLabel" style="margin-left: 30%">Non Production
+                                Operations -
+                                Others</h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="rounded col-sm-10 mx-auto form p-4"
+                                 style="background-image: url('{% static "fundo.png" %}'); opacity: 85%">
+                                <div class="row">
+                                    <div class="column">
+                                        <p>FORMULÁRIO SERVIÇO EXTERNO</p>
+                                        <p>FORMULÁRIO NEW ITEMS APPROVAL</p>
+                                        <p>REGISTO ESPONTÂNEO</p>
+                                        <p>SUMÁRIO DE COMPRAS URGENTE</p>
+                                        <p>PAYMENT REQUEST DETAILS</p>
+                                    </div>
+                                    <div class="column" style="margin-left: 50px">
+                                        <input type="file" id="oneDoc" name="oneOthers"></br>
+                                        <input type="file" id="twoDoc" name="twoOthers"
+                                               style="margin-top: 9px"></br>
+                                        <input type="file" id="threeDoc" name="threeOthers"
+                                               style="margin-top: 9px"></br>
+                                        <input type="file" id="fourDoc" name="fourOthers"
+                                               style="margin-top: 9px"></br>
+                                        <input type="file" id="fiveDoc" name="fiveOthers"
+                                               style="margin-top: 9px"></br>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit">Submit</button>
+                            <button type="button" value="close" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <div class="modal fade" id="anexoOne" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">PROCESSAMENTO 1295/6</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        {% for row in procedimentos.all %}
+                            {% if row.anexoOne %}
+                                <a id="anexoOneString" href="{{ row.anexoOne.url }}"
+                                   target="_blank" class="link-primary"><b>{{ row.anexoOne.url|slice:'32:' }}
+                                </b></a></br></br>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" value="close" data-dismiss="modal">close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="anexoTwo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">RECEBIMENTOS MATERIAIS</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        {% for row in procedimentos.all %}
+                            {% if row.anexoTwo %}
+                                <a href="{{ row.anexoTwo.url }}"
+                                   target="_blank" class="link-primary"><b>{{ row.anexoTwo.url|slice:'32:' }}
+                                </b></a></br></br>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" value="close" data-dismiss="modal">close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="anexoThree" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">MATERIAL OBSOLETO OU SCRAP</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        {% for row in procedimentos.all %}
+                            {% if row.anexoThree %}
+                                <a href="{{ row.anexoThree.url }}"
+                                   target="_blank" class="link-primary"><b>{{ row.anexoThree.url|slice:'34:' }}
+                                </b></a></br></br>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" value="close" data-dismiss="modal">close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="anexoFour" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">REQUISIÇÃO DE MATERIAL DE CONSIGNAÇÃO</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        {% for row in procedimentos.all %}
+                            {% if row.anexoFour %}
+                                <a href="{{ row.anexoFour.url }}"
+                                   target="_blank" class="link-primary"><b>{{ row.anexoFour.url|slice:'33:' }}
+                                </b></a></br></br>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" value="close" data-dismiss="modal">close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="anexoFive" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">PROCESSAMENTO IMPRESSÃO 1621</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        {% for row in procedimentos.all %}
+                            {% if row.anexoFive %}
+                                <a href="{{ row.anexoFive.url }}"
+                                   target="_blank" class="link-primary"><b>{{ row.anexoFive.url|slice:'33:' }}
+                                </b></a></br></br>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" value="close" data-dismiss="modal">close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="anexoSix" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">CÂMARA REFRIGERAÇÃO / ENTREGA MATERIAIS</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        {% for row in procedimentos.all %}
+                            {% if row.anexoSix %}
+                                <a href="{{ row.anexoSix.url }}"
+                                   target="_blank" class="link-primary"><b>{{ row.anexoSix.url|slice:'32:' }}
+                                </b></a></br></br>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" value="close" data-dismiss="modal">close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="anexoSeven" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">VERIFICAÇÃO 5 DOS BATCHES</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        {% for row in procedimentos.all %}
+                            {% if row.anexoSeven %}
+                                <a href="{{ row.anexoSeven.url }}"
+                                   target="_blank" class="link-primary"><b>{{ row.anexoSeven.url|slice:'34:' }}
+                                </b></a></br></br>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" value="close" data-dismiss="modal">close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="anexoEight" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">SERVIÇO EXTERNO COMPRAS DE BAIXO VALOR</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        {% for row in procedimentos.all %}
+                            {% if row.anexoEight %}
+                                <a href="{{ row.anexoEight.url }}"
+                                   target="_blank" class="link-primary"><b>{{ row.anexoEight.url|slice:'34:' }}
+                                </b></a></br></br>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" value="close" data-dismiss="modal">close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="anexoNine" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">PROCESSAMENTO DE 2308 FORNECIMENTO E CRÉDITOS</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        {% for row in procedimentos.all %}
+                            {% if row.anexoNine %}
+                                <a href="{{ row.anexoNine.url }}"
+                                   target="_blank" class="link-primary"><b>{{ row.anexoNine.url|slice:'33:' }}
+                                </b></a></br></br>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" value="close" data-dismiss="modal">close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="qpsOne" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">PROCESSAMENTO 1295/6</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        {% for row in procedimentos.all %}
+                            {% if row.qpsOne %}
+                                <a href="{{ row.qpsOne.url }}"
+                                   target="_blank" class="link-primary"><b>{{ row.qpsOne.url|slice:'29:' }}
+                                </b></a></br></br>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" value="close" data-dismiss="modal">close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="qpsTwo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">RECEBIMENTOS MATERIAIS</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        {% for row in procedimentos.all %}
+                            {% if row.qpsTwo %}
+                                <a href="{{ row.qpsTwo.url }}"
+                                   target="_blank" class="link-primary"><b>{{ row.qpsTwo.url|slice:'29:' }}
+                                </b></a></br></br>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" value="close" data-dismiss="modal">close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="qpsThree" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">MATERIAL OBSOLETO OU SCRAP</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        {% for row in procedimentos.all %}
+                            {% if row.qpsThree %}
+                                <a href="{{ row.qpsThree.url }}"
+                                   target="_blank" class="link-primary"><b>{{ row.qpsThree.url|slice:'31:' }}
+                                </b></a></br></br>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" value="close" data-dismiss="modal">close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="qpsFour" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">REQUISIÇÃO DE MATERIAL DE CONSIGNAÇÃO</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        {% for row in procedimentos.all %}
+                            {% if row.qpsFour %}
+                                <a href="{{ row.qpsFour.url }}"
+                                   target="_blank" class="link-primary"><b>{{ row.qpsFour.url|slice:'30:' }}
+                                </b></a></br></br>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" value="close" data-dismiss="modal">close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="qpsFive" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">PROCESSAMENTO IMPRESSÃO 1621</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        {% for row in procedimentos.all %}
+                            {% if row.qpsFive %}
+                                <a href="{{ row.qpsFive.url }}"
+                                   target="_blank" class="link-primary"><b>{{ row.qpsFive.url|slice:'30:' }}
+                                </b></a></br></br>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" value="close" data-dismiss="modal">close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="qpsSix" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">CÂMARA REFRIGERAÇÃO / ENTREGA MATERIAIS</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        {% for row in procedimentos.all %}
+                            {% if row.qpsSix %}
+                                <a href="{{ row.qpsSix.url }}"
+                                   target="_blank" class="link-primary"><b>{{ row.qpsSix.url|slice:'29:' }}
+                                </b></a></br></br>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" value="close" data-dismiss="modal">close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="qpsSeven" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">VERIFICAÇÃO 5 DOS BATCHES</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        {% for row in procedimentos.all %}
+                            {% if row.qpsSeven %}
+                                <a href="{{ row.qpsSeven.url }}"
+                                   target="_blank" class="link-primary"><b>{{ row.qpsSeven.url|slice:'31:' }}
+                                </b></a></br></br>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" value="close" data-dismiss="modal">close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="qpsEight" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">SERVIÇO EXTERNO COMPRAS DE BAIXO VALOR</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        {% for row in procedimentos.all %}
+                            {% if row.qpsEight %}
+                                <a href="{{ row.qpsEight.url }}"
+                                   target="_blank" class="link-primary"><b>{{ row.qpsEight.url|slice:'31:' }}
+                                </b></a></br></br>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" value="close" data-dismiss="modal">close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="qpsNine" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">PROCESSAMENTO DE 2308 FORNECIMENTO E CRÉDITOS</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        {% for row in procedimentos.all %}
+                            {% if row.qpsNine %}
+                                <a href="{{ row.qpsNine.url }}"
+                                   target="_blank" class="link-primary"><b>{{ row.qpsNine.url|slice:'30:' }}
+                                </b></a></br></br>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" value="close" data-dismiss="modal">close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="position: absolute; right: 85px; bottom: 0">
+            <a href="#reportIssue" data-toggle="modal" data-target="#reportIssue" class="fas fa-info-circle"
+               style="font-size: 15px; height: 22px"> Help</a>
+        </div>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" action="{% url 'vware:reportNonProduction' %}">
+        {% csrf_token %}
+        <div class="modal fade" id="reportIssue" tabindex="-1" role="dialog"
+             aria-labelledby="myModalLabel">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: rgba(236,144,0,0.86)">
+                        <h4 class="modal-title" id="myModalLabel" style="margin-left: 45%; font-size: 40px"><i>HELP</i>
+                        </h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body"
+                         style="background: linear-gradient(to bottom, rgba(236,144,0,0.86) 0%, ghostwhite 100%); ">
+                        <div style="margin-top: 10px">
+                            <p style="font-size: 20px"><strong>Escreva aqui possíveis erros de utilização desta página
+                                em
+                                específico, ou deixe sugestões de melhoria</strong></p>
+                            <textarea class="form-control mt-n3" name="reportICDR" id="reportICDR" rows="11"
+                                      style="background-color: floralwhite; text-align: center;font-family:sans-serif;font-size:1.5em"
+                                      required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="background-color: ghostwhite">
+                        <button type="submit" id="submitReportICDR" class="btn btn-primary">Submeter</button>
+                        <button type="button" class="btn btn-primary" value="pending" data-dismiss="modal">Fechar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        $(document).ready(function () {
+
+            var tabelaProcedimentos = $('#tabelaProcedimentos').DataTable({
+                "info": false,
+                "paging": false,
+                "ordering": false,
+                "searching": false,
+                "scrollX": 500,
+            });
+
+            var tabelaOthers = $('#tabelaOthers').DataTable({
+                "info": false,
+                "paging": false,
+                "ordering": false,
+                "searching": false,
+                "scrollX": 500,
+            });
+
+            $('#tabelaProcedimentos tbody').on('click', '#configurationsDocumentacao', function () {
+                var myModal = new bootstrap.Modal(document.getElementById('configurationsDocumentacaoModal'))
+                myModal.show()
+            });
+
+            $('#tabelaProcedimentos tbody').on('click', '#configurationAnexos', function () {
+                var myModal = new bootstrap.Modal(document.getElementById('configurationsAnexosModal'))
+                myModal.show()
+            });
+
+            $('#tabelaProcedimentos tbody').on('click', '#configurationQps', function () {
+                var myModal = new bootstrap.Modal(document.getElementById('configurationsQpsModal'))
+                myModal.show()
+            });
+
+            $('#tabelaOthers tbody').on('click', '#configurationOthers', function () {
+                var myModal = new bootstrap.Modal(document.getElementById('configurationsOthersModal'))
+                myModal.show()
+            });
+        });
+    </script>
+{% endblock %}

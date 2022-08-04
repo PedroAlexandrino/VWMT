@@ -1,0 +1,162 @@
+{% extends "vware/baseArmazem.html" %}
+{% load static %}
+
+{% block body_title %}
+    <div class="text-primary">
+        <h6><b><i class="fa fa-home text-secondary"></i><a href={% url 'main:main' %}><span
+                class="text-secondary"> Home | </span></a> Pending</b></h6>
+    </div>
+
+    <style>
+
+        .containerPrincipal {
+            height: 835px;
+            width: 100%;
+            top: 11px;
+            left: 0px;
+            position: relative;
+            border: 3px solid transparent;
+        }
+
+    </style>
+{% endblock %}
+
+
+{% block body_content %}
+
+    <div class="containerPrincipal" style="text-align: center">
+        <div class="form-inline">
+            <p class="mb-n5">Total: {{ elementosFA|length }}</p>
+            <p style="margin-left: 43.5%">
+            <h3><b> FA Table</b></h3></p>
+        </div>
+
+        <table id="tableFAPending" class="display" style="width:100%">
+            <thead style="margin-left: -9px">
+            <tr>
+                <th>Event ID</th>
+                <th>Event Sub ID</th>
+                <th>Item</th>
+                <th>Location To</th>
+                <th>Quantity Remaining</th>
+                <th>Quantity Required</th>
+                <th>Created Date</th>
+                <th>Created Time</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for val in elementosFA %}
+                <tr>
+                    <td>{{ val.id }}</td>
+                    <td>{{ val.subID }}</td>
+                    <td>{{ val.item }}</td>
+                    <td>{{ val.locTo }}</td>
+                    <td>{{ val.qtyRequired }}</td>
+                    <td>{{ val.qtyRemaining }}</td>
+                    <td>{{ val.date }}</td>
+                    <td>{{ val.time }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <div class="form-inline">
+            <p class="mb-n5">Total: {{ elementosBP|length }}</p>
+            <p style="margin-left: 43.5%">
+            <h3><b> BP Table</b></h3></p>
+        </div>
+
+        <table id="tableBPPending" class="display" style="width:100%">
+            <thead style="margin-left: -9px">
+            <tr>
+                <th>Event ID</th>
+                <th>Event Sub ID</th>
+                <th>Item</th>
+                <th>Location To</th>
+                <th>Quantity Remaining</th>
+                <th>Quantity Required</th>
+                <th>Created Date</th>
+                <th>Created Time</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for val in elementosBP %}
+                <tr>
+                    <td>{{ val.id }}</td>
+                    <td>{{ val.subID }}</td>
+                    <td>{{ val.item }}</td>
+                    <td>{{ val.locTo }}</td>
+                    <td>{{ val.qtyRequired }}</td>
+                    <td>{{ val.qtyRemaining }}</td>
+                    <td>{{ val.date }}</td>
+                    <td>{{ val.time }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <form method="POST" enctype="multipart/form-data" action="{% url 'receiving:uploadTaskBrowse' %}">
+            {% csrf_token %}
+            <div class="form-inline">
+                <div class="form-inline" style="bottom: 30px; margin-left: 10px; position: absolute">
+                    <button type="submit" name="_updatePending" id="_updatePending" class="btn btn-primary">Update Info</button>
+                    {% for data in data.all %}
+                        <h4 style="margin-left: 20px">Last update: {{ data }}</h4>
+                        <input type="hidden" id="lastData" value="{{ data }}">
+                        <input type="hidden" id="hourRed" value="{{ data.redHour }}">
+                        <input type="hidden" id="hourYellow" value="{{ data.yellowHour }}">
+                        <input type="hidden" id="lastUpdateRed" value="{{ data.lastUpdateRed }}">
+                    {% endfor %}
+                </div>
+            </div>
+        </form>
+        <div style="bottom: 0px; margin-left: 25px; position: absolute">
+            <h6><b><i class="fa fa-chevron-left text-secondary"></i><a href={% url 'receiving:mnfgSupply' %}><span
+                    class="text-secondary"> Back </span></a></b></h6>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        $(document).ready(function () {
+            const lastData = document.getElementById('lastData').value
+            const lastUpdateRed = document.getElementById('lastUpdateRed').value
+            if (new Date().getHours() - new Date(lastData).getHours() >= lastUpdateRed) {
+                $('h4').css({
+                    'background-color': '#ff0000',
+                    'color': 'white',
+                });
+            }
+
+            setInterval(function () {
+                location.reload()
+                $.ajax({
+                    type: 'POST',
+                    url: '/receiving/uploadTaskBrowse/',
+                    data: {
+                        csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                        _updatePending: ''
+                    },
+                    success: function () {
+                    }
+                })
+            }, 60000);
+
+            $('#tableFAPending').DataTable({
+                "info": false,
+                "paging": false,
+                "searching": false,
+                "scrollY": "270px",
+                "order": [[6, "asc"], [7, "asc"]],
+
+            });
+
+            $('#tableBPPending').DataTable({
+                "info": false,
+                "paging": false,
+                "searching": false,
+                "scrollY": "270px",
+                "order": [[6, "asc"], [7, "asc"]],
+            });
+        });
+    </script>
+{% endblock %}

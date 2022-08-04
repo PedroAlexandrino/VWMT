@@ -1,0 +1,355 @@
+{% extends "vware/baseArmazem.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block body_title %}
+    <div class="text-primary">
+        <h6><b><i class="fa fa-home text-secondary"></i><a href={% url 'main:main' %}><span
+                class="text-secondary"> Home | </span></a> Receiving Operations</b></h6>
+    </div>
+    <style>
+        .containerPrincipal {
+            height: 835px;
+            width: 100%;
+            top: 11px;
+            left: 0px;
+            position: relative;
+            border: 3px solid transparent;
+        }
+
+        .containerCima {
+            height: 400px;
+            width: 100%;
+            top: 17px;
+            left: 0px;
+            position: absolute;
+            border: 3px solid transparent;
+        }
+
+        .containerBaixo {
+            height: 400px;
+            width: 100%;
+            top: 400px;
+            right: 0%;
+            position: absolute;
+            border: 3px solid transparent;
+        }
+
+    </style>
+{% endblock %}
+
+{% block body_content %}
+    <div class="containerPrincipal">
+        <div class="containerCima">
+            <table id="tabelaReceivingOperation" class="display" style="width:100%">
+                <thead>
+                <tr>
+                    <th class="text-center">OPERATIONS</th>
+                    <th class="text-center">RECEÇÃO ADMINISTRATIVA</th>
+                    <th class="text-center">DESCARGA VEÍCULO</th>
+                    <th class="text-center">RECEÇÃO FÍSICA</th>
+                    <th class="text-center">ARRUMAÇÃO MATERIAL</th>
+                    <th class="text-center">PICKING</th>
+                    <th class="text-center">INSPEÇÃO MATERIAL</th>
+                    <th class="text-center">LINEFEEDER EMERGÊNCIA</th>
+                    <th class="text-center">SUBMISSÃO PURGA</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>
+                        <div class="text-center">QPS</div>
+                    </td>
+                    <td id="1" style="text-align: center">
+                        <a class="fas fa-list-alt fa-2x" data-toggle="modal" data-target="#one"></a>
+                    </td>
+                    <td id="2" style="text-align: center">
+                        <a class="fas fa-list-alt fa-2x" data-toggle="modal" data-target="#two"></a>
+                    </td>
+                    <td id="3" style="text-align: center">
+                        <a class="fas fa-list-alt fa-2x" data-toggle="modal" data-target="#three"></a>
+                    </td>
+                    <td id="4" style="text-align: center">
+                        <a class="fas fa-list-alt fa-2x" data-toggle="modal" data-target="#four"></a>
+                    </td>
+                    <td id="5" style="text-align: center">
+                        <a class="fas fa-list-alt fa-2x" data-toggle="modal" data-target="#five"></a>
+                    </td>
+                    <td id="6" style="text-align: center">
+                        <a class="fas fa-list-alt fa-2x" data-toggle="modal" data-target="#six"></a>
+                    </td>
+                    <td id="7" style="text-align: center">
+                        <a class="fas fa-list-alt fa-2x" data-toggle="modal" data-target="#seven"></a>
+                    </td>
+                    <td id="8" style="text-align: center">
+                        <a class="fas fa-list-alt fa-2x" data-toggle="modal" data-target="#eight"></a>
+                    </td>
+                    <td>
+                        <div class="fas fa-edit" id="configurations" name="configurations"></div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal fade" id="one" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Receiving Operations</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    {% for row in receivingOperation.all %}
+                        {% if row.one %}
+                            <a href="{{ row.one.url }}"
+                               target="_blank" class="link-primary"><b>{{ row.one.url|slice:'21:' }}
+                            </b></a></br></br>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" value="close" data-dismiss="modal">close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="two" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Receiving Operations</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    {% for row in receivingOperation.all %}
+                        {% if row.two %}
+                            <a href="{{ row.two.url }}"
+                               target="_blank" class="link-primary"><b>{{ row.two.url|slice:'21:' }}
+                            </b></a></br></br>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" value="close" data-dismiss="modal">close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="three" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Receiving Operations</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    {% for row in receivingOperation.all %}
+                        {% if row.three %}
+                            <a href="{{ row.three.url }}"
+                               target="_blank" class="link-primary"><b>{{ row.three.url|slice:'23:' }}
+                            </b></a></br></br>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" value="close" data-dismiss="modal">close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="four" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Receiving Operations</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    {% for row in receivingOperation.all %}
+                        {% if row.four %}
+                            <a href="{{ row.four.url }}"
+                               target="_blank" class="link-primary"><b>{{ row.four.url|slice:'22:' }}
+                            </b></a></br></br>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" value="close" data-dismiss="modal">close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="five" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Receiving Operations</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    {% for row in receivingOperation.all %}
+                        {% if row.five %}
+                            <a href="{{ row.five.url }}"
+                               target="_blank" class="link-primary"><b>{{ row.five.url|slice:'22:' }}
+                            </b></a></br></br>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" value="close" data-dismiss="modal">close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="six" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Receiving Operations</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    {% for row in receivingOperation.all %}
+                        {% if row.six %}
+                            <a href="{{ row.six.url }}"
+                               target="_blank" class="link-primary"><b>{{ row.six.url|slice:'21:' }}
+                            </b></a></br></br>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" value="close" data-dismiss="modal">close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="seven" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Receiving Operations</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    {% for row in receivingOperation.all %}
+                        {% if row.seven %}
+                            <a href="{{ row.seven.url }}"
+                               target="_blank" class="link-primary"><b>{{ row.seven.url|slice:'23:' }}
+                            </b></a></br></br>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" value="close" data-dismiss="modal">close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="eight" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Receiving Operations</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    {% for row in receivingOperation.all %}
+                        {% if row.eight %}
+                            <a href="{{ row.eight.url }}"
+                               target="_blank" class="link-primary"><b>{{ row.eight.url|slice:'23:' }}
+                            </b></a></br></br>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" value="close" data-dismiss="modal">close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form method="POST" action="{% url 'vware:configurationReceivingOperation' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal fade" id="configurationsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel" style="margin-left: 40%">Receiving Operations</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="rounded col-md-9 mx-auto form p-4"
+                             style="background-image: url('{% static "fundo.png" %}'); opacity: 85%">
+                            <div class="row">
+                                <div class="column">
+                                    <p>RECEÇÃO ADMINISTRATIVA </p>
+                                    <p>DESCARGA VEÍCULO </p>
+                                    <p>RECEÇÃO FÍSICA </p>
+                                    <p>ARRUMAÇÃO MATERIAL </p>
+                                    <p>PICKING </p>
+                                    <p>INSPEÇÃO MATERIAL </p>
+                                    <p>LINEFEEDER EMERGÊNCIA </p>
+                                    <p>SUBMISSÃO PURGA </p>
+                                </div>
+                                <div class="column" style="margin-left: 50px">
+                                    <input type="file" id="one" name="one" multiple></br>
+                                    <input type="file" id="two" name="two" multiple style="margin-top: 9px"></br>
+                                    <input type="file" id="three" name="three" multiple style="margin-top: 9px"></br>
+                                    <input type="file" id="four" name="four" multiple style="margin-top: 9px"></br>
+                                    <input type="file" id="five" name="five" multiple style="margin-top: 9px"></br>
+                                    <input type="file" id="six" name="six" multiple style="margin-top: 9px"></br>
+                                    <input type="file" id="seven" name="seven" multiple style="margin-top: 9px"></br>
+                                    <input type="file" id="eight" name="eight" multiple style="margin-top: 9px"></br>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit">Submit</button>
+                        <button type="button" value="close" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+
+        $(document).ready(function () {
+            var tabelaReceivingOperation = $('#tabelaReceivingOperation').DataTable({
+                "info": false,
+                "paging": false,
+                "ordering": false,
+                "searching": false,
+                "scrollX": 500,
+            });
+
+            $('#tabelaReceivingOperation tbody').on('click', '#configurations', function () {
+                var myModal = new bootstrap.Modal(document.getElementById('configurationsModal'))
+                myModal.show()
+            });
+        });
+    </script>
+{% endblock %}

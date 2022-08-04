@@ -1,0 +1,253 @@
+{% extends "vware/baseArmazem.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block body_title %}
+    <div class="text-primary">
+        <h6><b><i class="fa fa-home text-secondary"></i><a href={% url 'main:main' %}><span
+                class="text-secondary"> Home | </span></a> Shipping</b></h6>
+    </div>
+{% endblock %}
+
+
+{% block body_content %}
+    <p class="mt-3">
+    <table id="example" class="display" style="width:100%">
+        <thead>
+        <tr>
+            <th></th>
+            <th>QPS Shipping</th>
+            <th>QPS Packing</th>
+            <th>Checklist</th>
+            <th>Inspeção Dedicada</th>
+            <th>Cross Docking</th>
+            <th>Engenharia</th>
+            <th>Serviços</th>
+            <th>Guide Lines</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for row in dadosBD.all %}
+            <tr>
+                <b>
+                    <td class=" border-right" style="background-color: #eae7fe">{{ row.oem }}</td>
+                </b>
+                <td><a id="qpsShippingButton" class="btn-link-default far fa-file-alt"
+                       class="link-primary"><b> QPS Shipping</b></a></td>
+                {% comment %}{% if row.qpsShipping %}
+                    <td><b><a class="btn-link-default far fa-file-alt" href="{{ row.qpsShipping.url }}"
+                              target="_blank" class="link-primary"><b>
+                        <h7> QPS SHIPPING</h7>
+                    </b></a></b>
+                    </td>
+                {% else %}
+                    <td><a> </a></td>
+                {% endif %}
+                {% if row.qpsPacking %}
+                    <td width="11%"><a class="btn-link-default far fa-file-alt" href="{{ row.qpsPacking.url }}"
+                                       target="_blank"
+                                       class="link-primary"><b> QPS PACKING</b></a></td>
+                {% else %}
+                    <td><a> </a></td>
+                {% endif %}{% endcomment %}
+                <td>
+                    <a id="qpsPackingButton" class="btn-link-default far fa-file-alt"
+                       class="link-primary"><b> QPS PACKING</b></a>
+                </td>
+
+                <td>Checklist</td>
+                <td>Inspecao</td>
+                <td>cross</td>
+                <td>engenharia</td>
+                <td>servicos</td>
+                <td>lines</td>
+
+                {% comment %} hyperligação para imprimir o conteudo de checklist{% endcomment %}
+                {% comment %}{% if row.checklist %}
+                    <td>
+                        <button type="button" class="btn btn-link-default fas fa-print ml-n3"
+                                onclick="printJS('{{ row.checklist.url }}')"><i
+                        ></i><b>CHECKLIST</b>
+                        </button>
+                    </td>
+                {% else %}
+                    <td><a> </a></td>
+                {% endif %}
+                 hyperligação para abrir inspecaoDedicada num novo separador
+                {% if row.inspecaoDedicada %}
+                    <td><a class="btn-link-default far fa-file-alt"
+                           href="{{ row.inspecaoDedicada.url }}"
+                           target="_blank"><b> INSPEÇÃO DEDICADA</b></a></td>
+                {% else %}
+                    <td><a> </a></td>
+                {% endif %}
+                {% if row.crossDocking %}
+                    <td width="12%"><a class="btn-link-default far fa-file-alt" href="{{ row.crossDocking.url }}"
+                                       target="_blank"
+                                       class="link-primary"><b> CROSS DOCKING</b></a>
+                    </td>
+                {% else %}
+                    <td><a> </a></td>
+                {% endif %}
+                {% if row.engenharia %}
+                    <td><a class="btn-link-default far fa-file-alt" href="{{ row.engenharia.url }}"
+                           target="_blank"
+                           class="link-primary"><b> ENGENHARIA</b></a>
+                    </td>
+                {% else %}
+                    <td><a> </a></td>
+                {% endif %}
+                {% if row.servicos %}
+                    <td><a class="btn-link-default far fa-file-alt" href="{{ row.servicos.url }}"
+                           target="_blank"
+                           class="link-primary"><b> SERVIÇOS</b></a>
+                    </td>
+                {% else %}
+                    <td><a> </a></td>
+                {% endif %}
+                {% if row.guideLines %}
+                    <td><a class="btn-link-default far fa-file-alt" href="{{ row.guideLines.url }}"
+                           target="_blank"
+                           class="link-primary"><b> GUIDE LINES</b></a>
+                    </td>
+                {% else %}
+                    <td><a> </a></td>
+                {% endif %}{% endcomment %}
+            </tr>
+        {% endfor %}
+        </tbody>
+        <tfoot>
+        <tr>
+            <th></th>
+        </tr>
+        </tfoot>
+    </table>
+    </div>
+
+    <form method="POST" class="form" action="{% url 'vware:qpsPacking' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal fade" id="qpsPackingModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">QPS Packing Files</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <h6><b>General path</b></h6>
+                        <p id="caminho"></p>
+                        <input type="hidden" class="mt-n2" name="oemCliente" id="oemCliente" value="{{ oemCliente }}">
+                        <h6><b>Available files</b></h6>
+                        <p id="ficheirosOEM"></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" value="close" data-dismiss="modal">close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="modal fade" id="qpsShippingModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">QPS Shipping Files</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" class="mt-n2" name="oemCliente" id="oemCliente" value="{{ oemCliente }}">
+                        <h6><b>Available files</b></h6>
+                        <p id="ficheirosShipping"></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" value="close" data-dismiss="modal">close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+{% endblock %}
+
+
+{% block javascript %}
+    <script>
+
+        $(document).ready(function () {
+
+            var table = $('#example').DataTable({
+                paging: false,
+                searching: false,
+                info: false,
+                ordering: false,
+                scrollY: 720,
+                scrollX: 120,
+                scrollCollapse: true,
+
+            });
+
+            $('#example tbody').on('click', '#qpsPackingButton', function () {
+                var myModal = new bootstrap.Modal(document.getElementById('qpsPackingModal'))
+                myModal.show()
+                var data = table.row($(this).parents('tr')).data();
+
+                var caminho = "W:\\sharedir\\MP&L\\PROCEDIMENTOS\\Packaging\\QPS EMBALAGEM 2\\" + data[0] + "\\"
+
+                $('#caminho').html(caminho);
+
+                $.ajax({
+                    type: 'GET',
+                    url: '{% url 'vware:qpsPacking' %}',
+                    data:
+                        {
+                            csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                            oemCliente: data[0],
+                        },
+                    success: function (response) {
+
+                        let desiredData = replaceCommaLine(response.files.toString());
+
+                        function replaceCommaLine(data) {
+                            //convert string to array and remove whitespace
+                            let dataToArray = data.split(',').map(item => item.trim());
+                            //convert array to string replacing comma with new line
+                            return dataToArray.join("</br>");
+                        }
+
+                        $('#ficheirosOEM').html(desiredData);
+                    }
+                });
+            });
+            $('#example tbody').on('click', '#qpsShippingButton', function () {
+                var myModal = new bootstrap.Modal(document.getElementById('qpsShippingModal'))
+                myModal.show()
+
+                //var caminho = "W:\\sharedir\\MP&L\\PROCEDIMENTOS\\Shipping\\QPS Shipping"
+
+                $.ajax({
+                    type: 'GET',
+                    url: '{% url 'vware:qpsShipping' %}',
+                    data:
+                        {
+                            csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                        },
+                    success: function (response) {
+
+                        let desiredData = replaceCommaLine(response.files.toString());
+
+                        function replaceCommaLine(data) {
+                            //convert string to array and remove whitespace
+                            let dataToArray = data.split(',').map(item => item.trim());
+                            //convert array to string replacing comma with new line
+                            return dataToArray.join("</br>");
+                        }
+
+                        $('#ficheirosShipping').html(desiredData);
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}

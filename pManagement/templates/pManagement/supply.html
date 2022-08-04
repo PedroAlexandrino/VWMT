@@ -1,0 +1,698 @@
+{% extends "vware/baseArmazem.html" %}
+{% load static %}
+
+{% block body_title %}
+
+    <div class="text-primary">
+        <h6><b><i class="fa fa-home text-secondary"></i><a href={% url 'main:main' %}><span
+                class="text-secondary"> Home | </span></a> Extra Orders</b></h6>
+    </div>
+    <style>
+        .containerPrincipal {
+            height: 70%;
+            width: 100%;
+            top: 11px;
+            left: 0px;
+            position: relative;
+            border-bottom: 3px solid transparent;
+        }
+
+        .containerSecundario {
+            height: 30%;
+            width: 100%;
+            top: 75%;
+            left: 0px;
+            position: relative;
+            border: 3px solid transparent;
+        }
+
+    </style>
+{% endblock %}
+
+
+{% block body_content %}
+    <div class="containerPrincipal">
+        <table id="pedidosExtra" class="display" style="width:100%">
+            <thead>
+            <tr>
+                <th>Client</th>
+                <th>Product</th>
+                <th>Package</th>
+                <th>Quantity</th>
+                <th>Link</th>
+                <th>Request Date</th>
+                <th>Required Time/Time Left</th>
+                <th style="display: none">RemainingTime</th>
+                <th>Comment</th>
+                <th>State</th>
+                <th style="display: none">estado</th>
+                <th style="display: none">startTime</th>
+                <th style="display: none">tempoSupply</th>
+                <th style="display: none">tempoLimite</th>
+                <th style="display: none">ultimosDez</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for extraLine in pedidosExtra.all %}
+                <tr>
+                    <td>{{ extraLine.cliente }}</td>
+                    <td>{{ extraLine.produto }}</td>
+                    <td>{{ extraLine.embalagem }}</td>
+                    <td>{{ extraLine.quantidade }}</td>
+                    <td>{% if extraLine.link %}
+                        <a class="btn-link-default" href="{{ extraLine.link }}"
+                           target="_blank"
+                           class="link-primary">{{ extraLine.embalagem }}</a>
+                    {% endif %}</td>
+                    <td>{{ extraLine.dataPedido }}</td>
+                    <td>{{ extraLine.tempoSupply }}/({{ extraLine.tempoSupplyRestante }})</td>
+                    <td style="display: none">{{ extraLine.tempoSupplyRestante }}</td>
+                    <td><label for="comentarioInput"></label><input type="text" style="width: 230px"
+                                                                    nome="comentarioInput"
+                                                                    id="comentarioInput">{{ extraLine.comentario }}
+                    </td>
+                    <td>
+                        <div class="form-inline" style="width: 330px">
+                            {% if extraLine.estado == "emProcessamento" %}
+                                <button type="submit" id="emProcessamento" data-toggle="modal"
+                                        style="margin-right: 5px; background-color: green" data-target="#myForm">On
+                                    going
+                                </button>
+                                <button type="button" id="enviado" style="margin-right: 5px">Send</button>
+                                <button type="button" id="rejeitado" style="margin-right: 5px">Reject</button>
+                            {% endif %}
+                            {% if extraLine.estado == "pedido" %}
+                                <button type="submit" id="pedido" data-toggle="modal"
+                                        style="margin-right: 5px; background-color: whitesmoke"
+                                        data-target="#myForm">
+                                    On
+                                    going
+                                </button>
+                                <button type="button" id="enviado" style="margin-right: 5px">Send</button>
+                                <button type="button" id="rejeitado" style="margin-right: 5px">Reject</button>
+                            {% endif %}
+                            {% if extraLine.estado == "send" %}
+                                <button type="button" id="aleatorio" data-toggle="modal"
+                                        style="margin-right: 5px; background-color: green">On
+                                    going
+                                </button>
+                                <button type="button" id="enviadoCor"
+                                        style="margin-right: 65px; background-color: green">
+                                    Send
+                                </button>
+                            {% endif %}
+                            {% if extraLine.estado == "reject" %}
+                                <button type="button" id="rejeitadoCor"
+                                        style="margin-left: 128px; margin-right: 5px; background-color: red">Reject
+                                </button>
+                            {% endif %}
+                            <button type="button" id="received" style="margin-right: 5px">Received</button>
+                            {% if not extraLine.estado == "send" and not extraLine.estado == "reject" %}
+                                <button type="button" id="cancel" style="margin-right: 5px">Cancel</button>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td style="display: none">{{ extraLine.estado }}</td>
+                    {% if extraLine.startTime %}
+                        <td style="display: none">{{ extraLine.startTime }}</td>
+                    {% else %}
+                        <td style="display: none"></td>
+                    {% endif %}
+                    <td style="display: none">{{ extraLine.tempoSupply }}</td>
+                    <td style="display: none"></td>
+                    <td style="display: none"></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            <tfoot></tfoot>
+        </table>
+    </div>
+
+    <div class="containerSecundario" style="margin-top: 35px">
+        <table id="pedidosHistorico" class="display" style="width:100%">
+            <thead>
+            <tr>
+                <th>Client</th>
+                <th>Product</th>
+                <th>Package</th>
+                <th>Quantity</th>
+                <th>Request Date</th>
+                <th>End Date</th>
+                <th style="width: 50px">Comment</th>
+                <th>State</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for historicLine in pedidosHistorico.all %}
+                <tr>
+                    <td style="margin-right: -150px; width: 10%">{{ historicLine.cliente }}</td>
+                    <td style="width: 15%">{{ historicLine.produto }}</td>
+                    <td style="width: 15%">{{ historicLine.embalagem }}</td>
+                    <td style="width: 5%">{{ historicLine.quantidade }}</td>
+                    <td style="width: 15%">{{ historicLine.dataPedido }}</td>
+                    <td style="width: 10%">{{ historicLine.dataTerminado }}</td>
+                    <td style="width: 20%">{{ historicLine.comentario }}</td>
+
+                    <td style="width: 5%">
+                        <button type="submit" id="infoHistoric" data-toggle="modal"
+                                style="margin-right: 5px;"
+                                data-target="">{{ historicLine.estado }}
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            <tfoot></tfoot>
+        </table>
+    </div>
+    <div style="position: absolute; right: 85px; bottom: -200px">
+        <a href="#reportIssue" data-toggle="modal" data-target="#reportIssue" class="fas fa-info-circle"
+           style="font-size: 15px; height: 22px"> Help</a>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" action="{% url 'pManagement:reportSupplyPackage' %}">
+        {% csrf_token %}
+        <div class="modal fade" id="reportIssue" tabindex="-1" role="dialog"
+             aria-labelledby="myModalLabel">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: rgba(236,144,0,0.86)">
+                        <h4 class="modal-title" id="myModalLabel" style="margin-left: 45%; font-size: 40px"><i>HELP</i>
+                        </h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body"
+                         style="background: linear-gradient(to bottom, rgba(236,144,0,0.86) 0%, ghostwhite 100%); ">
+                        <div style="margin-top: 10px">
+                            <p style="font-size: 20px"><strong>Escreva aqui possíveis erros de utilização desta página
+                                em
+                                específico, ou deixe sugestões de melhoria</strong></p>
+                            <textarea class="form-control mt-n3" name="reportICDR" id="reportICDR" rows="11"
+                                      style="background-color: floralwhite; text-align: center;font-family:sans-serif;font-size:1.5em"
+                                      required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="background-color: ghostwhite">
+                        <button type="submit" id="submitReportICDR" class="btn btn-primary">Submeter</button>
+                        <button type="button" class="btn btn-primary" value="pending" data-dismiss="modal">Fechar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <form method="POST" class="form" action="{% url 'pManagement:atualizaEstado' %}"
+          enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal fade" id="myForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">Confirm submission</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="infoEstado"></p>
+                        <input type="hidden" id="estadoProcesso" name="estadoProcesso"
+                               value="{{ estadoProcesso }}">
+                        <input type="hidden" id="cliente1" name="cliente1"
+                               value="{{ cliente1 }}">
+                        <input type="hidden" id="produto1" name="produto1"
+                               value="{{ produto1 }}">
+                        <input type="hidden" id="embalagem1" name="embalagem1"
+                               value="{{ embalagem1 }}">
+                        <input type="hidden" id="data2" name="data2"
+                               value="{{ data2 }}">
+                        <input type="hidden" id="startTime" name="startTime"
+                               value="{{ startTime }}">
+                        <input type="hidden" id="endTime" name="endTime"
+                               value="{{ endTime }}">
+                        {% if user.is_authenticated %}
+                            <input type="hidden" id="autor" name="autor"
+                                   value="{{ user.username }}">
+                        {% else %}
+                            <input type="hidden" id="autor" name="autor"
+                                   value="">
+                        {% endif %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="close" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Confirm</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+    <div class="modal fade" id="infoHistoricModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Information</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <p id="info"></p>
+                    <div id="embalagemEscolhida" name="embalagemEscolhida">{{ embalagemEscolhida }}</div>
+                    <div id="dataPedidoEscolhida" name="dataPedidoEscolhida">{{ dataPedidoEscolhida }}</div>
+                    <p><b>History</b></p>
+                    <div id="listaHistorico" name="listaHistorico">{{ listaHistorico }}</div>
+                    {% comment %}{% for element in historicoAutores.all %}
+                        {% if element.horaP == dataPedidoEscolhida %}
+                            <p>{{ element.horaPedido }}, {{ element.estado }}, {{ element.horaAlteracao }}</p>
+                        {% endif %}
+                    {% endfor %}{% endcomment %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="close" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <form method="POST" class="form" action="{% url 'pManagement:addHistoric' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal fade" id="remove" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">Confirm submission</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="infoForm"></p>
+                        <input type="hidden" id="clienteForm" name="clienteForm" value="{{ clienteForm }}">
+                        <input type="hidden" id="produtoForm" name="produtoForm" value="{{ produtoForm }}">
+                        <input type="hidden" id="embalagemForm" name="embalagemForm" value="{{ embalagemForm }}">
+                        <input type="hidden" id="dataTerminadoForm" name="dataTerminadoForm"
+                               value="{{ dataTerminadoForm }}">
+                        <input type="hidden" id="dataPedidoForm" name="dataPedidoForm" value="{{ dataPedidoForm }}">
+                        <input type="hidden" id="quantidadeForm" name="quantidadeForm"
+                               value="{{ quantidade }}">
+                        <input type="hidden" id="comentarioForm" name="comentarioForm"
+                               value="{{ comentarioForm }}">
+                        <input type="hidden" id="estadoForm" name="estadoForm" value="{{ estadoForm }}">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="dismiss" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Confirm</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        $(document).ready(function () {
+            var table = $('#pedidosExtra').DataTable({
+                "info": false,
+                "searching": false,
+                "scrollY": "520px",
+                "scrollCollapse": true,
+                "paging": false,
+                "ordering": false,
+                "scrollX": true,
+                "rowCallback": function (row, data, index) {
+                    var tempoLimite = moment(data[5], 'DD-MM-YYYY HH:mm:ss').add(data[7], 'minutes')
+                    var ultimosDez = moment(tempoLimite, 'DD-MM-YYYY HH:mm:ss').subtract(10, 'minutes')
+                    if (moment() > ultimosDez) {
+                        $('td', row).css({
+                            'background-color': '#FFFF66',
+                            'color': 'black',
+                        });
+                    }
+                    if (moment() > tempoLimite) {
+                        $('td', row).css({
+                            'background-color': '#ff5252',
+                            'color': 'black',
+                        });
+                    }
+                }
+            });
+
+            setInterval(function () {
+                table.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                    var data = this.data();
+                    var tempoLimite = moment(data[5], 'DD-MM-YYYY HH:mm:ss').add(data[7], 'minutes')
+                    var ultimosDez = moment(tempoLimite, 'DD-MM-YYYY HH:mm:ss').subtract(10, 'minutes')
+
+                    console.log([data[11]]);
+                    console.log(tempoLimite.toLocaleString());
+                    console.log(ultimosDez.toLocaleString());
+                    if (data[10] == 'emProcessamento' || data[10] == 'send') {
+                        console.log("chegou aqui dentro");
+
+                        data[7] = data[7] - 1
+                        if (data[7] <= 0) {
+                            data[7] = 0
+                        }
+                        this.row(rowIdx).data(data);
+                        let dataPedido = data[5]
+                        //let tempoFinal = inicio.getMinutes() + data[6]
+
+                        table.draw();
+                        $.ajax({
+                            type: 'POST',
+                            url: '{% url 'pManagement:atualizaTempo' %}',
+                            data:
+                                {
+                                    csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                                    novoTempoSupply: data[7],
+                                    dataPedido: dataPedido,
+                                    tempoLimite: tempoLimite.format('YYYY-MM-DD HH:mm:ss'),
+                                    ultimosDez: ultimosDez.format('YYYY-MM-DD HH:mm:ss'),
+                                },
+                            success: function () {
+                                console.log("ajax com sucesso");
+                            }
+                        });
+                    }
+                    // ... do something with data(), or this.node(), etc
+
+                });
+            }, 60000); // Wait 1 minute before running again
+
+            function pad(val) {
+                var valString = val + "";
+                if (valString.length < 2) {
+                    return "0" + valString;
+                } else {
+                    return valString;
+                }
+            }
+
+            {% comment %}// forma de botao nao atualizar a pagina
+            const botaoPedido = document.getElementById('pedidoForm')
+            $(this).on('submit', '#pedidoForm', function (e) {
+                e.preventDefault();
+                var table1 = table.row($(this).parents('tr')).data();
+                this.style.backgroundColor = 'green';
+                $.ajax({
+                    type: 'POST',
+                    url: '{% url 'pManagement:atualizaEstado' %}',
+                    data:
+                        {
+                            csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                            estadoProcesso: "emProcessamento",
+                            data2: table1[5],
+                        },
+                    success: function () {
+                        alert('Saved');
+                    }
+                });
+            })
+
+            $(this).on('submit', '#processamentoForm', function (e) {
+                e.preventDefault();
+                var table1 = table.row($(this).parents('tr')).data();
+                this.style.backgroundColor = 'whitesmoke';
+                $.ajax({
+                    type: 'POST',
+                    url: '{% url 'pManagement:atualizaEstado' %}',
+                    data:
+                        {
+                            csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                            estadoProcesso: "pedido",
+                            data2: table1[5],
+                        },
+                    success: function () {
+                        alert('Saved');
+                    }
+                });
+            }){% endcomment %}
+
+            $('#pedidosExtra tbody').on('click', '#pedido', function () {
+                var myModal = new bootstrap.Modal(document.getElementById('myForm'))
+                myModal.show()
+                var estadoProcesso = "emProcessamento"
+                var data1 = table.row($(this).parents('tr')).data();
+                var cliente = data1[0]
+                var produto = data1[1]
+                var embalagem = data1[2]
+                var data2 = data1[5]
+                var tempoSupply = data1[6]
+                var tempoContador = data1[7]
+                var modalInfo = "Start " + embalagem + "?";
+                var startTime = moment().format('DD-MM-YYYY HH:mm:ss');
+
+                {% comment %}const countdownE = data1[7]
+                var totalSeconds = tempoSupply;
+                setInterval(setTime, 1000);
+
+                function setTime() {
+                    table.cell(countdownE).data(pad(totalSeconds % 60)+":"+pad(parseInt(totalSeconds / 60))).draw();
+                    //countdownE.innerHTML = (pad(totalSeconds % 60)+":"+pad(parseInt(totalSeconds / 60)));
+                    --totalSeconds;
+                }
+
+                function pad(val) {
+                    var valString = val + "";
+                    if (valString.length < 2) {
+                        return "0" + valString;
+                    } else {
+                        return valString;
+                    }
+                }{% endcomment %}
+
+                var minutesLabel = document.getElementById("minutes");
+                var secondsLabel = document.getElementById("seconds");
+                var totalSeconds = 2000;
+                setInterval(setTime, 1000);
+
+                function setTime() {
+                    --totalSeconds;
+                    secondsLabel.innerHTML = pad(totalSeconds % 60);
+                    minutesLabel.innerHTML = pad(parseInt(totalSeconds / 60));
+                }
+
+                function pad(val) {
+                    var valString = val + "";
+                    if (valString.length < 2) {
+                        return "0" + valString;
+                    } else {
+                        return valString;
+                    }
+                }
+
+                $('#startTime').val(startTime);
+                $('#infoEstado').html(modalInfo);
+                $('#estadoProcesso').val(estadoProcesso);
+                $('#cliente1').val(cliente);
+                $('#produto1').val(produto);
+                $('#embalagem1').val(embalagem);
+                $('#data2').val(data2)
+                console.log("running");
+                $.ajax({
+                    url: "{% url 'pManagement:atualizaEstado' %}",
+                    type: "POST",
+                    data: {
+                        estadoProcesso: estadoProcesso,
+                        cliente1: cliente,
+                        produto1: produto,
+                        embalagem1: embalagem,
+                        data2: data2,
+                        startTime: startTime,
+                    },
+                    success: function () {
+                        console.log("success");
+                    }
+                })
+
+            });
+
+            $('#pedidosExtra tbody').on('click', '#emProcessamento', function () {
+                var myModal = new bootstrap.Modal(document.getElementById('myForm'))
+                myModal.show()
+                var estadoProcesso = "pedido"
+                var data1 = table.row($(this).parents('tr')).data();
+                var cliente = data1[0]
+                var produto = data1[1]
+                var embalagem = data1[2]
+                var data2 = data1[5]
+                var modalInfo = "Cancel " + embalagem + "?";
+                var startTime = moment().format('DD-MM-YYYY HH:mm:ss');
+                $('#startTime').val(startTime);
+                $('#infoEstado').html(modalInfo);
+                $('#estadoProcesso').val(estadoProcesso);
+                $('#cliente1').val(cliente);
+                $('#produto1').val(produto);
+                $('#embalagem1').val(embalagem);
+                $('#data2').val(data2)
+            });
+
+
+            $('#pedidosExtra tbody').on('click', '#enviado', function () {
+                if ($(this).closest('td').find('#emProcessamento').length && this.style.backgroundColor != 'yellow') {
+                    var myModal = new bootstrap.Modal(document.getElementById('myForm'))
+                    myModal.show()
+                    var estadoProcesso = "send"
+                    var data = table.row($(this).parents('tr')).data();
+                    var modalInfo = "Confirm send?";
+                    $('#info').html(modalInfo);
+                    // Add response in Modal body
+                    var cliente = data[0]
+                    var produto = data[1]
+                    var embalagem = data[2]
+                    var data2 = data[5]
+                    var startTime = moment().format('DD-MM-YYYY HH:mm:ss');
+                    $('#startTime').val(startTime);
+                    $('#infoEstado').html(modalInfo);
+                    $('#estadoProcesso').val(estadoProcesso);
+                    $('#cliente1').val(cliente);
+                    $('#produto1').val(produto);
+                    $('#embalagem1').val(embalagem);
+                    $('#data2').val(data2)
+                }
+            });
+
+            $('#pedidosExtra tbody').on('click', '#rejeitado', function () {
+                var myModal = new bootstrap.Modal(document.getElementById('myForm'))
+                myModal.show()
+                var estadoProcesso = "reject"
+                var data = table.row($(this).parents('tr')).data();
+                var modalInfo = "Confirm reject?";
+                $('#info').html(modalInfo);
+                // Add response in Modal body
+                var cliente = data[0]
+                var produto = data[1]
+                var embalagem = data[2]
+                var data2 = data[5]
+                var endTime = moment().format('DD-MM-YYYY HH:mm:ss');
+                var startTime = moment().format('DD-MM-YYYY HH:mm:ss');
+                $('#startTime').val(startTime);
+                $('#endTime').val(endTime);
+                $('#infoEstado').html(modalInfo);
+                $('#estadoProcesso').val(estadoProcesso);
+                $('#cliente1').val(cliente);
+                $('#produto1').val(produto);
+                $('#embalagem1').val(embalagem);
+                $('#data2').val(data2)
+            });
+
+            $('#pedidosExtra tbody').on('click', '#received', function () {
+                if ($(this).closest('td').find('#enviadoCor').length || $(this).closest('td').find('#rejeitadoCor').length) {
+                    var botaoProcessado = this
+                    var myModal = new bootstrap.Modal(document.getElementById('remove'))
+                    myModal.show()
+                    this.style.backgroundColor = 'red'
+                    var data = table.row($(this).parents('tr')).data()
+                    var input = table.row($(this).parents('tr')).nodes().to$().find('input').val()
+                    var modalInfo = "Confirm package received?"
+                    $('#infoForm').html(modalInfo)
+                    // Add response in Modal body
+                    var cliente = data[0]
+                    var produto = data[1]
+                    var embalagem = data[2]
+                    var quantidade = data[3]
+                    var dataPedido = data[5]
+                    var comentario = input
+                    var time = moment().format('DD-MM-YYYY HH:mm:ss');
+                    if ($(this).closest('td').find('#enviadoCor').length) {
+                        var estado = "Succeed"
+                    }
+                    if ($(this).closest('td').find('#rejeitadoCor').length) {
+                        var estado = "Rejected"
+                    }
+                    $('#dataTerminadoForm').val(time);
+                    $('#dataPedidoForm').val(dataPedido);
+                    $('#clienteForm').val(cliente);
+                    $('#produtoForm').val(produto);
+                    $('#embalagemForm').val(embalagem);
+                    $('#quantidadeForm').val(quantidade);
+                    $('#comentarioForm').val(comentario);
+                    $('#estadoForm').val(estado);
+                    $('#dismiss').on('click', function () {
+                        botaoProcessado.style.backgroundColor = 'whitesmoke'
+                    });
+                }
+            });
+
+            $('#pedidosExtra tbody').on('click', '#cancel', function () {
+                var botaoProcessado = this
+                var myModal = new bootstrap.Modal(document.getElementById('remove'))
+                myModal.show()
+                this.style.backgroundColor = 'red'
+                var data = table.row($(this).parents('tr')).data()
+                var input = table.row($(this).parents('tr')).nodes().to$().find('input').val()
+                var modalInfo = "Are you sure you want to cancel?"
+                $('#infoForm').html(modalInfo)
+                // Add response in Modal body
+                var cliente = data[0]
+                var produto = data[1]
+                var embalagem = data[2]
+                var quantidade = data[3]
+                var dataPedido = data[5]
+                var comentario = input
+                var time = moment().format('DD-MM-YYYY HH:mm:ss');
+                var estado = "Cancelled"
+                $('#dataTerminadoForm').val(time);
+                $('#dataPedidoForm').val(dataPedido);
+                $('#clienteForm').val(cliente);
+                $('#produtoForm').val(produto);
+                $('#embalagemForm').val(embalagem);
+                $('#quantidadeForm').val(quantidade);
+                $('#comentarioForm').val(comentario);
+                $('#estadoForm').val(estado);
+                $('#dismiss').on('click', function () {
+                    botaoProcessado.style.backgroundColor = 'whitesmoke'
+                });
+            });
+        });
+
+        $(document).ready(function () {
+            var table = $('#pedidosHistorico').DataTable({
+                "info": false,
+                "searching": true,
+                "scrollY": "175px",
+                "scrollCollapse": true,
+                "paging": false,
+                "order": [[5, "desc"]],
+                columnDefs: [{
+                    targets: 6,
+                    render: function (data, type, row) {
+                        return data.length > 50 ?
+                            data.substr(0, 50) + '…' :
+                            data;
+                    }
+                }]
+                /* Mudar a cor da linha inteira na tabela
+                "createdRow": function (row, data, index) {
+                    if (data[7] == "Rejected") {
+                        $('td', row).css({
+                            'background-color': '#ff5252',
+                            'color': 'white',
+                        });
+                    }
+                }*/
+            });
+
+            $('#pedidosHistorico tbody').on('click', '#infoHistoric', function () {
+                var myModal = new bootstrap.Modal(document.getElementById('infoHistoricModal'))
+                myModal.show()
+                var data = table.row($(this).parents('tr')).data()
+                var comentario = data[6]
+                var dataPedidoEscolhida = data[4]
+                var embalagemEscolhida = data[2]
+                var dataTerminado = data[5]
+                var modalInfo = "<b>Client:</b>&emsp;&emsp;&emsp;&emsp;&emsp;" + data[0] + "</br><b>Product:</b>&emsp;&emsp;&emsp;&emsp;" + data[1] + "</br><b>Package</b>:&emsp;&emsp;&emsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + data[2] + "</br><b>Quantity:</b>&emsp;&emsp;&emsp;&nbsp;&nbsp;&nbsp;" + data[3] + "</br><b>Request Date:</b>&emsp;&nbsp;&nbsp;&nbsp;" + data[4] + "</br><b>End Date:</b> &emsp;&emsp;&emsp;&nbsp;&nbsp;" + data[5] + "</br></br><b>Comment:</b>&emsp;&emsp;&emsp;&nbsp;" + data[6];
+
+
+                $('#embalagemEscolhida').val(embalagemEscolhida);
+                $('#comentario').val(comentario);
+                $('#dataPedidoEscolhida').val(dataPedidoEscolhida);
+                $('#dataTerminado').val(dataTerminado);
+                $('#info').html(modalInfo);
+                $('#listaHistorico').val(lista);
+            });
+        });
+    </script>
+{% endblock %}

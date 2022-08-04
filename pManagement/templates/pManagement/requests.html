@@ -1,0 +1,275 @@
+{% extends "vware/baseArmazem.html" %}
+{% load static %}
+
+{% block body_title %}
+    <div class="text-primary" xmlns="http://www.w3.org/1999/html">
+        <h6><b><i class="fa fa-home text-secondary"></i><a href={% url 'main:main' %}><span
+                class="text-secondary"> Home | </span></a> Requests</b></h6>
+    </div>
+{% endblock %}
+
+{% block body_content %}
+    <div class="mt-3">
+        {% if erro %}
+            <br/>
+            <div class="text-center">
+                <h1><b>{{ erro }}</b></h1>
+            </div>
+            <br/>
+        {% endif %}
+        <table id="example" class="display" style="width:100%">
+            <thead>
+            <tr>
+                <th>Cliente</th>
+                <th>Produto</th>
+                <th>Embalagem</th>
+                <th>Standart supply time</th>
+                <th>Link</th>
+                <th>Quantidade</th>
+                <td></td>
+            </tr>
+            </thead>
+            <tbody>
+            {% for elemento in data %}
+                <tr>
+                    <td>{{ elemento.cliente }}</td>
+                    <td>{{ elemento.produto }}</td>
+                    <td>{{ elemento.tipo }}</td>
+                    <td align="center">{{ elemento.tempo }}</td>
+                    <td>{{ elemento.link }}</td>
+                    <td align="center">{{ elemento.quantidade }}</td>
+                    <th>
+                        <button type="button" class="btn btn-outline-secondary" style="height: 18px"
+                                data-toggle="modal" data-target="#myModal">Take
+                        </button>
+                    </th>
+                </tr>
+            {% endfor %}
+            </tbody>
+            <tfoot>
+            <tr>
+                <th>Cliente</th>
+                <th>Produto</th>
+                <th>Embalagem</th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+            </tr>
+            </tfoot>
+        </table>
+
+        <div class="ml-lg-4 round" id="test">
+            <a href="#" value="ClearFilters" onclick="ClearFilters()">Limpar filtros</a>
+        </div>
+
+        <!-- trata do ficheiro xlxs sinserido -->
+        <div class="containerPath mt-4" style="margin-left: 30px">
+            <div class="path" id="uploadClass">
+                <form method="POST" enctype="multipart/form-data" action="{% url 'pManagement:upload' %}">
+                    {% csrf_token %}
+                    <div class="form-inline" style="width: 570px">
+                        <h4 class="mt-3">IMPORT XLSX FILE:</h4>
+                        <input style="margin-left: 20px" type="file" name="myfile" id="myfile"
+                               title="Schedule Data"></br>
+                    </div>
+                    <button class="btn btn-outline-primary" style="margin-left: 154px" type="submit">Upload</button>
+                    {% if erro2 %}
+                        <b>{{ erro2 }}</b></br>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+        <div style="position: absolute; right: 85px; bottom: 0">
+            <a href="#reportIssue" data-toggle="modal" data-target="#reportIssue" class="fas fa-info-circle"
+               style="font-size: 15px; height: 22px"> Help</a>
+        </div>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" action="{% url 'pManagement:reportCustomerPacking' %}">
+        {% csrf_token %}
+        <div class="modal fade" id="reportIssue" tabindex="-1" role="dialog"
+             aria-labelledby="myModalLabel">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: rgba(236,144,0,0.86)">
+                        <h4 class="modal-title" id="myModalLabel" style="margin-left: 45%; font-size: 40px"><i>HELP</i>
+                        </h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body"
+                         style="background: linear-gradient(to bottom, rgba(236,144,0,0.86) 0%, ghostwhite 100%); ">
+                        <div style="margin-top: 10px">
+                            <p style="font-size: 20px"><strong>Escreva aqui possíveis erros de utilização desta página
+                                em
+                                específico, ou deixe sugestões de melhoria</strong></p>
+                            <textarea class="form-control mt-n3" name="reportICDR" id="reportICDR" rows="11"
+                                      style="background-color: floralwhite; text-align: center;font-family:sans-serif;font-size:1.5em"
+                                      required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="background-color: ghostwhite">
+                        <button type="submit" id="submitReportICDR" class="btn btn-primary">Submeter</button>
+                        <button type="button" class="btn btn-primary" value="pending" data-dismiss="modal">Fechar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- Modal onde é inserida a quantidade -->
+    <form method="POST" class="form" action="{% url 'pManagement:takeQuantity' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">Remove Item</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+
+                    </div>
+                    <div class="modal-body">
+                        <p id="info"></p>
+                        <input type="hidden" id="oem" name="oem" value="{{ oem }}">
+                        <input type="hidden" id="produto" name="produto" value="{{ produto }}">
+                        <input type="hidden" id="embalagem" name="embalagem" value="{{ embalagem }}">
+                        <input type="hidden" id="data" name="data" value="{{ data }}">
+                        <input type="hidden" id="link" name="link" value="{{ link }}">
+                        <input type="hidden" id="tempoSupply" name="tempoSupply" value="{{ tempoSupply }}">
+                        <input type="hidden" id="quantidadeExistente" name="quantidadeExistente"
+                               value="{{ quantidadeExistente }}">
+                        <h6><b>Insert quantity to remove</b></h6>
+                        <input type="number" name="quantidade" id="quantidade">
+                        <input type="hidden" id="estado" name="estado" value="{{ estado }}">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+{% endblock %}
+
+{% block javascript %}
+    <script>
+
+        $('.clearable.example .ui.selection.dropdown')
+            .dropdown({
+                clearable: true
+            });
+
+        $('.clearable.example .ui.inline.dropdown')
+            .dropdown({
+                clearable: true,
+                placeholder: 'any'
+            });
+
+        $(document).ready(function () {
+            // Setup - add a text input to each footer cell
+            $('#example thead tr').clone(true).appendTo('#example thead');
+            $('#example thead tr:eq(1) th').each(function (i) {
+                var title = $(this).text();
+                $(this).html('<input type="text" style="margin-left: -9px" class="form-control" placeholder="Procurar ' + title + '" />');
+
+                $('input', this).on('keyup change', function () {
+                    if (table.column(i).search() !== this.value) {
+                        table
+                            .column(i)
+                            .search(this.value)
+                            .draw();
+                    }
+                });
+            });
+
+            var table = $('#example').DataTable({
+                orderCellsTop: true,
+                fixedHeader: true,
+                "scrollY": 488,
+                "scrollX": 120,
+                "paging": false,
+                "info": false,
+
+                select: {
+                    style: 'os',
+                    selector: 'th:first-child',
+                    blurable: true
+                },
+                order: [[1, 'asc']],
+
+                initComplete: function () {
+                    var api = this.api();
+                    api.columns([0, 1, 2, 3]).$('td').click(function () {
+                        api.search(this.innerHTML).draw();
+                    });
+                    this.api().columns([0, 1, 2]).every(function () {
+                        var column = this;
+                        var select = $('<select class="form-control" style="margin-left: -9px" id="selected"><option value=""></option></select>')
+                            .appendTo($(column.footer()).empty())
+                            .on('change', function () {
+                                var val = $.fn.dataTable.util.escapeRegex(
+                                    $(this).val()
+                                );
+
+                                column
+                                    .search(val ? '^' + val + '$' : '', true, false)
+                                    .draw();
+                            });
+
+                        column.data().unique().sort().each(function (d, j) {
+                            console.log(column.data().unique().sort());
+                            select.append('<option value="' + d + '">' + d + '</option>')
+                        });
+                    });
+                },
+            });
+
+            $('#example tbody').on('click', 'button', function () {
+
+                var data = table.row($(this).parents('tr')).data();
+                //alert(data[0] + "'s quantity of " + data[2] + " is: " + data[4]);
+                //$("#myModal").modal('show');
+                // Add response in Modal body
+                var oem = data[0]
+                var produto = data[1]
+                var embalagem = data[2]
+                var tempoSupply = data[3]
+                var link1 = data[4]
+                var indice = link1.search(".pdf") + 4
+                var link = link1.slice(34, indice)
+                var quantidadeExistente = data[5]
+                var modalInfo = "Client:&emsp;&emsp;" + data[0] + "</br>" +
+                    "Product: &emsp;" + data[1] + "</br>" +
+                    "Package:&emsp;" + data[2] + "</br></br>" +
+                    "Available quantity:&emsp;<b style='font-size: large'>" + data[4] + "</b>"
+                var time = moment().format('DD-MM-YYYY HH:mm:ss');
+                var estado = "pedido"
+                $('#data').val(time);
+                $('#info').html(modalInfo);
+                $('#oem').val(oem);
+                $('#produto').val(produto);
+                $('#link').val(link);
+                $('#embalagem').val(embalagem);
+                $('#quantidadeExistente').val(quantidadeExistente);
+                $('#estado').val(estado);
+                $('#tempoSupply').val(tempoSupply);
+            });
+        });
+
+        function ClearFilters() {
+            $('.form-control').val('');  // Clear ext and select inputs with classname form-control
+            $('#chk').prop('checked', false).change();  // Clear checkbox and trigger change event
+
+            var table = $('#example').DataTable();
+            table
+                .search('')
+                .columns().search('')
+                .draw();
+        }
+    </script>
+{% endblock %}

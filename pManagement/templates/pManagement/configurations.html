@@ -1,0 +1,126 @@
+{% extends "vware/baseArmazem.html" %}
+{% load static %}
+
+{% block body_title %}
+    <div class="text-primary">
+        <h6><b><i class="fa fa-home text-secondary"></i><a href={% url 'main:main' %}><span
+                class="text-secondary"> Home | </span></a> Packing</b></h6>
+    </div>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>jQuery UI Datepicker - Default functionality</title>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="/resources/demos/style.css">
+
+    <style>
+        .containerPrincipal {
+            height: 835px;
+            width: 100%;
+            top: 11px;
+            left: 0px;
+            position: relative;
+            border: 3px solid transparent;
+        }
+
+        .button {
+            width: 35%;
+            height: 70px;
+            display: inline-block;
+            font-family: Arial, "Helvetica", sans-serif;
+            font-size: 45px;
+            color: #fff;
+            text-decoration: none;
+            text-align: center;
+            text-shadow: 1px 1px 0 #7D9EAD, 2px 2px 0 #7D9EAD, 1px 1px 0 #7D9EAD;
+            padding-top: 6px;
+            margin-left: auto;
+            margin-right: auto;
+            left: 30px;
+            position: relative;
+            cursor: pointer;
+            border: none;
+            background: #FBA51A;
+            background-image: linear-gradient(bottom, #E57200 0%, #FBA51A 100%);
+            border-radius: 5px;
+            box-shadow: inset 0px 1px 0px #FBA51A, 0px 5px 0px 0px #cb7b25, 0px 10px 5px #999;
+        }
+
+        .button:active {
+            top: 3px;
+            box-shadow: inset 0px 1px 0px #FBA51A, 0px 2px 0px 0px #E57200, 0px 5px 3px #999;
+        }
+
+        .button:hover, button:focus {
+            outline: none;
+            transform: translateY(0.5px);
+        }
+    </style>
+{% endblock %}
+
+
+{% block body_content %}
+   
+    <div class="containerPrincipal">
+     
+        <div style="width: 95%; bottom: 0%; position: absolute; border: 3px solid transparent; text-align: center">
+            <button type="submit" class="button" data-toggle="modal" data-target="#alterarGrupoCrossdocking">
+                Change account Groups
+            </button>
+        </div>
+        <div style="bottom: 0px; margin-left: 25px; position: absolute">
+            <h6><b><i class="fa fa-chevron-left text-secondary"></i><a
+                    href={% url 'main:main' %}><span
+                    class="text-secondary"> Back </span></a></b></h6>
+        </div>
+    </div>
+
+
+    
+
+    <form method="POST" class="form" action="{% url 'pManagement:changeUserGroups' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal fade" id="alterarGrupoCrossdocking" tabindex="-1" role="dialog"
+             aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">Change account groups</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <label for="username"><h6><b style="color: black">Username</b></h6></label>
+                        <select class="form-control" id="username" name="username" required>
+                            <!-- ESTE BLOCO NAO TÁ A IR BUSCAR PS USER.NAME -->
+                            <option value="">Select User</option>
+                               {% for user in users %}
+                                <option value="{{ user.username }}">{{ user.username }}</option>
+                               {% endfor %}
+                        </select></br>
+                        <label for="paginas"><h6><b style="color: black">Pages</b></h6></label>
+                        <select class="form-control" name="paginas" id="paginas" required>
+                            
+                        
+                            <option value="">Select accessable pages</option>
+                            <option value="requests">requests</option>
+                            <option value="newItem">newItem</option>
+                            <option value="Supply">Supply</option>
+                            <option value="ReturnablePackage">ReturnablePackage</option>
+                            <option value="ExtendablePackage">Extendable package</option>
+                            <option value="StockPackage">Stock Package</option>
+                            <option value="none">Remove access to all Packing pages</option>
+                            
+                      
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">
+                            Create
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+{% endblock %}

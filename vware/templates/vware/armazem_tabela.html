@@ -1,0 +1,28 @@
+{% load static %}
+{% for object in file %}
+    <tr>
+        <td>
+            <div class="d-inline-block align-middle">
+                <img src="{% static 'img/users/4.jpg' %}" alt="user image"
+                     class="rounded-circle img-40 align-top mr-15">
+                <div class="d-inline-block">
+                    <h6>User xpto</h6>
+                    <p class="text-muted mb-0">Palmela Plant, PT</p>
+                </div>
+            </div>
+        </td>
+        <td>
+            <label class="badge badge-primary">Sketch</label>
+            <label class="badge badge-primary">Ui</label>
+        </td>
+        <td>
+            <button type="button" class="btn btn-outline-primary"
+                    onclick="printJS({printable:'{{ object.adminUpload.url }}', type:'pdf'})"><i
+                    class="fas fa-print"></i>PDF
+            </button>
+            <a href="{{ object.adminUploadLink }}" target="_blank" rel="noopener noreferrer">
+                <button class="btn btn-outline-danger"><i class="fas fa-file-powerpoint"></i>PowerPoint</button>
+            </a>
+        </td>
+    </tr>
+{% endfor %}

@@ -1,0 +1,334 @@
+{% extends "vware/baseArmazem.html" %}
+{% load static %}
+
+{% block body_title %}
+    <div class="text-primary">
+        <h6><b><i class="fa fa-home text-secondary"></i><a href={% url 'main:main' %}><span
+                class="text-secondary"> Home | </span></a> Configurations</b></h6>
+    </div>
+
+    <style>
+        .button {
+            width: 35%;
+            height: 70px;
+            display: inline-block;
+            font-family: Arial, "Helvetica", sans-serif;
+            font-size: 45px;
+            color: #fff;
+            text-decoration: none;
+            text-align: center;
+            text-shadow: 1px 1px 0 #7D9EAD, 2px 2px 0 #7D9EAD, 1px 1px 0 #7D9EAD;
+            padding-top: 6px;
+            margin-left: auto;
+            margin-right: auto;
+            left: 30px;
+            position: relative;
+            cursor: pointer;
+            border: none;
+            background: #FBA51A;
+            background-image: linear-gradient(bottom, #E57200 0%, #FBA51A 100%);
+            border-radius: 5px;
+            box-shadow: inset 0px 1px 0px #FBA51A, 0px 5px 0px 0px #cb7b25, 0px 10px 5px #999;
+        }
+
+        .button:active {
+            top: 3px;
+            box-shadow: inset 0px 1px 0px #FBA51A, 0px 2px 0px 0px #E57200, 0px 5px 3px #999;
+        }
+
+        .button:hover, button:focus {
+            outline: none;
+            transform: translateY(0.5px);
+        }
+
+        .containerPrincipal {
+            height: 815px;
+            width: 100%;
+            top: 11px;
+            left: 0px;
+            position: relative;
+            border: 3px solid transparent;
+        }
+    </style>
+{% endblock %}
+
+
+{% block body_content %}
+
+
+    <div class="containerPrincipal">
+
+        <div style="width: 49%; height: 100%; top: 30px; left: 0px; position: absolute; border: 3px solid transparent;">
+            <table id="line" class="display" style="width:100%">
+                <thead style="margin-left: -9px">
+                <tr>
+                    <th>Line</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for linha in linhas.all %}
+                    <tr>
+                        <td>{{ linha.linha }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+                <tfoot>
+                <th>
+                    <button class="btn btn-outline-dark" style="height: 16px; width: 70px; margin-left: -18px"
+                            data-toggle="modal"
+                            data-target="#addLinha" id="addLine">Add new
+                    </button>
+                    </br>
+                    <div id="removeButton">
+                        <button class="btn btn-outline-dark mt-1"
+                                style="height: 16px; width: 70px; margin-left: -18px"
+                                data-toggle="modal" data-target="#removerLinha" name="removeLine" id="removeLine">Delete
+                        </button>
+                    </div>
+                </th>
+                </tfoot>
+            </table>
+        </div>
+        <div style="width: 46%; height: 100%; top: 43px; right: 0px; position: absolute; border: 3px solid transparent;">
+            <table id="justification" class="display" style="width:100%">
+                <thead style="margin-left: -9px">
+                <tr>
+                    <th>Justification</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for justificacao in justificacoes.all %}
+                    <tr>
+                        <td>{{ justificacao.justificacao }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+                <tfoot>
+                <th>
+                    <button class="btn btn-outline-dark" style="height: 16px; width: 70px; margin-left: -18px"
+                            data-toggle="modal"
+                            data-target="#addJustificacao" id="addJustification">Add new
+                    </button>
+                    </br>
+                    <div id="removeButton">
+                        <button class="btn btn-outline-dark mt-1"
+                                style="height: 16px; width: 70px; margin-left: -18px"
+                                data-toggle="modal" data-target="#removerJustificacao" name="removeJustification"
+                                id="removeJustification">Delete
+                        </button>
+                    </div>
+                </th>
+                </tfoot>
+            </table>
+        </div>
+        <div style="position: absolute; top: 65%">
+            <div style="background-color: lightgrey">
+                <p style="font-size: 14px"><b>Carregar ficheiro backup disponivel em
+                    "W:\sharedir\MP&L\Warehouse\PWMS\PWMS Backup\"</b></p>
+                <form method="POST" enctype="multipart/form-data" action="{% url 'receiving:uploadDataLineRequest' %}">
+                    {% csrf_token %}
+                    <input type="file" accept="" name="ficheiro" id="ficheiro"></br>
+                    <button type="submit" class="btn btn-secondary mt-1">Upload</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div style="width: 95%; bottom: 0%; position: absolute; border: 3px solid transparent; text-align: center">
+        <button type="submit" class="button" data-toggle="modal" data-target="#alterarGrupoReceiving">
+            Change account Groups
+        </button>
+    </div>
+    <div style="bottom: 0px; margin-left: 25px; position: absolute">
+        <h6><b><i class="fa fa-chevron-left text-secondary"></i><a href={% url 'receiving:lineRequest' %}><span
+                class="text-secondary"> Back </span></a></b></h6>
+    </div>
+
+
+    <form method="POST" class="form" action="{% url 'receiving:createLine' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal fade" id="addLinha" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">Insert new Line</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <h6><b>Insert line</b></h6>
+                        <input type="text" name="newLine" id="newLine"/>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <form method="POST" class="form" action="{% url 'receiving:deleteLine' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal fade" id="removerLinha" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">Remove Line</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="infoLine"></p>
+                        <input type="hidden" name="nome2" id="nome2" value="{{ nome2 }}"/>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Confirm</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+    <form method="POST" class="form" action="{% url 'receiving:createJustification' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal fade" id="addJustificacao" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">Insert new Justification</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <h6><b>Insert Justification</b></h6>
+                        <input style="width: 440px" type="text" name="newJustification" id="newJustification"/>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+    <form method="POST" class="form" action="{% url 'receiving:deleteJustification' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal fade" id="removerJustificacao" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">Remove Justification</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="infoJustification"></p>
+                        <input type="hidden" name="nome3" id="nome3" value="{{ nome3 }}"/>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Confirm</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <form method="POST" class="form" action="{% url 'receiving:changeUserGroups' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal fade" id="alterarGrupoReceiving" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">Change account groups</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <label for="username"><h6><b style="color: black">Username</b></h6></label>
+                        <select class="form-control" id="username" name="username" required>
+                            <option value="">Select User</option>
+                            {% for user in users.all %}
+                                <option value="{{ user.username }}">{{ user.username }}</option>
+                            {% endfor %}
+                        </select></br>
+                        <label for="paginas"><h6><b style="color: black">Pages</b></h6></label>
+                        <select class="form-control" name="paginas" id="paginas" required>
+                            <option value="">Select accessable pages</option>
+                            <option value="lineRequest">Line Request</option>
+                            <option value="mnfgSupply">MNFG Supply</option>
+                            <option value="tpm">TPM</option>
+                            <option value="lineRequest/mnfgSupply">Line Request, MNFG Supply</option>
+                            <option value="lineRequest/tpm">Line Request, TPM</option>
+                            <option value="mnfgSupply/tpm">MNFG Supply, TPM</option>
+                            <option value="lineRequest/mnfgSupply/tpm">Line Request, MNFG Supply, TPM</option>
+                            <option value="none">Remove access to all Receiving pages</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Create</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+{% endblock %}
+
+{% block javascript %}
+
+    <script>
+        $(document).ready(function () {
+            var tableLine = $('#line').DataTable({
+                "searching": false,
+                "info": false,
+                "paging": false,
+                "ordering": false,
+                "scrollCollapse": true,
+                "scrollY": "500px",
+                "select": {
+                    style: 'os',
+                    items: 'cell'
+                },
+            });
+
+            $('#line tbody').on('click', 'tr', function () {
+                var nome = tableLine.row($(this)).data();
+                var modalInfo = "Want to delete " + nome + "?";
+                $('#infoLine').html(modalInfo);
+                $('#nome2').val(nome);
+                $('#removeButton').on('click', 'button', function () {
+                });
+            });
+        });
+
+        $(document).ready(function () {
+            var tableJustification = $('#justification').DataTable({
+                "searching": false,
+                "info": false,
+                "paging": false,
+                "ordering": false,
+                "scrollCollapse": true,
+                "scrollY": "500px",
+                "select": {
+                    style: 'os',
+                    items: 'cell'
+                },
+            });
+            $('#justification tbody').on('click', 'tr', function () {
+                var nome = tableJustification.row($(this)).data();
+                var modalInfo = "Want to delete " + nome + "?";
+                $('#infoJustification').html(modalInfo);
+                $('#nome3').val(nome);
+                $('#removeButton').on('click', 'button', function () {
+                });
+            });
+        });
+
+    </script>
+{% endblock %}

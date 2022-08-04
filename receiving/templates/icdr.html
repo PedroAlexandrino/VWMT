@@ -1,0 +1,1709 @@
+{% extends "vware/baseArmazem.html" %}
+{% load static %}
+
+{% block body_title %}
+
+    <div class="text-primary">
+        <h6><b><i class="fa fa-home text-secondary"></i><a href={% url 'main:main' %}><span
+                class="text-secondary"> Home | </span></a> ICDR</b></h6>
+    </div>
+    <style>
+        textarea.black {
+            color: black;
+            -webkit-text-fill-color: black;
+
+        }
+
+        .button {
+            width: 35%;
+            height: 70px;
+            display: inline-block;
+            font-family: Arial, "Helvetica", sans-serif;
+            font-size: 45px;
+            color: #fff;
+            text-decoration: none;
+            text-align: center;
+            text-shadow: 1px 1px 0 #7D9EAD, 2px 2px 0 #7D9EAD, 1px 1px 0 #7D9EAD;
+            padding-top: 6px;
+            margin-left: auto;
+            margin-right: auto;
+            left: 30px;
+            position: relative;
+            cursor: pointer;
+            border: none;
+            background: #FBA51A;
+            background-image: linear-gradient(bottom, #E57200 0%, #FBA51A 100%);
+            border-radius: 5px;
+            box-shadow: inset 0px 1px 0px #FBA51A, 0px 5px 0px 0px #cb7b25, 0px 10px 5px #999;
+        }
+
+        .button:active {
+            top: 3px;
+            box-shadow: inset 0px 1px 0px #FBA51A, 0px 2px 0px 0px #E57200, 0px 5px 3px #999;
+        }
+
+        .button:hover, button:focus {
+            outline: none;
+            transform: translateY(0.5px);
+        }
+
+        .containerPrincipal {
+            height: 860px;
+            width: 100%;
+            top: 11px;
+            left: 0px;
+            position: relative;
+            border: 1px solid transparent;
+        }
+
+        .column_left {
+            border-left: 2px solid black;
+        }
+
+        tfoot input {
+            width: 100%;
+        }
+    </style>
+{% endblock %}
+
+{% block body_content %}
+    <div class="containerPrincipal">
+        {% if erro %}
+            <div class="container p-1">
+                <div class="row no-gutters">
+                    <div class="col-lg-4 col-md-1 m-auto">
+                        <div class="alert alert-danger shadow my-3" role="alert" style="border-radius: 3px">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="True" style="color:#721C24">&times;</span>
+                            </button>
+                            <div class="row">
+                                <svg width="3em" height="3em" viewBox="0 0 16 16"
+                                     class="m-1 bi bi-exclamation-circle-fill"
+                                     fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd"
+                                          d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
+                                </svg>
+                                <p style="font-size:30px; margin-left: 10px; margin-top: 3px"
+                                   class="mb-0 font-weight-light"><b class="mr-1">Sem permissão!</b>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        <p style="text-align: center; font-size: 60px; margin-bottom: -25px; background-color: #FBA51A"><b>ICDR'S</b>
+        </p>
+
+        <table id="icdrHistory" class="stripe hover row-border" style="width:100%">
+            <thead>
+            <tr style="font-size: 12.5px">
+                <th style="text-align: center; background-color: darkgrey"><b>DATA ABERTURA</b></th>
+                <th style="text-align: center; background-color: darkgrey"><b>AGEING (DIAS)</b></th>
+                <th class="column_left" style="text-align: center; background-color: darkgrey"><strong>Nº/ANO</strong>
+                </th>
+                <th style="text-align: center; background-color: darkgrey"><strong>FORNECEDOR</strong></th>
+                <th style="text-align: center; background-color: darkgrey"><strong>PARTNUMBER</strong></th>
+                <th style="text-align: center; background-color: darkgrey"><strong>QT</strong></th>
+                <th class="column_left" style="text-align: center; background-color: darkgrey"><b>MOTIVO</b></th>
+                <th class="column_left" style="text-align: center; background-color: darkgrey"><b>ALFANDEGA (S/N)</b>
+                </th>
+                <th colspan="2" class="column_left" style="text-align: center; background-color: darkgrey"><b>RESPONSÁVEL</b>
+                    <p style="font-size: 10px">(Nome / Departamento)</p>
+                </th>
+                <th class="column_left" style="text-align: center; background-color: darkgrey"><b>COMENTÁRIOS
+                    (ABERTURA)</b></th>
+                <th class="column_left" style="text-align: center"><b>UN COST</b></th>
+                <th style="text-align: center"><b>TOTAL COST</b></th>
+                <th class="column_left" style="text-align: center"><b>RCT UNP</b></th>
+                <th style="text-align: center"><b>CYCLE COUNT</b></th>
+                <th class="column_left" style="text-align: center"><b>CONSUMO</b></th>
+                <th class="column_left" style="text-align: center; min-width: 45px"><b>QAD (PO Nº)</b></th>
+                <th class="column_left" style="text-align: center"><b>COMENTÁRIOS</b></th>
+                <th class="column_left" style="text-align: center; min-width: 60px"><b>DATA FECHO</b></th>
+                <th class="column_left" style="text-align: center"><b>CYCLE COUNT</b></th>
+                <th style="text-align: center"><b>DATA CC</b></th>
+                <th class="column_left" style="text-align: center"><b>AUDIT CHECK</b></th>
+                <th class="column_left" style="text-align: center"><b>UPDATE</b></th>
+                <th style="text-align: center"><b>ABRIR</b></th>
+                <th style="display: none">ID</th>
+            </tr>
+            <tr>
+                <th style="text-align: center; font-size: 10px"><i><em>Receiving</em></i></th>
+                <th style="text-align: center; font-size: 10px"><i><em>Receiving</em></i></th>
+                <th style="text-align: center; font-size: 10px"><i><em>Receiving</em></i></th>
+                <th style="text-align: center; font-size: 10px"><i><em>Receiving</em></i></th>
+                <th style="text-align: center; font-size: 10px"><i><em>Receiving</em></i></th>
+                <th style="text-align: center; font-size: 10px"><i><em>Receiving</em></i></th>
+                <th style="text-align: center; font-size: 10px"><i><em>Receiving</em></i></th>
+                <th style="text-align: center; font-size: 10px"><i><em>Receiving</em></i></th>
+                <th style="text-align: center; font-size: 10px"><i><em>Receiving</em></i></th>
+                <th style="text-align: center; font-size: 10px"><i><em>Receiving</em></i></th>
+                <th style="text-align: center; font-size: 10px"><i><em>Receiving</em></i></th>
+                <th style="text-align: center; font-size: 10px"><i><em>Automatic</em></i></th>
+                <th style="text-align: center; font-size: 10px"><i><em>Automatic</em></i></th>
+                <th style="text-align: center; font-size: 10px"><i><em>Receiving</em></i></th>
+                <th style="text-align: center; font-size: 10px"><i><em>Receiving</em></i></th>
+                <th style="text-align: center; font-size: 10px"><i><em>All</em></i></th>
+                <th style="text-align: center; font-size: 10px"><i><em>All</em></i></th>
+                <th style="text-align: center; font-size: 10px"><i><em>All</em></i></th>
+                <th style="text-align: center; font-size: 10px"><i><em>Receiving</em></i></th>
+                <th style="text-align: center; font-size: 10px"><i><em>CC</em></i></th>
+                <th style="text-align: center; font-size: 10px"><i><em>CC</em></i></th>
+                <th style="text-align: center; font-size: 10px"><i><em>Finanças</em></i></th>
+                <th></th>
+                <th></th>
+                <th style="display: none">ID</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for icdr in listaICDR.all %}
+                <tr style="text-align: center; font-size: 14px">
+                    {% if icdr.date != '' and tipo1 or icdr.date != '' and tipo1tipo2 or icdr.date != '' and tipo1tipo3 or icdr.date != '' and tipo1tipo2tipo3 %}
+                        <td title="{{ icdr.aberturaICDR }}">{{ icdr.aberturaICDR }}</td>
+                        <td title="{{ icdr.ageing }}">{{ icdr.ageing }}</td>
+                        <td title="{{ icdr.nAno }}">{{ icdr.nAno }}</td>
+                        <td title="{{ icdr.fornecedor }}">{{ icdr.fornecedor }}</td>
+                        <td title="{{ icdr.partnumber }}">{{ icdr.partnumber }}</td>
+                        <td title="{{ icdr.quantidade }}">{{ icdr.quantidade }}</td>
+                        <td title="{{ icdr.tipo }}">{{ icdr.tipo }}</td>
+                        <td title="{{ icdr.simNao }}">{{ icdr.simNao }}</td>
+                        <td title="{{ icdr.responsavel }}">{{ icdr.responsavel }}</td>
+                        <td title="{{ icdr.departamento }}">{{ icdr.departamento }}</td>
+                        <td title="{{ icdr.comentarioFecho }}">{{ icdr.comentarioFecho }}</td>
+                        <td title="{{ icdr.unCost }}">{{ icdr.unCost }}</td>
+                        <td title="{{ icdr.totalCost }}">{{ icdr.totalCost }}</td>
+                        {% if icdr.rctUnpCheck == 'true' %}
+                            <td title="RCT UNP"><input type="checkbox" id="rctUnp" name="rctUnp" checked disabled></td>
+                        {% else %}
+                            <td title="RCT UNP"><input type="checkbox" id="rctUnp" name="rctUnp" disabled></td>
+                        {% endif %}
+                        {% if icdr.cycleCountCheck == 'true' %}
+                            <td title="CYCLE COUNT"><input type="checkbox" id="cycleCountCheck" name="cycleCountCheck"
+                                                           checked disabled></td>
+                        {% else %}
+                            <td title="CYCLE COUNT"><input type="checkbox" id="cycleCountCheck" name="cycleCountCheck"
+                                                           disabled></td>
+                        {% endif %}
+                        <td title="{{ icdr.consumption }}"><a type="button"
+                                                              class="fas fa-plus-circle fa-2x button5"
+                                                              id="consumptionTipo1"
+                                                              style="color: orange; background-color: black; border-radius: 50%; margin-left: 10px; margin-top: 2px"></a>
+                        </td>
+                        <td title="{{ icdr.po }}"><a type="button"
+                                                     class="fas fa-plus-circle fa-2x button5"
+                                                     id="poNumberTipo1"
+                                                     style="color: orange; background-color: black; border-radius: 50%; margin-left: 10px; margin-top: 2px"></a>
+                        </td>
+                        <td title="{{ icdr.comentarioFechoICDR }}"><a type="button"
+                                                                      class="fas fa-plus-circle fa-2x button5"
+                                                                      id="comentariosFechoTipo1"
+                                                                      style="color: orange; background-color: black; border-radius: 50%; margin-left: 10px; margin-top: 2px"></a>
+                        </td>
+                        <td title="{{ icdr.date }}">{{ icdr.date }}</td>
+                        <td title="{{ icdr.cycleCount }}">{{ icdr.cycleCount }}</td>
+                        <td title="{{ icdr.dataCycleCount }}">{{ icdr.dataCycleCount }}</td>
+                        <td title="{{ icdr.auditCheck }}">{{ icdr.auditCheck }}</td>
+                        <td></td>
+                        <td>
+                            <button style="height: 17px" class="btn btn-primary btn-sm" id="reAbrirICDR"
+                                    name="reAbrirICDR">Abrir
+                            </button>
+                        </td>
+                        <td style="display: none">{{ icdr.id }}</td>
+                    {% elif icdr.date != '' and not tipo1 and not tipo1tipo2 and not tipo1tipo3 and not tipo1tipo2tipo3 %}
+                        <td title="{{ icdr.aberturaICDR }}">{{ icdr.aberturaICDR }}</td>
+                        <td title="{{ icdr.ageing }}">{{ icdr.ageing }}</td>
+                        <td title="{{ icdr.nAno }}">{{ icdr.nAno }}</td>
+                        <td title="{{ icdr.fornecedor }}">{{ icdr.fornecedor }}</td>
+                        <td title="{{ icdr.partnumber }}">{{ icdr.partnumber }}</td>
+                        <td title="{{ icdr.quantidade }}">{{ icdr.quantidade }}</td>
+                        <td title="{{ icdr.tipo }}">{{ icdr.tipo }}</td>
+                        <td title="{{ icdr.simNao }}">{{ icdr.simNao }}</td>
+                        <td title="{{ icdr.responsavel }}">{{ icdr.responsavel }}</td>
+                        <td title="{{ icdr.departamento }}">{{ icdr.departamento }}</td>
+                        <td title="{{ icdr.comentarioFecho }}">{{ icdr.comentarioFecho }}</td>
+                        <td title="{{ icdr.unCost }}">{{ icdr.unCost }}</td>
+                        <td title="{{ icdr.totalCost }}">{{ icdr.totalCost }}</td>
+                        {% if icdr.rctUnpCheck == 'true' %}
+                            <td title="RCT UNP"><input type="checkbox" id="rctUnp" name="rctUnp" checked disabled></td>
+                        {% else %}
+                            <td title="RCT UNP"><input type="checkbox" id="rctUnp" name="rctUnp" disabled></td>
+                        {% endif %}
+                        {% if icdr.cycleCountCheck == 'true' %}
+                            <td title="CYCLE COUNT"><input type="checkbox" id="cycleCountCheck" name="cycleCountCheck"
+                                                           checked disabled></td>
+                        {% else %}
+                            <td title="CYCLE COUNT"><input type="checkbox" id="cycleCountCheck" name="cycleCountCheck"
+                                                           disabled></td>
+                        {% endif %}
+                        <td title="{{ icdr.consumption }}"><a type="button"
+                                                              class="fas fa-plus-circle fa-2x button5"
+                                                              id="consumption"
+                                                              style="color: orange; background-color: black; border-radius: 50%; margin-left: 10px; margin-top: 2px"></a>
+                        </td>
+                        <td title="{{ icdr.po }}"><a type="button"
+                                                     class="fas fa-plus-circle fa-2x button5"
+                                                     id="poNumber"
+                                                     style="color: orange; background-color: black; border-radius: 50%; margin-left: 10px; margin-top: 2px"></a>
+                        </td>
+                        <td title="{{ icdr.comentarioFechoICDR }}"><a type="button"
+                                                                      class="fas fa-plus-circle fa-2x button5"
+                                                                      id="comentariosFecho"
+                                                                      style="color: orange; background-color: black; border-radius: 50%; margin-left: 10px; margin-top: 2px"></a>
+                        </td>
+                        <td title="{{ icdr.date }}">{{ icdr.date }}</td>
+                        <td title="{{ icdr.cycleCount }}">{{ icdr.cycleCount }}</td>
+                        <td title="{{ icdr.dataCycleCount }}">{{ icdr.dataCycleCount }}</td>
+                        <td title="{{ icdr.auditCheck }}">{{ icdr.auditCheck }}</td>
+                        <td></td>
+                        <td></td>
+                        <td style="display: none">{{ icdr.id }}</td>
+                    {% elif tipo1tipo2tipo3 %}
+                        <td title="{{ icdr.aberturaICDR }}">{{ icdr.aberturaICDR }}</td>
+                        <td title="{{ icdr.ageing }}">{{ icdr.ageing }}</td>
+                        <td title="{{ icdr.nAno }}">{{ icdr.nAno }}</td>
+                        <td title="{{ icdr.fornecedor }}">{{ icdr.fornecedor }}</td>
+                        <td title="{{ icdr.partnumber }}">{{ icdr.partnumber }}</td>
+                        <td title="{{ icdr.quantidade }}">{{ icdr.quantidade }}</td>
+                        <td title="{{ icdr.tipo }}">{{ icdr.tipo }}</td>
+                        <td title="{{ icdr.simNao }}">{{ icdr.simNao }}</td>
+                        <td title="{{ icdr.responsavel }}">{{ icdr.responsavel }}</td>
+                        <td title="{{ icdr.departamento }}">{{ icdr.departamento }}</td>
+                        <td title="{{ icdr.comentarioFecho }}">{{ icdr.comentarioFecho }}</td>
+                        <td title="{{ icdr.unCost }}">{{ icdr.unCost }}</td>
+                        <td title="{{ icdr.totalCost }}">{{ icdr.totalCost }}</td>
+                        {% if icdr.rctUnpCheck == 'true' %}
+                            <td title="RCT UNP"><input type="checkbox" id="rctUnp" name="rctUnp" checked></td>
+                        {% else %}
+                            <td title="RCT UNP"><input type="checkbox" id="rctUnp" name="rctUnp"></td>
+                        {% endif %}
+                        {% if icdr.cycleCountCheck == 'true' %}
+                            <td title="CYCLE COUNT"><input type="checkbox" id="cycleCountCheck" name="cycleCountCheck"
+                                                           checked></td>
+                        {% else %}
+                            <td title="CYCLE COUNT"><input type="checkbox" id="cycleCountCheck" name="cycleCountCheck">
+                            </td>
+                        {% endif %}
+                        <td title="{{ icdr.consumption }}"><a type="button"
+                                                              class="fas fa-plus-circle fa-2x button5"
+                                                              id="consumptionTipo1"
+                                                              style="color: orange; background-color: black; border-radius: 50%; margin-left: 10px; margin-top: 2px"></a>
+                        </td>
+                        <td title="{{ icdr.po }}"><a type="button"
+                                                     class="fas fa-plus-circle fa-2x button5"
+                                                     id="poNumberTipo1"
+                                                     style="color: orange; background-color: black; border-radius: 50%; margin-left: 10px; margin-top: 2px"></a>
+                        </td>
+                        <td title="{{ icdr.comentarioFechoICDR }}"><a type="button"
+                                                                      class="fas fa-plus-circle fa-2x button5"
+                                                                      id="comentariosFechoTipo1"
+                                                                      style="color: orange; background-color: black; border-radius: 50%; margin-left: 10px; margin-top: 2px"></a>
+                        </td>
+                        <td title="{{ icdr.date }}">
+                            <button type="button" name="dataHoraFecho" style="height: 17px" class="btn btn-primary"
+                                    id="dataHoraFecho">Time
+                            </button>
+                        </td>
+                        <td title="{{ icdr.cycleCount }}"><input class="form-control" value="{{ icdr.cycleCount }}">
+                        </td>
+                        <td title="{{ icdr.dataCycleCount }}"><input class="form-control"
+                                                                     value="{{ icdr.dataCycleCount }}"></td>
+                        <td title="{{ icdr.auditCheck }}"><input class="form-control" value="{{ icdr.auditCheck }}">
+                        </td>
+                        <td><a id="updateICDR" type="button" class="btn btn-primary btn-sm"
+                               style="height: 17px; margin-left: 8px">Update</a>
+                        </td>
+                        <td></td>
+                        <td style="display: none">{{ icdr.id }}</td>
+                    {% elif tipo1tipo2 %}
+                        <td title="{{ icdr.aberturaICDR }}">{{ icdr.aberturaICDR }}</td>
+                        <td title="{{ icdr.ageing }}">{{ icdr.ageing }}</td>
+                        <td title="{{ icdr.nAno }}">{{ icdr.nAno }}</td>
+                        <td title="{{ icdr.fornecedor }}">{{ icdr.fornecedor }}</td>
+                        <td title="{{ icdr.partnumber }}">{{ icdr.partnumber }}</td>
+                        <td title="{{ icdr.quantidade }}">{{ icdr.quantidade }}</td>
+                        <td title="{{ icdr.tipo }}">{{ icdr.tipo }}</td>
+                        <td title="{{ icdr.simNao }}">{{ icdr.simNao }}</td>
+                        <td title="{{ icdr.responsavel }}">{{ icdr.responsavel }}</td>
+                        <td title="{{ icdr.departamento }}">{{ icdr.departamento }}</td>
+                        <td title="{{ icdr.comentarioFecho }}">{{ icdr.comentarioFecho }}</td>
+                        <td title="{{ icdr.unCost }}">{{ icdr.unCost }}</td>
+                        <td title="{{ icdr.totalCost }}">{{ icdr.totalCost }}</td>
+                        {% if icdr.rctUnpCheck == 'true' %}
+                            <td title="RCT UNP"><input type="checkbox" id="rctUnp" name="rctUnp" checked></td>
+                        {% else %}
+                            <td title="RCT UNP"><input type="checkbox" id="rctUnp" name="rctUnp"></td>
+                        {% endif %}
+                        {% if icdr.cycleCountCheck == 'true' %}
+                            <td title="CYCLE COUNT"><input type="checkbox" id="cycleCountCheck" name="cycleCountCheck"
+                                                           checked></td>
+                        {% else %}
+                            <td title="CYCLE COUNT"><input type="checkbox" id="cycleCountCheck" name="cycleCountCheck">
+                            </td>
+                        {% endif %}
+                        <td title="{{ icdr.consumption }}"><a type="button"
+                                                              class="fas fa-plus-circle fa-2x button5"
+                                                              id="consumptionTipo1"
+                                                              style="color: orange; background-color: black; border-radius: 50%; margin-left: 10px; margin-top: 2px"></a>
+                        </td>
+                        <td title="{{ icdr.po }}"><a type="button"
+                                                     class="fas fa-plus-circle fa-2x button5"
+                                                     id="poNumberTipo1"
+                                                     style="color: orange; background-color: black; border-radius: 50%; margin-left: 10px; margin-top: 2px"></a>
+                        </td>
+                        <td title="{{ icdr.comentarioFechoICDR }}"><a type="button"
+                                                                      class="fas fa-plus-circle fa-2x button5"
+                                                                      id="comentariosFechoTipo1"
+                                                                      style="color: orange; background-color: black; border-radius: 50%; margin-left: 10px; margin-top: 2px"></a>
+                        </td>
+                        <td title="{{ icdr.date }}">
+                            <button type="button" name="dataHoraFecho" style="height: 17px" class="btn btn-primary"
+                                    id="dataHoraFecho">Time
+                            </button>
+                        </td>
+                        <td title="{{ icdr.cycleCount }}"><input value="{{ icdr.cycleCount }}"></td>
+                        <td title="{{ icdr.dataCycleCount }}"><input value="{{ icdr.dataCycleCount }}"></td>
+                        <td title="{{ icdr.auditCheck }}">{{ icdr.auditCheck }}</td>
+                        <td><a id="updateICDR" type="button" class="btn btn-primary btn-sm"
+                               style="height: 17px; margin-left: 8px">Update</a>
+                        </td>
+                        <td></td>
+                        <td style="display: none">{{ icdr.id }}</td>
+                    {% elif tipo1tipo3 %}
+                        <td title="{{ icdr.aberturaICDR }}">{{ icdr.aberturaICDR }}</td>
+                        <td title="{{ icdr.ageing }}">{{ icdr.ageing }}</td>
+                        <td title="{{ icdr.nAno }}">{{ icdr.nAno }}</td>
+                        <td title="{{ icdr.fornecedor }}">{{ icdr.fornecedor }}</td>
+                        <td title="{{ icdr.partnumber }}">{{ icdr.partnumber }}</td>
+                        <td title="{{ icdr.quantidade }}">{{ icdr.quantidade }}</td>
+                        <td title="{{ icdr.tipo }}">{{ icdr.tipo }}</td>
+                        <td title="{{ icdr.simNao }}">{{ icdr.simNao }}</td>
+                        <td title="{{ icdr.responsavel }}">{{ icdr.responsavel }}</td>
+                        <td title="{{ icdr.departamento }}">{{ icdr.departamento }}</td>
+                        <td title="{{ icdr.comentarioFecho }}">{{ icdr.comentarioFecho }}</td>
+                        <td title="{{ icdr.unCost }}">{{ icdr.unCost }}</td>
+                        <td title="{{ icdr.totalCost }}">{{ icdr.totalCost }}</td>
+                        {% if icdr.rctUnpCheck == 'true' %}
+                            <td title="RCT UNP"><input type="checkbox" id="rctUnp" name="rctUnp" checked></td>
+                        {% else %}
+                            <td title="RCT UNP"><input type="checkbox" id="rctUnp" name="rctUnp"></td>
+                        {% endif %}
+                        {% if icdr.cycleCountCheck == 'true' %}
+                            <td title="CYCLE COUNT"><input type="checkbox" id="cycleCountCheck" name="cycleCountCheck"
+                                                           checked></td>
+                        {% else %}
+                            <td title="CYCLE COUNT"><input type="checkbox" id="cycleCountCheck" name="cycleCountCheck">
+                            </td>
+                        {% endif %}
+                        <td title="{{ icdr.consumption }}"><a type="button"
+                                                              class="fas fa-plus-circle fa-2x button5"
+                                                              id="consumptionTipo1"
+                                                              style="color: orange; background-color: black; border-radius: 50%; margin-left: 10px; margin-top: 2px"></a>
+                        </td>
+                        <td title="{{ icdr.po }}"><a type="button"
+                                                     class="fas fa-plus-circle fa-2x button5"
+                                                     id="poNumberTipo1"
+                                                     style="color: orange; background-color: black; border-radius: 50%; margin-left: 10px; margin-top: 2px"></a>
+                        </td>
+                        <td title="{{ icdr.comentarioFechoICDR }}"><a type="button"
+                                                                      class="fas fa-plus-circle fa-2x button5"
+                                                                      id="comentariosFechoTipo1"
+                                                                      style="color: orange; background-color: black; border-radius: 50%; margin-left: 10px; margin-top: 2px"></a>
+                        </td>
+                        <td title="{{ icdr.date }}">
+                            <button type="button" name="dataHoraFecho" style="height: 17px" class="btn btn-primary"
+                                    id="dataHoraFecho">Time
+                            </button>
+                        </td>
+                        <td title="{{ icdr.cycleCount }}">{{ icdr.cycleCount }}</td>
+                        <td title="{{ icdr.dataCycleCount }}">{{ icdr.dataCycleCount }}</td>
+                        <td title="{{ icdr.auditCheck }}"><input value="{{ icdr.auditCheck }}"></td>
+                        <td><a id="updateICDR" type="button" class="btn btn-primary btn-sm"
+                               style="height: 17px; margin-left: 8px">Update</a>
+                        </td>
+                        <td></td>
+                        <td style="display: none">{{ icdr.id }}</td>
+                    {% elif tipo2tipo3 %}
+                        <td title="{{ icdr.aberturaICDR }}">{{ icdr.aberturaICDR }}</td>
+                        <td title="{{ icdr.ageing }}">{{ icdr.ageing }}</td>
+                        <td title="{{ icdr.nAno }}">{{ icdr.nAno }}</td>
+                        <td title="{{ icdr.fornecedor }}">{{ icdr.fornecedor }}</td>
+                        <td title="{{ icdr.partnumber }}">{{ icdr.partnumber }}</td>
+                        <td title="{{ icdr.quantidade }}">{{ icdr.quantidade }}</td>
+                        <td title="{{ icdr.tipo }}">{{ icdr.tipo }}</td>
+                        <td title="{{ icdr.simNao }}">{{ icdr.simNao }}</td>
+                        <td title="{{ icdr.responsavel }}">{{ icdr.responsavel }}</td>
+                        <td title="{{ icdr.departamento }}">{{ icdr.departamento }}</td>
+                        <td title="{{ icdr.comentarioFecho }}">{{ icdr.comentarioFecho }}</td>
+                        <td title="{{ icdr.unCost }}">{{ icdr.unCost }}</td>
+                        <td title="{{ icdr.totalCost }}">{{ icdr.totalCost }}</td>
+                        {% if icdr.rctUnpCheck == 'true' %}
+                            <td title="RCT UNP"><input type="checkbox" id="rctUnp" name="rctUnp" disabled checked></td>
+                        {% else %}
+                            <td title="RCT UNP"><input type="checkbox" id="rctUnp" name="rctUnp" disabled></td>
+                        {% endif %}
+                        {% if icdr.cycleCountCheck == 'true' %}
+                            <td title="CYCLE COUNT"><input type="checkbox" id="cycleCountCheck" name="cycleCountCheck"
+                                                           checked disabled></td>
+                        {% else %}
+                            <td title="CYCLE COUNT"><input type="checkbox" id="cycleCountCheck" name="cycleCountCheck"
+                                                           disabled>
+                            </td>
+                        {% endif %}
+                        <td title="{{ icdr.consumption }}"><a type="button"
+                                                              class="fas fa-plus-circle fa-2x button5"
+                                                              id="consumption"
+                                                              style="color: orange; background-color: black; border-radius: 50%; margin-left: 10px; margin-top: 2px"></a>
+                        </td>
+                        <td title="{{ icdr.po }}"><a type="button"
+                                                     class="fas fa-plus-circle fa-2x button5"
+                                                     id="poNumber"
+                                                     style="color: orange; background-color: black; border-radius: 50%; margin-left: 10px; margin-top: 2px"></a>
+                        </td>
+                        <td title="{{ icdr.comentarioFechoICDR }}"><a type="button"
+                                                                      class="fas fa-plus-circle fa-2x button5"
+                                                                      id="comentariosFecho"
+                                                                      style="color: orange; background-color: black; border-radius: 50%; margin-left: 10px; margin-top: 2px"></a>
+                        </td>
+                        <td title="{{ icdr.date }}">{{ icdr.date }}</td>
+                        <td title="{{ icdr.cycleCount }}"><input value="{{ icdr.cycleCount }}"></td>
+                        <td title="{{ icdr.dataCycleCount }}"><input value="{{ icdr.dataCycleCount }}"></td>
+                        <td title="{{ icdr.auditCheck }}"><input value="{{ icdr.auditCheck }}"></td>
+                        <td><a id="updateICDR" type="button" class="btn btn-primary btn-sm"
+                               style="height: 17px; margin-left: 8px">Update</a>
+                        </td>
+                        <td></td>
+                        <td style="display: none">{{ icdr.id }}</td>
+                    {% elif tipo1 %}
+                        <td title="{{ icdr.aberturaICDR }}">{{ icdr.aberturaICDR }}</td>
+                        <td title="{{ icdr.ageing }}">{{ icdr.ageing }}</td>
+                        <td title="{{ icdr.nAno }}">{{ icdr.nAno }}</td>
+                        <td title="{{ icdr.fornecedor }}">{{ icdr.fornecedor }}</td>
+                        <td title="{{ icdr.partnumber }}">{{ icdr.partnumber }}</td>
+                        <td title="{{ icdr.quantidade }}">{{ icdr.quantidade }}</td>
+                        <td title="{{ icdr.tipo }}">{{ icdr.tipo }}</td>
+                        <td title="{{ icdr.simNao }}">{{ icdr.simNao }}</td>
+                        <td title="{{ icdr.responsavel }}">{{ icdr.responsavel }}</td>
+                        <td title="{{ icdr.departamento }}">{{ icdr.departamento }}</td>
+                        <td title="{{ icdr.comentarioFecho }}">{{ icdr.comentarioFecho }}</td>
+                        <td title="{{ icdr.unCost }}">{{ icdr.unCost }}</td>
+                        <td title="{{ icdr.totalCost }}">{{ icdr.totalCost }}</td>
+                        {% if icdr.rctUnpCheck == 'true' %}
+                            <td title="RCT UNP"><input type="checkbox" id="rctUnp" name="rctUnp" checked></td>
+                        {% else %}
+                            <td title="RCT UNP"><input type="checkbox" id="rctUnp" name="rctUnp"></td>
+                        {% endif %}
+                        {% if icdr.cycleCountCheck == 'true' %}
+                            <td title="CYCLE COUNT"><input type="checkbox" id="cycleCountCheck" name="cycleCountCheck"
+                                                           checked></td>
+                        {% else %}
+                            <td title="CYCLE COUNT"><input type="checkbox" id="cycleCountCheck" name="cycleCountCheck">
+                            </td>
+                        {% endif %}
+                        <td title="{{ icdr.consumption }}"><a type="button"
+                                                              class="fas fa-plus-circle fa-2x button5"
+                                                              id="consumptionTipo1"
+                                                              style="color: orange; background-color: black; border-radius: 50%; margin-left: 10px; margin-top: 2px"></a>
+                        </td>
+                        <td title="{{ icdr.po }}"><a type="button"
+                                                     class="fas fa-plus-circle fa-2x button5"
+                                                     id="poNumberTipo1"
+                                                     style="color: orange; background-color: black; border-radius: 50%; margin-left: 10px; margin-top: 2px"></a>
+                        </td>
+                        <td title="{{ icdr.comentarioFechoICDR }}"><a type="button"
+                                                                      class="fas fa-plus-circle fa-2x button5"
+                                                                      id="comentariosFechoTipo1"
+                                                                      style="color: orange; background-color: black; border-radius: 50%; margin-left: 10px; margin-top: 2px"></a>
+                        </td>
+                        <td title="{{ icdr.date }}">
+                            <button type="button" name="dataHoraFecho" style="height: 17px" class="btn btn-primary"
+                                    id="dataHoraFecho">Time
+                            </button>
+                        </td>
+                        <td title="{{ icdr.cycleCount }}">{{ icdr.cycleCount }}</td>
+                        <td title="{{ icdr.dataCycleCount }}">{{ icdr.dataCycleCount }}</td>
+                        <td title="{{ icdr.auditCheck }}">{{ icdr.auditCheck }}</td>
+                        <td><a id="updateICDR" type="button" class="btn btn-primary btn-sm"
+                               style="height: 17px; margin-left: 8px">Update</a>
+                        </td>
+                        <td></td>
+                        <td style="display: none">{{ icdr.id }}</td>
+                    {% elif tipo2 %}
+                        <td title="{{ icdr.aberturaICDR }}">{{ icdr.aberturaICDR }}</td>
+                        <td title="{{ icdr.ageing }}">{{ icdr.ageing }}</td>
+                        <td title="{{ icdr.nAno }}">{{ icdr.nAno }}</td>
+                        <td title="{{ icdr.fornecedor }}">{{ icdr.fornecedor }}</td>
+                        <td title="{{ icdr.partnumber }}">{{ icdr.partnumber }}</td>
+                        <td title="{{ icdr.quantidade }}">{{ icdr.quantidade }}</td>
+                        <td title="{{ icdr.tipo }}">{{ icdr.tipo }}</td>
+                        <td title="{{ icdr.simNao }}">{{ icdr.simNao }}</td>
+                        <td title="{{ icdr.responsavel }}">{{ icdr.responsavel }}</td>
+                        <td title="{{ icdr.departamento }}">{{ icdr.departamento }}</td>
+                        <td title="{{ icdr.comentarioFecho }}">{{ icdr.comentarioFecho }}</td>
+                        <td title="{{ icdr.unCost }}">{{ icdr.unCost }}</td>
+                        <td title="{{ icdr.totalCost }}">{{ icdr.totalCost }}</td>
+                        {% if icdr.rctUnpCheck == 'true' %}
+                            <td title="RCT UNP"><input type="checkbox" id="rctUnp" name="rctUnp" disabled checked></td>
+                        {% else %}
+                            <td title="RCT UNP"><input type="checkbox" id="rctUnp" name="rctUnp" disabled></td>
+                        {% endif %}
+                        {% if icdr.cycleCountCheck == 'true' %}
+                            <td title="CYCLE COUNT"><input type="checkbox" id="cycleCountCheck" name="cycleCountCheck"
+                                                           checked disabled></td>
+                        {% else %}
+                            <td title="CYCLE COUNT"><input type="checkbox" id="cycleCountCheck" name="cycleCountCheck"
+                                                           disabled>
+                            </td>
+                        {% endif %}
+                        <td title="{{ icdr.consumption }}"><a type="button"
+                                                              class="fas fa-plus-circle fa-2x button5"
+                                                              id="consumption"
+                                                              style="color: orange; background-color: black; border-radius: 50%; margin-left: 10px; margin-top: 2px"></a>
+                        </td>
+                        <td title="{{ icdr.po }}"><a type="button"
+                                                     class="fas fa-plus-circle fa-2x button5"
+                                                     id="poNumber"
+                                                     style="color: orange; background-color: black; border-radius: 50%; margin-left: 10px; margin-top: 2px"></a>
+                        </td>
+                        <td title="{{ icdr.comentarioFechoICDR }}"><a type="button"
+                                                                      class="fas fa-plus-circle fa-2x button5"
+                                                                      id="comentariosFecho"
+                                                                      style="color: orange; background-color: black; border-radius: 50%; margin-left: 10px; margin-top: 2px"></a>
+                        </td>
+                        <td title="{{ icdr.date }}">{{ icdr.date }}</td>
+                        <td title="{{ icdr.cycleCount }}"><input value="{{ icdr.cycleCount }}"></td>
+                        <td title="{{ icdr.dataCycleCount }}"><input value="{{ icdr.dataCycleCount }}"></td>
+                        <td title="{{ icdr.auditCheck }}">{{ icdr.auditCheck }}</td>
+                        <td><a id="updateICDR" type="button" class="btn btn-primary btn-sm"
+                               style="height: 17px; margin-left: 8px">Update</a>
+                        </td>
+                        <td></td>
+                        <td style="display: none">{{ icdr.id }}</td>
+                    {% elif tipo3 %}
+                        <td title="{{ icdr.aberturaICDR }}">{{ icdr.aberturaICDR }}</td>
+                        <td title="{{ icdr.ageing }}">{{ icdr.ageing }}</td>
+                        <td title="{{ icdr.nAno }}">{{ icdr.nAno }}</td>
+                        <td title="{{ icdr.fornecedor }}">{{ icdr.fornecedor }}</td>
+                        <td title="{{ icdr.partnumber }}">{{ icdr.partnumber }}</td>
+                        <td title="{{ icdr.quantidade }}">{{ icdr.quantidade }}</td>
+                        <td title="{{ icdr.tipo }}">{{ icdr.tipo }}</td>
+                        <td title="{{ icdr.simNao }}">{{ icdr.simNao }}</td>
+                        <td title="{{ icdr.responsavel }}">{{ icdr.responsavel }}</td>
+                        <td title="{{ icdr.departamento }}">{{ icdr.departamento }}</td>
+                        <td title="{{ icdr.comentarioFecho }}">{{ icdr.comentarioFecho }}</td>
+                        <td title="{{ icdr.unCost }}">{{ icdr.unCost }}</td>
+                        <td title="{{ icdr.totalCost }}">{{ icdr.totalCost }}</td>
+                        {% if icdr.rctUnpCheck == 'true' %}
+                            <td title="RCT UNP"><input type="checkbox" id="rctUnp" name="rctUnp" checked disabled></td>
+                        {% else %}
+                            <td title="RCT UNP"><input type="checkbox" id="rctUnp" name="rctUnp" disabled></td>
+                        {% endif %}
+                        {% if icdr.cycleCountCheck == 'true' %}
+                            <td title="CYCLE COUNT"><input type="checkbox" id="cycleCountCheck" name="cycleCountCheck"
+                                                           checked disabled></td>
+                        {% else %}
+                            <td title="CYCLE COUNT"><input type="checkbox" id="cycleCountCheck" name="cycleCountCheck"
+                                                           disabled>
+                            </td>
+                        {% endif %}
+                        <td title="{{ icdr.consumption }}"><a type="button"
+                                                              class="fas fa-plus-circle fa-2x button5"
+                                                              id="consumption"
+                                                              style="color: orange; background-color: black; border-radius: 50%; margin-left: 10px; margin-top: 2px"></a>
+                        </td>
+                        <td title="{{ icdr.po }}"><a type="button"
+                                                     class="fas fa-plus-circle fa-2x button5"
+                                                     id="poNumber"
+                                                     style="color: orange; background-color: black; border-radius: 50%; margin-left: 10px; margin-top: 2px"></a>
+                        </td>
+                        <td title="{{ icdr.comentarioFechoICDR }}"><a type="button"
+                                                                      class="fas fa-plus-circle fa-2x button5"
+                                                                      id="comentariosFecho"
+                                                                      style="color: orange; background-color: black; border-radius: 50%; margin-left: 10px; margin-top: 2px"></a>
+                        </td>
+                        <td title="{{ icdr.date }}">{{ icdr.date }}</td>
+                        <td title="{{ icdr.cycleCount }}">{{ icdr.cycleCount }}</td>
+                        <td title="{{ icdr.dataCycleCount }}">{{ icdr.dataCycleCount }}</td>
+                        <td title="{{ icdr.auditCheck }}"><input value="{{ icdr.auditCheck }}"></td>
+                        <td><a id="updateICDR" type="button" class="btn btn-primary btn-sm"
+                               style="height: 17px; margin-left: 8px">Update</a>
+                        </td>
+                        <td></td>
+                        <td style="display: none">{{ icdr.id }}</td>
+                    {% else %}
+                        <td title="{{ icdr.aberturaICDR }}">{{ icdr.aberturaICDR }}</td>
+                        <td title="{{ icdr.ageing }}">{{ icdr.ageing }}</td>
+                        <td title="{{ icdr.nAno }}">{{ icdr.nAno }}</td>
+                        <td title="{{ icdr.fornecedor }}">{{ icdr.fornecedor }}</td>
+                        <td title="{{ icdr.partnumber }}">{{ icdr.partnumber }}</td>
+                        <td title="{{ icdr.quantidade }}">{{ icdr.quantidade }}</td>
+                        <td title="{{ icdr.tipo }}">{{ icdr.tipo }}</td>
+                        <td title="{{ icdr.simNao }}">{{ icdr.simNao }}</td>
+                        <td title="{{ icdr.responsavel }}">{{ icdr.responsavel }}</td>
+                        <td title="{{ icdr.departamento }}">{{ icdr.departamento }}</td>
+                        <td title="{{ icdr.comentarioFecho }}">{{ icdr.comentarioFecho }}</td>
+                        <td title="{{ icdr.unCost }}">{{ icdr.unCost }}</td>
+                        <td title="{{ icdr.totalCost }}">{{ icdr.totalCost }}</td>
+                        {% if icdr.rctUnpCheck == 'true' %}
+                            <td title="RCT UNP"><input type="checkbox" id="rctUnp" name="rctUnp" checked disabled></td>
+                        {% else %}
+                            <td title="RCT UNP"><input type="checkbox" id="rctUnp" name="rctUnp" disabled></td>
+                        {% endif %}
+                        {% if icdr.cycleCountCheck == 'true' %}
+                            <td title="CYCLE COUNT"><input type="checkbox" id="cycleCountCheck" name="cycleCountCheck"
+                                                           checked disabled></td>
+                        {% else %}
+                            <td title="CYCLE COUNT"><input type="checkbox" id="cycleCountCheck" name="cycleCountCheck"
+                                                           disabled></td>
+                        {% endif %}
+                        <td title="{{ icdr.consumption }}"><a type="button"
+                                                              class="fas fa-plus-circle fa-2x button5"
+                                                              id="consumption"
+                                                              style="color: orange; background-color: black; border-radius: 50%; margin-left: 10px; margin-top: 2px"></a>
+                        </td>
+                        <td title="{{ icdr.po }}"><a type="button"
+                                                     class="fas fa-plus-circle fa-2x button5"
+                                                     id="poNumber"
+                                                     style="color: orange; background-color: black; border-radius: 50%; margin-left: 10px; margin-top: 2px"></a>
+                        </td>
+                        <td title="{{ icdr.comentarioFechoICDR }}"><a type="button"
+                                                                      class="fas fa-plus-circle fa-2x button5"
+                                                                      id="comentariosFecho"
+                                                                      style="color: orange; background-color: black; border-radius: 50%; margin-left: 10px; margin-top: 2px"></a>
+                        </td>
+                        <td title="{{ icdr.date }}">{{ icdr.date }}</td>
+                        <td title="{{ icdr.cycleCount }}">{{ icdr.cycleCount }}</td>
+                        <td title="{{ icdr.dataCycleCount }}">{{ icdr.dataCycleCount }}</td>
+                        <td title="{{ icdr.auditCheck }}">{{ icdr.auditCheck }}</td>
+                        <td></td>
+                        <td></td>
+                        <td style="display: none">{{ icdr.id }}</td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+            </tbody>
+            <tfoot>
+            <tr>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <td style="text-align: center"><input type="checkbox" name="filterRCT" id="filterRCT"
+                                                      title="Filter checked RCT UNP"></td>
+                <td style="text-align: center"><input type="checkbox" name="filterCC" id="filterCC"
+                                                      title="Filter checked CC"></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <th></th>
+                <th></th>
+                <th></th>
+                <td></td>
+                <td></td>
+                <td style="display: none">{{ icdr.id }}</td>
+            </tr>
+            </tfoot>
+        </table>
+        <div class="form-inline mt-4">
+            <button type="button" class="btn btn-primary ml-2 mb-3" id="excel">Excel</button>
+            <div style="margin-left: 88%" class="mb-3">
+                <button class="btn btn-primary rounded" data-toggle="modal" data-target="#criarNovoUser">Criar user
+                </button>
+            </div>
+        </div>
+        <div style="position: absolute; right: 85px; bottom: 0">
+            <a href="#reportIssue" data-toggle="modal" data-target="#reportIssue" class="fas fa-info-circle"
+               style="font-size: 15px; height: 22px"> Help</a>
+        </div>
+        {% if filtroDesativado %}
+            <div style="left: 0px; bottom: 10px; position: absolute; border: 3px solid transparent"
+                 class="form-inline ml-2">
+                <input type="checkbox" id="filterDataICDR" name="filterDataICDR" title="FILTRAR ATIVOS">
+                <p style="margin-left: 5px"><b>Apenas ICDR Abertos</b></p>
+            </div>
+        {% else %}
+            <div style="left: 0px; bottom: 10px; position: absolute; border: 3px solid transparent"
+                 class="form-inline ml-2">
+                <input type="checkbox" id="filterDataICDR" name="filterDataICDR" title="FILTRAR ATIVOS" checked>
+                <p style="margin-left: 5px"><b>Apenas ICDR Abertos</b></p>
+            </div>
+        {% endif %}
+
+        {% for group in  request.user.groups.all %}
+            {% if 'ICDR - tipo1' in group.name %}
+                <div style="width: 90%; margin-left: 4%; bottom: 0%; position: absolute; border: 3px solid transparent; text-align: center">
+                    <button type="submit" class="button" data-toggle="modal" data-target="#criarNovo">
+                        NOVA ENTRADA
+                    </button>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" action="{% url 'receiving:reportICDR' %}">
+        {% csrf_token %}
+        <div class="modal fade" id="reportIssue" tabindex="-1" role="dialog"
+             aria-labelledby="myModalLabel">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: rgba(236,144,0,0.86)">
+                        <h4 class="modal-title" id="myModalLabel" style="margin-left: 45%; font-size: 40px"><i>HELP</i>
+                        </h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body"
+                         style="background: linear-gradient(to bottom, rgba(236,144,0,0.86) 0%, ghostwhite 100%); ">
+                        <div style="margin-top: 10px">
+                            <p style="font-size: 20px"><strong>Escreva aqui possíveis erros de utilização desta página
+                                em
+                                específico, ou deixe sugestões de melhoria</strong></p>
+                            <textarea class="form-control mt-n3" name="reportICDR" id="reportICDR" rows="11"
+                                      style="background-color: floralwhite; text-align: center;font-family:sans-serif;font-size:1.5em"
+                                      required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="background-color: ghostwhite">
+                        <button type="submit" id="submitReportICDR" class="btn btn-primary">Submeter</button>
+                        <button type="button" class="btn btn-primary" value="pending" data-dismiss="modal">Fechar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <form method="POST" enctype="multipart/form-data" action="{% url 'receiving:criarICDR' %}">
+        {% csrf_token %}
+        <div class="modal fade" id="criarNovo" name="criarNovo" tabindex="-1" role="dialog"
+             aria-labelledby="myModalLabel">
+            <div class="modal-dialog modal-xl" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: rgba(236,144,0,0.86)">
+                        <h4 class="modal-title" id="myModalLabel" style="margin-left: 40%; font-size: 40px"><i>Inserir
+                            dados</i></h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body"
+                         style="background: linear-gradient(to bottom, rgba(236,144,0,0.86) 0%, ghostwhite 100%); ">
+                        <div class="form-inline">
+                            <div style="text-align: center">
+                                <p style="font-size: 20px"><strong>ICDR - Nº / ANO</strong></p>
+                                <input type="text" class="form-control mt-n3" name="numeroAno" id="numeroAno"
+                                       style="width: 525px; background-color: floralwhite" value="{{ ultimoElemento }}"
+                                       required>
+                            </div>
+                            <div style="margin-left: 50px; text-align: center">
+                                <p style="font-size: 20px"><strong>ICDR - FORNECEDOR</strong></p>
+                                <input type="text" class="form-control mt-n3" name="fornecedor" id="fornecedor"
+                                       style="width: 525px; background-color: floralwhite"
+                                       required>
+                            </div>
+                        </div>
+                        <div class="form-inline" style="margin-top: 10px">
+                            <div style="text-align: center">
+                                <p style="font-size: 20px"><strong>ICDR - PARTNUMBER</strong></p>
+                                <input type="text" class="form-control mt-n3" name="partnumber" id="partnumber"
+                                       style="width: 525px; background-color: floralwhite"
+                                       required>
+                            </div>
+                            <div style="margin-left: 50px; text-align: center">
+                                <p style="font-size: 20px"><strong>ICDR - QUANTIDADE</strong></p>
+                                <input type="number" class="form-control mt-n3" name="quantidade" id="quantidade"
+                                       style="width: 525px; background-color: floralwhite"
+                                       required>
+                            </div>
+                        </div>
+                        <div class="form-inline" style="margin-top: 10px">
+                            <div style="text-align: center">
+                                <p style="font-size: 20px"><strong>MOTIVO - TIPO</strong></p>
+                                <input type="text" class="form-control mt-n3" name="tipo" id="tipo"
+                                       style="width: 525px; background-color: floralwhite" list="motivos"
+                                       required>
+                                <datalist id="motivos">
+                                    {% for motivo in motivos.all %}
+                                        <option value='{{ motivo }}'>{{ motivo }}</option>
+                                    {% endfor %}
+                                </datalist>
+                            </div>
+                            <div style="margin-left: 50px; text-align: center">
+                                <p style="font-size: 20px"><strong>ALFANDEGA - (SIM/NÃO)</strong></p>
+                                <select class="form-control" name="alfandegaSimNao" id="alfandegaSimNao"
+                                        style="width: 525px; background-color: floralwhite; margin-top: -15px" required>
+                                    <option value=""></option>
+                                    <option value="sim">SIM</option>
+                                    <option value="nao">NÃO</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-inline" style="margin-top: 10px">
+                            <div style="text-align: center">
+                                <p style="font-size: 20px"><strong>RESPONSÁVEL</strong></p>
+                                <input type="text" class="form-control mt-n3 dropClass" name="responsavel"
+                                       id="responsavel"
+                                       list="responsaveis"
+                                       style="width: 525px; background-color: floralwhite"
+                                       required>
+                                <datalist id="responsaveis">
+                                    {% for user in utilizadoresICDR.all %}
+                                        <option value='{{ user.username }}'>{{ user.nome }}</option>
+                                    {% endfor %}
+                                </datalist>
+                            </div>
+                            <div style="margin-left: 50px; text-align: center">
+                                <p style="font-size: 20px"><strong>DEPARTAMENTO</strong></p>
+                                <input type="text" class="form-control mt-n3" name="departamento" id="departamento"
+                                       list="listaAreas"
+                                       style="width: 525px; background-color: floralwhite"
+                                       required>
+                            </div>
+                        </div>
+                        <div style="margin-left: 50px; text-align: center">
+                            <p style="font-size: 20px; margin-top: 10px; margin-left: -60px">
+                                <strong>COMENTÁRIOS</strong>
+                            </p>
+                            <textarea class="form-control mt-n3" name="comentarios" id="comentarios" rows="11"
+                                      style="font-family:sans-serif;font-size:1.2em; margin-left: -25px; background-color: floralwhite"></textarea>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer" style="background-color: ghostwhite">
+                        <button type="submit" class="btn btn-primary" id="botaoCriarICDR">Criar</button>
+                        <button type="button" class="btn btn-primary" value="pending" data-dismiss="modal">Fechar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <form method="POST" enctype="multipart/form-data" action="{% url 'receiving:criarUserICDR' %}">
+        {% csrf_token %}
+        <div class="modal fade" id="criarNovoUser" name="criarNovoUser" tabindex="-1" role="dialog"
+             aria-labelledby="myModalLabel">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: rgba(236,144,0,0.86)">
+                        <h4 class="modal-title" id="myModalLabel" style="margin-left: 36%; font-size: 40px"><i>Inserir
+                            dados</i></h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body"
+                         style="background: linear-gradient(to bottom, rgba(236,144,0,0.86) 0%, ghostwhite 100%); ">
+                        <div style="margin-top: 10px; text-align: center">
+                            <div style="text-align: center">
+                                <p style="font-size: 20px"><strong>Nome (primeiro e último)</strong></p>
+                                <input type="text" class="form-control mt-n3" name="nomeUser" id="nomeUser"
+                                       style="background-color: floralwhite; text-align: center"
+                                       required>
+                            </div>
+                            <div style="text-align: center">
+                                <p style="font-size: 20px"><strong>Área</strong></p>
+                                <input type="text" class="form-control mt-n3" name="areaUser" id="areaUser"
+                                       style="background-color: floralwhite; text-align: center" list="listaAreas"
+                                       required>
+                                <datalist id="listaAreas">
+                                    <option value='MPL'>MPL</option>
+                                    <option value='MPL MNGR'>MPL MNGR</option>
+                                    <option value='MPL SNR MNGR'>MPL SNR MNGR</option>
+                                    <option value='Service'>Service</option>
+                                    <option value='Service MNGR'>Service MNGR</option>
+                                    <option value='Service SNR MNGR'>Service SNR MNGR</option>
+                                    <option value='ENG'>ENG</option>
+                                    <option value='ENG MNGR'>ENG MNGR</option>
+                                    <option value='ENG SNR MNGR'>ENG SNR MNGR</option>
+                                    <option value='QA'>QA</option>
+                                    <option value='QA SNR MNGR'>QA SNR MNGR</option>
+                                    <option value='VPBEC'>VPBEC</option>
+                                    <option value='PLAST'>PLAST</option>
+                                    <option value='PLAST SNR MNGR'>PLAST SNR MNGR</option>
+                                    <option value='COMPRAS'>COMPRAS</option>
+                                    <option value='MFG'>MFG</option>
+                                    <option value='MFG MNGR'>MFG MNGR</option>
+                                    <option value='MFG SNR MNGR'>MFG SNR MNGR</option>
+                                    <option value='IT MNGR'>IT MNGR</option>
+                                    <option value='351E'>351E</option>
+                                    <option value='3515'>3515</option>
+                                </datalist>
+                            </div>
+                            <div style="text-align: center">
+                                <p style="font-size: 20px"><strong>Email</strong></p>
+                                <input type="email" class="form-control mt-n3" name="emailUser" id="emailUser"
+                                       style="background-color: floralwhite; text-align: center"
+                                       placeholder="user@visteon.com"
+                                       required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="background-color: ghostwhite">
+                        <button type="submit" class="btn btn-primary">Criar</button>
+                        <button type="button" class="btn btn-primary" value="pending" data-dismiss="modal">Fechar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="modal fade" id="confirmarFechoICDR" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #FBA51A">
+                    <h4 class="modal-title" id="myModalLabel" style="margin-left: 22%; font-size: 40px"><i>Confirmar
+                        fecho de ICDR</i></h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body" style="background: linear-gradient(to bottom, #FBA51A 0%, #ffb700 100%)">
+                    <p id="infoConfirmarICDR"></p>
+                    <input style="display: none" type="text" id="idICDR">
+                </div>
+                <div class="modal-footer"
+                     style="background-color: #ffb700 ">
+                    <button type="button" id="confirmarFecho" class="btn btn-primary">Confirmar</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Fechar
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" action="{% url 'receiving:updateConsumption' %}">
+        {% csrf_token %}
+        <div class="modal fade" id="modalOpenICDRTipo1" tabindex="-1" role="dialog"
+             aria-labelledby="myModalLabel">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: #FBA51A">
+                        <h4 class="modal-title" id="myModalLabel" style="margin-left: 22%; font-size: 40px"><i>Open ICDR
+                            -
+                            Consumption</i></h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body" style="background: linear-gradient(to bottom, #FBA51A 0%, ghostwhite 100%)">
+                        <p><b>Novo consumption</b></p>
+                        <p><b>User: {{ user.username }}</b></p>
+                        <textarea class="form-control" type="text" id="novoOpenICDRTipo1" name="novoOpenICDR"
+                                  style="background-color: floralwhite"></textarea>
+                        </br>
+                        <textarea class="form-control black" rows="23" type="text"
+                                  id="existenteOpenICDRTipo1" name="existenteOpenICDR"
+                                  style="background-color: floralwhite" disabled></textarea>
+                        <input type="text" style="display: none" id="openICDRElemID" name="openICDRElemID">
+                    </div>
+                    <div class="modal-footer"
+                         style="background-color: ghostwhite ">
+                        <button type="submit" id="adicionar1" class="btn btn-primary">Adicionar</button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Fechar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="modal fade" id="modalOpenICDR" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #FBA51A">
+                    <h4 class="modal-title" id="myModalLabel" style="margin-left: 22%; font-size: 40px"><i>Open ICDR
+                        -
+                        Consumption</i></h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body" style="background: linear-gradient(to bottom, #FBA51A 0%, ghostwhite 100%)">
+                    <textarea class="form-control black" rows="23" type="text"
+                              id="existenteOpenICDR" name="existenteOpenICDR"
+                              style="background-color: floralwhite" disabled></textarea>
+                </div>
+                <div class="modal-footer"
+                     style="background-color: ghostwhite ">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Fechar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" action="{% url 'receiving:updatePONumber' %}">
+        {% csrf_token %}
+        <div class="modal fade" id="modalQADEntryTipo1" tabindex="-1" role="dialog"
+             aria-labelledby="myModalLabel">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: #FBA51A">
+                        <h4 class="modal-title" id="myModalLabel" style="margin-left: 27%; font-size: 40px"><i>QAD Entry
+                            -
+                            PO Nº</i></h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body" style="background: linear-gradient(to bottom, #FBA51A 0%, ghostwhite 100%)">
+                        <p><b>Novo PO nº</b></p>
+                        <p><b>User: {{ user.username }}</b></p>
+                        <textarea class="form-control" type="text" id="novoQADEntryTipo1" name="novoQADEntry"
+                                  style="background-color: floralwhite"></textarea>
+                        </br>
+                        <textarea class="form-control black" rows="23" type="text"
+                                  id="existenteQADEntryTipo1" name="existenteQADEntry"
+                                  style="background-color: floralwhite" disabled></textarea>
+                        <input type="text" style="display: none" id="poNumberElemIDTipo1" name="poNumberElemID">
+                    </div>
+                    <div class="modal-footer"
+                         style="background-color: ghostwhite ">
+                        <button type="submit" id="adicionar2" class="btn btn-primary">Adicionar</button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Fechar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="modal fade" id="modalQADEntry" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #FBA51A">
+                    <h4 class="modal-title" id="myModalLabel" style="margin-left: 27%; font-size: 40px"><i>QAD Entry
+                        -
+                        PO Nº</i></h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body" style="background: linear-gradient(to bottom, #FBA51A 0%, ghostwhite 100%)">
+                    <textarea class="form-control black" rows="23" type="text"
+                              id="existenteQADEntry" name="existenteQADEntry"
+                              style="background-color: floralwhite" disabled></textarea>
+                </div>
+                <div class="modal-footer"
+                     style="background-color: ghostwhite ">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Fechar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" action="{% url 'receiving:updateComentarioFechoICDR' %}">
+        {% csrf_token %}
+        <div class="modal fade" id="modalComentariosFechoICDRTipo1" tabindex="-1" role="dialog"
+             aria-labelledby="myModalLabel">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: #FBA51A">
+                        <h4 class="modal-title" id="myModalLabel" style="margin-left: 17%; font-size: 40px"><i>COMENTÁRIOS
+                            FECHO ICDR</i></h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body" style="background: linear-gradient(to bottom, #FBA51A 0%, ghostwhite 100%)">
+                        <p><b>Novo comentário</b></p>
+                        <p><b>User: {{ user.username }}</b></p>
+                        <textarea class="form-control" type="text" id="novoComentarioFechoICDRTipo1"
+                                  name="novoComentarioFechoICDR"
+                                  style="background-color: floralwhite"></textarea>
+                        </br>
+                        <textarea class="form-control black" rows="23" type="text"
+                                  id="existenteComentarioFechoICDRTipo1" name="existenteComentarioFechoICDR"
+                                  style="background-color: floralwhite" disabled></textarea>
+                        <input type="text" style="display: none" id="comentarioFechoElemID"
+                               name="comentarioFechoElemID">
+                    </div>
+                    <div class="modal-footer"
+                         style="background-color: ghostwhite ">
+                        <button type="submit" id="adicionar3" class="btn btn-primary">Adicionar
+                        </button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Fechar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="modal fade" id="modalComentariosFechoICDR" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #FBA51A">
+                    <h4 class="modal-title" id="myModalLabel" style="margin-left: 17%; font-size: 40px"><i>COMENTÁRIOS
+                        FECHO ICDR</i></h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body" style="background: linear-gradient(to bottom, #FBA51A 0%, ghostwhite 100%)">
+                    <textarea class="form-control black" rows="23" type="text"
+                              id="existenteComentarioFechoICDR" name="existenteComentarioFechoICDR"
+                              style="background-color: floralwhite" disabled></textarea>
+                </div>
+                <div class="modal-footer"
+                     style="background-color: ghostwhite ">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Fechar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" action="{% url 'receiving:mudaEstadoFiltroICDR' %}">
+        {% csrf_token %}
+        <div class="modal fade" id="confirmarCC" tabindex="-1" role="dialog"
+             aria-labelledby="myModalLabel">
+            <div class="modal-dialog modal-xl" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: whitesmoke">
+                        <h4 class="modal-title" id="myModalLabel" style="margin-left: 30%; font-size: 40px"><i>Confirmar
+                            Cycle Count</i></h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                        <input type="hidden" id="idConfirmarCC" name="idConfirmarCC">
+                        <input type="hidden" id="estadoConfirmarCC" name="estadoConfirmarCC">
+                        <input type="hidden" id="elementoConfirmarCC" name="elementoConfirmarCC">
+                    </div>
+
+                    <div class="modal-footer"
+                         style="background-color: ghostwhite ">
+                        <button type="submit" class="btn btn-primary">Confirmar
+                        </button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Fechar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <form method="POST" enctype="multipart/form-data" action="{% url 'receiving:mudaEstadoFiltroICDR' %}">
+        {% csrf_token %}
+        <div class="modal fade" id="confirmarRetirarCC" tabindex="-1" role="dialog"
+             aria-labelledby="myModalLabel">
+            <div class="modal-dialog modal-xl" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: whitesmoke">
+                        <h4 class="modal-title" id="myModalLabel" style="margin-left: 17%; font-size: 40px"><i>Confirmar
+                            CANCELAMENTO de Cycle Count</i></h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-footer"
+                         style="background-color: ghostwhite ">
+                        <input type="hidden" id="idRetirarCC" name="idRetirarCC">
+                        <input type="hidden" id="estadoRetirarCC" name="estadoRetirarCC">
+                        <input type="hidden" id="elementoRetirarCC" name="elementoRetirarCC">
+                        <button type="submit" class="btn btn-primary">Confirmar
+                        </button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Fechar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        $(document).ready(function () {
+            // Setup - add a text input to each footer cell
+            $('#icdrHistory tfoot th').each(function (i) {
+                var title = $('#gatewayHistory tfoot th').eq($(this).index()).text();
+                $(this).html('<input class="form-control" style="margin-left: -15px; text-align: center; font-size: 10px" type="text" placeholder="Procurar" data-index="' + i + '" />');
+            });
+
+            $('#responsavel').on('change', function () {
+                var responsavel = this.value
+                $.ajax({
+                    type: 'GET',
+                    url: '/receiving/getDepartamento/',
+                    dataType: "text json",
+                    data: {
+                        'responsavel': responsavel
+                    },
+                    success: function (response) {
+                        $('#departamento').val(response.elemento[0].area)
+                    }
+                });
+            });
+
+            $('#departamento').on('change', function () {
+                var departamento = this.value
+                $.ajax({
+                    type: 'GET',
+                    url: '/receiving/getUtilizadoresPorDepartamento/',
+                    dataType: "text json",
+                    data: {
+                        'departamento': departamento
+                    },
+                    success: function (response) {
+                        $("#responsaveis").empty();
+                        for (elem in response.elementos) {
+                            $("<option/>").html(response.elementos[elem].username).appendTo("#responsaveis");
+                        }
+                        if (response.elementos.length === 0) {
+                            $.ajax({
+                                type: 'GET',
+                                url: '/receiving/searchAllInfoUtilizadores/',
+                                data: {
+                                    csrfmiddlewaretoken: "{{ csrf_token }}",
+                                },
+                                success: function (response) {
+                                    $("#responsaveis").empty();
+                                    for (elem in response.resposta) {
+                                        $("<option/>").html(response.resposta[elem].username).appendTo("#responsaveis");
+                                    }
+                                }
+                            })
+                        }
+                    }
+                });
+            });
+
+            var table = $('#icdrHistory').DataTable({
+                paging: false,
+                order: [[0, 'desc']],
+                info: false,
+                scrollY: 460,
+                scrollX: true,
+                scrollCollapse: true,
+                columnDefs: [{
+                    targets: "_all",
+                    render: function (data, type, row) {
+                        if (data.startsWith('<')) {
+                            return data
+                        }
+                        return data.length > 19 ?
+                            data.substr(0, 19) + '…' :
+                            data;
+                    }
+                }
+                ],
+            });
+
+            $('#icdrHistory tbody').on('click', '#dataHoraFecho', function () {
+                var data = table.row($(this).parents('tr')).data();
+                var myModal = new bootstrap.Modal(document.getElementById('confirmarFechoICDR'))
+                myModal.show()
+
+                var numero = data[2]
+
+                $('#infoConfirmarICDR').html("<b>Data criação de ICDR: </b>" + data[0] + "</br></br><b>Nº / Ano: </b>" + numero)
+                $('#idICDR').val(data[24])
+            });
+
+            {% comment %}$(document).on('click', '#botaoCriarICDR', function () {
+                document.getElementById("botaoCriarICDR").disabled = true;
+                setTimeout(function () {
+                    document.getElementById("botaoCriarICDR").disabled = false;
+                }, 10000);
+            });{% endcomment %}
+
+            $('#icdrHistory tbody').on('click', '#updateICDR', function () {
+                document.getElementById("updateICDR").disabled = true;
+                setTimeout(function () {
+                    document.getElementById("updateICDR").disabled = false;
+                }, 5000);
+                var data = table.row($(this).parents('tr')).data();
+
+                var poNumber = $(this).closest("tr").find('td:eq(16) input').val()
+                var cycleCount = $(this).closest("tr").find('td:eq(19) input').val()
+                var dataCycleCount = $(this).closest("tr").find('td:eq(20) input').val()
+                var auditCheck = $(this).closest("tr").find('td:eq(21) input').val()
+                var checkedRctUnp = $(this).closest("tr").find('td:eq(13) input').is(':checked');
+                var checkedCycleCount = $(this).closest("tr").find('td:eq(14) input').is(':checked');
+
+                if (poNumber === undefined) {
+                    poNumber = ''
+                }
+                if (cycleCount === undefined) {
+                    cycleCount = ''
+                }
+                if (dataCycleCount === undefined) {
+                    dataCycleCount = ''
+                }
+                if (auditCheck === undefined) {
+                    auditCheck = ''
+                }
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/receiving/updateICDR/',
+                    data: {
+                        csrfmiddlewaretoken: "{{ csrf_token }}",
+                        'id': data[24],
+                        'poNumber': poNumber,
+                        'cycleCount': cycleCount,
+                        'dataCycleCount': dataCycleCount,
+                        'auditCheck': auditCheck,
+                        'checkedRctUnp': checkedRctUnp,
+                        'checkedCycleCount': checkedCycleCount,
+                    },
+                    success: function () {
+                        window.location = "{% url 'receiving:icdr'  %}"
+                    }
+                })
+            });
+
+            $(document).on('click', '#confirmarFecho', function () {
+                document.getElementById("confirmarFecho").disabled = true;
+                setTimeout(function () {
+                    document.getElementById("confirmarFecho").disabled = false;
+                }, 5000);
+                var id = $('#idICDR').val()
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/receiving/setDataHoraFechoICDR/',
+                    data: {
+                        csrfmiddlewaretoken: "{{ csrf_token }}",
+                        'id': id
+                    },
+                    success: function () {
+                        window.location = "{% url 'receiving:icdr'  %}"
+                    }
+                })
+            });
+
+            $('#icdrHistory tbody').on('click', '#consumptionTipo1', function () {
+                var data = table.row($(this).parents('tr')).data();
+                var myModal = new bootstrap.Modal(document.getElementById('modalOpenICDRTipo1'))
+                myModal.show()
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/receiving/getElem/',
+                    dataType: "text json",
+                    data: {
+                        'id': data[24],
+                        'atributo': 'consumption'
+                    },
+                    success: function (response) {
+                        $('#existenteOpenICDRTipo1').val(response.response)
+                        $('#openICDRElemID').val(data[24])
+                    }
+                });
+            });
+
+            $('#icdrHistory tbody').on('click', '#consumption', function () {
+                var data = table.row($(this).parents('tr')).data();
+                var myModal = new bootstrap.Modal(document.getElementById('modalOpenICDR'))
+                myModal.show()
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/receiving/getElem/',
+                    dataType: "text json",
+                    data: {
+                        'id': data[24],
+                        'atributo': 'consumption'
+                    },
+                    success: function (response) {
+                        $('#existenteOpenICDR').val(response.response)
+                        $('#openICDRElemID').val(data[24])
+                    }
+                });
+            });
+
+            $('#icdrHistory tbody').on('click', '#poNumberTipo1', function () {
+                var data = table.row($(this).parents('tr')).data();
+                var myModal = new bootstrap.Modal(document.getElementById('modalQADEntryTipo1'))
+                myModal.show()
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/receiving/getElem/',
+                    dataType: "text json",
+                    data: {
+                        'id': data[24],
+                        'atributo': 'poNumber'
+                    },
+                    success: function (response) {
+                        $('#existenteQADEntryTipo1').val(response.response)
+                        $('#poNumberElemIDTipo1').val(data[24])
+                    }
+                });
+            });
+
+            $('#icdrHistory tbody').on('click', '#poNumber', function () {
+                var data = table.row($(this).parents('tr')).data();
+                var myModal = new bootstrap.Modal(document.getElementById('modalQADEntry'))
+                myModal.show()
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/receiving/getElem/',
+                    dataType: "text json",
+                    data: {
+                        'id': data[24],
+                        'atributo': 'poNumber'
+                    },
+                    success: function (response) {
+                        $('#existenteQADEntry').val(response.response)
+                        $('#poNumberElemID').val(data[24])
+                    }
+                });
+            });
+
+            $('#icdrHistory tbody').on('click', '#comentariosFecho', function () {
+                var data = table.row($(this).parents('tr')).data();
+                var myModal = new bootstrap.Modal(document.getElementById('modalComentariosFechoICDR'))
+                myModal.show()
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/receiving/getElem/',
+                    dataType: "text json",
+                    data: {
+                        'id': data[24],
+                        'atributo': 'comentariosFecho'
+                    },
+                    success: function (response) {
+                        $('#existenteComentarioFechoICDR').val(response.response)
+                        $('#comentarioFechoElemID').val(data[24])
+                    }
+                });
+            });
+
+            $('#icdrHistory tbody').on('click', '#comentariosFechoTipo1', function () {
+                var data = table.row($(this).parents('tr')).data();
+                var myModal = new bootstrap.Modal(document.getElementById('modalComentariosFechoICDRTipo1'))
+                myModal.show()
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/receiving/getElem/',
+                    dataType: "text json",
+                    data: {
+                        'id': data[24],
+                        'atributo': 'comentariosFecho'
+                    },
+                    success: function (response) {
+                        $('#existenteComentarioFechoICDRTipo1').val(response.response)
+                        $('#comentarioFechoElemID').val(data[24])
+                    }
+                });
+            });
+
+            $('#icdrHistory tbody').on('click', '#reAbrirICDR', function () {
+                var data = table.row($(this).parents('tr')).data();
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/receiving/reAbrirICDR/',
+                    data: {
+                        csrfmiddlewaretoken: "{{ csrf_token }}",
+                        'id': data[24],
+                    },
+                    success: function () {
+                        window.location = "{% url 'receiving:icdr'  %}"
+                    }
+                });
+            });
+
+            $(document).on('click', '#excel', function () {
+                $.ajax({
+                    type: 'GET',
+                    url: '/receiving/downloadExcel/',
+                    data: {},
+                    success: function () {
+                        var element = document.createElement('a');
+                        element.setAttribute('href', '/media/receiving/icdr/workbookICDR.xls');
+                        element.setAttribute('download', 'my-file-name');
+
+                        element.style.display = 'none';
+                        document.body.appendChild(element);
+
+                        element.click();
+
+                        document.body.removeChild(element);
+                    }
+                })
+            });
+
+            // Filter event handler
+            $(table.table().container()).on('keyup', 'tfoot input', function () {
+                table
+                    .column($(this).data('index'))
+                    .search(this.value)
+                    .draw();
+            });
+
+            $('input[id=filterDataICDR]:checkbox').on('change', function () {
+                if (this.checked) {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/receiving/mudaEstadoSession/',
+                        data: {
+                            csrfmiddlewaretoken: "{{ csrf_token }}",
+                            'estado': 'off'
+                        },
+                        success: function () {
+                            table.draw()
+                        }
+                    })
+                } else {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/receiving/mudaEstadoSession/',
+                        data: {
+                            csrfmiddlewaretoken: "{{ csrf_token }}",
+                            'estado': 'on'
+                        },
+                        success: function () {
+                            window.location = "{% url 'receiving:icdr'  %}"
+                        }
+                    })
+                }
+            });
+
+            var checked = $('input[id=filterDataICDR]:checkbox').is(':checked');
+            if (checked) {
+                table.columns(18).search('Time').draw()
+            }
+
+            $('input[id=rctUnp]:checkbox').on('change', function () {
+                var data = table.row($(this).parents('tr')).data();
+                var id = data[24]
+                if (this.checked) {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/receiving/mudaEstadoFiltroICDR/',
+                        data: {
+                            csrfmiddlewaretoken: "{{ csrf_token }}",
+                            'id': id,
+                            'estado': 'true',
+                            'elemento': 'rct'
+                        },
+                        success: function () {
+                        }
+                    })
+                } else {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/receiving/mudaEstadoFiltroICDR/',
+                        data: {
+                            csrfmiddlewaretoken: "{{ csrf_token }}",
+                            'id': id,
+                            'estado': 'false',
+                            'elemento': 'rct'
+                        },
+                        success: function () {
+                        }
+                    })
+                }
+                // Run the search plugin
+                table.draw();
+            });
+
+            $('input[id=cycleCountCheck]:checkbox').on('change', function () {
+                var data = table.row($(this).parents('tr')).data();
+                var id = data[24]
+                if (this.checked) {
+                    var myModal = new bootstrap.Modal(document.getElementById('confirmarCC'))
+                    myModal.show()
+
+                    $('#idConfirmarCC').val(data[24])
+                    $('#estadoConfirmarCC').val('true')
+                    $('#elementoConfirmarCC').val('cycle')
+
+                    {% comment %}$.ajax({
+                        type: 'POST',
+                        url: '/receiving/mudaEstadoFiltroICDR/',
+                        data: {
+                            csrfmiddlewaretoken: "{{ csrf_token }}",
+                            'id': id,
+                            'estado': 'true',
+                            'elemento': 'cycle'
+                        },
+                        success: function () {
+                        }
+                    }){% endcomment %}
+                } else {
+                    var myModal = new bootstrap.Modal(document.getElementById('confirmarRetirarCC'))
+                    myModal.show()
+
+                    $('#idRetirarCC').val(data[24])
+                    $('#estadoRetirarCC').val('false')
+                    $('#elementoRetirarCC').val('cycle')
+
+                    {% comment %}$.ajax({
+                        type: 'POST',
+                        url: '/receiving/mudaEstadoFiltroICDR/',
+                        data: {
+                            csrfmiddlewaretoken: "{{ csrf_token }}",
+                            'id': id,
+                            'estado': 'false',
+                            'elemento': 'cycle'
+                        },
+                        success: function () {
+                        }
+                    }){% endcomment %}
+                }
+                // Run the search plugin
+                table.draw();
+            });
+
+            $('input[id=filterRCT]:checkbox').on('change', function () {
+                // Run the search plugin
+                table.draw();
+            });
+
+            $('input[id=filterCC]:checkbox').on('change', function () {
+                // Run the search plugin
+                table.draw();
+            });
+
+            $.fn.dataTable.ext.search.push(
+                function (settings, searchData, index, rowData, counter) {
+                    var checked = $('input[id=filterDataICDR]:checkbox').is(':checked');
+
+                    // If checked and Position column is blank don't display the row
+                    if (checked && !searchData[18].startsWith('Time')) {
+                        return false;
+                    }
+                    // Otherwise display the row
+                    return true;
+                },
+                function (settings, searchData, index, rowData, counter) {
+                    var checkedCC = $('input[id=filterCC]:checkbox').is(':checked');
+
+                    // If checked and Position column is blank don't display the row
+                    if (checkedCC && !rowData[14].includes('checked')) {
+                        return false;
+                    }
+                    // Otherwise display the row
+                    return true;
+                },
+                function (settings, searchData, index, rowData, counter) {
+                    var checkedRCT = $('input[id=filterRCT]:checkbox').is(':checked');
+
+                    // If checked and Position column is blank don't display the row
+                    if (checkedRCT && !rowData[13].includes('checked')) {
+                        return false;
+                    }
+                    // Otherwise display the row
+                    return true;
+                }
+            )
+        });
+    </script>
+{% endblock %}
