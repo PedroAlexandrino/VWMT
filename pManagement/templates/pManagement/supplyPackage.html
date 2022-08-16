@@ -198,7 +198,7 @@
                 <table id="example" class="stripe hover cell-border " style="width:100%">
                     <thead>
                     <tr>
-                        <td >Part-number</td>
+                        <td>Part-number</td>
                         <td>Description</td>
                         <td>Comment</td>
                         <td>
@@ -226,17 +226,25 @@
                                     <td title="{{ kitSuplyPackage.part_number|default:'Empty'}}">{{ kitSuplyPackage.part_number }}</td>
                                     <td title="{{ kitSuplyPackage.description|default:'Empty'}}">{{ kitSuplyPackage.description }}</td>
                                     <td title="{{ kitSuplyPackage.comment|default:'Empty'}}">{{ kitSuplyPackage.comment }}</td> 
-                                    <td id="clientPackage" name="clientPackage" class="text-center">
-                                        <a class="fas fa-list-alt fa-lg"></a>
+                                    
+                                    <td>
+                                        <button type="button" class="btn btn-success" data-toggle="modal" id="somevalue" data-target="#listaClientProd"style="background-color: #FBA51A; margin-left: 30%">
+                                            <li class="fa fa-plus fa-fw"></li>
+                                        </button>
                                     </td>
-                                    <td id="bomb" name="bomb" class="text-center">
-                                        <a class="fas fa-list-alt fa-lg"></a>
+
+
+                                    <td>
+                                        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#listaStockPackage"style="background-color: #FBA51A; margin-left: 30%">
+                                            <li class="fa fa-plus fa-fw"></li>
+                                        </button>
                                     </td>
+
                                     <td>{{ kitSuplyPackage.supply_time }}</td>
                                     <td class="text-center">{{ kitSuplyPackage.stock }}</td>
                                     <th><input style="width: 70px; margin-left: 8px" class=""
                                         type="number"
-                                        name="{{ kitSuplyPackage.id }}" id="{{ kitSuplyPackage.id }}"
+                                        name="{{ kitSuplyPackage.id }}" min="0" id="{{ kitSuplyPackage.id }}"
                                         value="{{ kitSuplyPackage.inventario}}"></th>
                                            
                                     <td class="text-center" id="link">{{ kitSuplyPackage.link }}</td>
@@ -373,7 +381,7 @@
                        
                         <div class="form-inline">
                             <p class="mt-2">Stock: </p>
-                            <input style="margin-left: 110px" type="number" id="supplyStockAdd" name="prodStockAdd"
+                            <input style="margin-left: 110px" type="number" min="0" id="supplyStockAdd" name="prodStockAdd"
                                    value="{{ kitSuplyPackage.inventario}}">
                         </div>
                         <div class="form-inline mt-3">
@@ -478,7 +486,7 @@
                     <div class="form-inline mt-3">
                         <h6 class="mt-1">Quantity: </h6>
                         <th style="width: 5%" id="novoStockProdutoEdit" name="novoStockProdutoEdit" title="{{ kitSuplyPackage.inventario|default:'Empty' }}">
-                            <input style="width: 70px; margin-left: 40px" class="" 
+                            <input style="width: 70px; margin-left: 40px" min="0" class="" 
                             type="number"
                             name="novoStockProdutoEdit" id="novoStockProdutoEdit"
                             value="{{ kitSuplyPackage.inventario|default:"" }}">
@@ -544,7 +552,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3 class="modal-title" id="myModalLabel"><b>New Client</b></h3>
+                    <h3 class="modal-title" id="myModalLabel"><b>New Client/Product</b></h3>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                             aria-hidden="true">&times;</span></button>
 
@@ -553,10 +561,24 @@
                     <h3><b> Create: </b></h3>
                     <div class="form-inline mt-3">
                         <h6 class="mt-1">Nome:   </h6>
+                        <input list="clientList" id="getCliente" name="getCliente" />
+                        <datalist id="clientList">
+                          {% for clientes in ClientesOEM.all %}
+                          <option value="{{clientes.oem}}" ></option>
+                          {% endfor %}
+                        </datalist>
+                        <!-- input seguinte é para sair -->
                         <input placeholder=" New client " type="form" name="novoClientName" id="NewClienteInput">
                         </div>
                           <div class="form-inline mt-3">
                         <h6 class="mt-1">Nome Produto:   </h6>
+                        <input list="prodList" id="getProds" name="getProds"  />
+                        <datalist id="prodList">
+                          {% for produtos in Produtos.all %}
+                          <option value="{{produtos.nome}}"></option>
+                          {% endfor %}
+                        </datalist>
+                        <!-- input seguinte é para sair -->
                         <input placeholder=" New client " type="form" name="novoClientName" id="NewClienteInput">
                         </div>
                         <div class="form-inline mt-3">
@@ -601,23 +623,24 @@
                        <td></td>
                        <th>Nome do Cliente</th>
                        <th>Nome do Produto</th>
-                       <th>Prod Descrição</th>
                        <th>Prod Comentario</th>
+                       <th></th>
                        <th></th>
                       
                    </tr>
                    </thead>
                    <tbody>
                    {% for pn in cliente_produto.all %}
-                        <!-- tens de enviar este prods_ref na view que faz o render-->
+                    
                             <tr>
                                 <td></td>
-                                <td>{{ pn.client_name.oem }}</td>
-                                <td>{{ pn.product_name.nome }}</td>
-                                <th>{{ pn.product_name.comentario }}</th>
-                                <td>{{ pn.product_name.descricao }}</td>
+                                <td>{{ pn.cliente.oem }}</td>
+                                <td>{{ pn.produto.nome }}</td>
+                                <th>{{ pn.comment }}</th>
+                                <th></th>
                                 <td style="display: none">{{ pn.id }}</td>
                             </tr>
+                            
                    {% endfor %}
                    </tbody>
                    <tfoot>
@@ -627,7 +650,7 @@
                        <th></th>
                        <th></th>
                        <td></td>
-                       <th></th>
+                       <td></td>
                        
                    </tr>
                    
@@ -702,8 +725,106 @@
         </div>
     </div>
 
+<!-- TABELA QUE VAI MOSTRAR OS CLIENTES/PRODUTO QUE ESTÂO AGREGADOS A UM CERTO SUPPLYPACKAGE -->
+    <div class="modal fade" id="listaClientProd" data-backdrop="false" tabindex="-1" role="dialog"
+    aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+       <div class="modal-content">
+           <div class="modal-header">
+               <h3 class="modal-title" id="myModalLabel"><b>Clientes V1</b></h3>
+               <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                       aria-hidden="true">&times;</span></button>
+           </div>
+           <div class="modal-body">
+               <p id="listaLinhaReturnable"></p></br>
+               <table id="listaPnReturnable" class="display" style="width:100%">
+                   <thead style="width:100%">
+                   <tr>
+                    <th></th>
+                    <th>Products</th>
+                    <th></th>
+                   </tr>
+                   </thead>
+                   <tbody>
+                   {% for pn in produts.all %}
+                   <!-- % if pn.produts.id == idShow % -->
+                       <tr>
+                        <td></td>
+                        <td> {{ pn.nome }} </td>
+                        <td style="display: none">{{ pn.id }}</td>
+                       </tr>
+                   {% endfor %}
+                   </tbody>
+                   <tfoot>
+                   <tr>
+                    <td></td>
+                    <td></td>
+                    <th></th>
+                   </tr>
+                   </tfoot>
+               </table>
+           </div>
+           <div class="modal-footer">
+               <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+               <button type="submit" id="savePNReturnable" class="btn btn-primary">Save</button>
+           </div>
+       </div>
+    </div>
+    </div>
 
-<!-- Clicavéis da tabela (btn azul)-->
+    <!-- TABELA PARA O STOCKPACKAGE QUE VAI RECEBER UM ID E VAI MOSTRAR TODOS OS STOCKS PACKAGES SELECIONADOS ANTERIORMENTE -->
+    <div class="modal fade" id="listaStockPackage" data-backdrop="false" tabindex="-1" role="dialog"
+aria-labelledby="myModalLabel">
+<div class="modal-dialog" role="document">
+   <div class="modal-content">
+       <div class="modal-header">
+           <h3 class="modal-title" id="myModalLabel"><b>ProductsV1</b></h3>
+           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                   aria-hidden="true">&times;</span></button>
+       </div>
+       <div class="modal-body">
+           <p id="listaLinhaReturnable"></p></br>
+           <table id="listaPnReturnable" class="display" style="width:100%">
+               <thead style="width:100%">
+               <tr>
+                <th></th>
+                <th>Products</th>
+                <th></th>
+               </tr>
+               </thead>
+               <tbody>
+               {% for pn in produts.all %}
+               <!-- % if pn.produts.id == idShow % -->
+                   <tr>
+                    <td></td>
+                    <td> {{ pn.nome }} </td>
+                    <td style="display: none">{{ pn.id }}</td>
+                   </tr>
+               {% endfor %}
+               </tbody>
+               <tfoot>
+               <tr>
+                <td></td>
+                <td></td>
+                <th></th>
+               </tr>
+               </tfoot>
+           </table>
+       </div>
+       <div class="modal-footer">
+           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+           <button type="submit" id="savePNReturnable" class="btn btn-primary">Save</button>
+       </div>
+   </div>
+</div>
+</div>
+
+
+
+
+
+
+<!-- Clicavéis da tabela (btn azul) (antigo, foi substituido pelas tabelas)-->
 
     <div class="modal fade" id="showPartNumbersExpendable" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2">
         <div class="modal-dialog" role="document">
@@ -960,9 +1081,9 @@ $(document).on('click', '#EditRowButton', function () {
     dataForm.append(
         "stockPackages", stockPackages
     )
-    dataForm.append(
+/*     dataForm.append(
         "csrfmiddlewaretoken", $('input[name=csrfmiddlewaretoken]').val()
-    )
+    ) */
 
     $.ajax({
             type: 'POST',
@@ -974,7 +1095,7 @@ $(document).on('click', '#EditRowButton', function () {
                 console.log("[API] Callback to the endpoint sucess")
             },
             complete: function () {
-                window.location.replace("{% url 'pManagement:supplyPackage' %}")
+                window.location.replace("{% url 'pManagement:updateSupplyPackage' %}")
             }
         }) 
 })
@@ -1002,7 +1123,7 @@ $(document).on('click', '#CreateClienteSubmiteButton', function () {
             $("addClientPackage").hide()
         },
         error: function(a, b, c) {
-            alert("Ja existe um cliente com o mesmo nom")
+            alert("Já existe um cliente com o mesmo nome")
         }
     })
 })
@@ -1317,7 +1438,7 @@ $('#example').on('change', 'input', function () {
                 console.log(data)
 
                 var modalInfo = "<p>" + "<b>Part-number:</b>&emsp;&emsp;" + data[0] + "</b>" +
-                    "<p>" + "<b>Descrição:</b>&emsp;&emsp;&emsp;" + descricao + "</p>" +
+                    "<p>" + "<b>Descrição:</b>&emsp;&emsp;&emsp;" + descricao + "</p>" + 
                     "<p>" + "<b>Comentario:</b>&emsp;&emsp;" + comentario + "</p>" +
                     /* "<p>" + "<b>Client Package:</b>&emsp;&emsp;" + client_package + "</p>" +
                     "<p>" + "<b>Parts:</b>&emsp;&emsp;" + stock_package + "</p>" + */
@@ -1343,7 +1464,13 @@ $('#example').on('change', 'input', function () {
                 var inventario = $(data[7]).val()
                 var link = data[8]
                 var rowIdUpdate = data[10]
-               
+                if(!partNumber.length){
+                    alert("Introduza um Part-Number válido")
+                }
+                
+                if(inventario < 0){
+                    alert("Introduza Inventario válido")
+                }
                 document.getElementById("novoPartNumberEdit").value = partNumber
                 document.getElementById("novoDescriptionEdit").value = descricao
                 document.getElementById("novoCommentEdit").value = comentario
@@ -1352,6 +1479,7 @@ $('#example').on('change', 'input', function () {
                 document.getElementById("partNumbersReturnable").value = client_package 
                 document.getElementById("partNumbersExpendable").value = stock_package 
 
+                
                 tableReturnable.rows().deselect()
                 tableExpendable.rows().deselect()
 

@@ -12,18 +12,28 @@ urlpatterns = [
     # Request
     path("requests/", views.requests, name="requests"),
     path("takeQuantity/", views.takeQuantity, name="takeQuantity"),
-
     path("supplyPackage/", views.supplyPackage, name="supplyPackage"),
     path("updateSupplyPackage/", views.updateSupplyPackage, name="updateSupplyPackage"),
     path("deleteSuplyPackage/", views.deleteSuplyPackage, name="deleteSuplyPackage"),
-    path("updateInventorySupplyPackage/",views.updateInventorySupplyPackage, name="updateInventorySupplyPackage"),
+    path(
+        "updateInventorySupplyPackage/",
+        views.updateInventorySupplyPackage,
+        name="updateInventorySupplyPackage",
+    ),
     path("updateSupplyStock", views.updateSupplyStock, name="updateSupplyStock"),
-
-    path("updateAllStockSupplyPackage/",views.updateAllStockSupplyPackage, name="updateAllStockSupplyPackage"),
-    path("deleteLinhaClienteProduto/", views.deleteLinhaClienteProduto, name="deleteLinhaClienteProduto"),
-    
-    path("updateClienteProduto/", views.updateClienteProduto, name="updateClienteProduto"),
-
+    path(
+        "updateAllStockSupplyPackage/",
+        views.updateAllStockSupplyPackage,
+        name="updateAllStockSupplyPackage",
+    ),
+    path(
+        "deleteLinhaClienteProduto/",
+        views.deleteLinhaClienteProduto,
+        name="deleteLinhaClienteProduto",
+    ),
+    path(
+        "updateClienteProduto/", views.updateClienteProduto, name="updateClienteProduto"
+    ),
     path("atualizaTempo/", views.atualizaTempo, name="atualizaTempo"),
     path("upload", views.upload, name="upload"),
     path("clients-json/", views.get_json_client_data, name="clients-json"),
@@ -34,16 +44,24 @@ urlpatterns = [
     path("type-json/<str:product>/", views.get_json_type_data, name="type-json"),
     # Pedido extra Packing
     path("createExtra/", views.create, name="pedidoExtra"),
-    # Supply        
+    path("getPNClienteProduto/", views.getPNClienteProduto, name="getPNClienteProduto"),
+    # Supply
     path("supply/", views.supply, name="supply"),
     path("atualizaEstado", views.atualizaEstado, name="atualizaEstado"),
     path("clienteProduto/", views.clienteProduto, name="clienteProduto"),
-    path("deleteLinhaClienteProduto/",views.deleteLinhaClienteProduto, name ="deleteLinhaClienteProduto"),
-    path("addClientePackage/",views.addClientePackage, name ="addClientePackage"),  
-    path("downloadExcelSupplyPackage/",views.downloadExcelSupplyPackage, name ="downloadExcelSupplyPackage"),  
-    
-    #path("clienteProduto1/", views.clienteProduto1, name="clienteProduto1"),
-  
+    path("downloadExcelClienteProduto/", views.downloadExcelClienteProduto, name="downloadExcelClienteProduto"),
+    path(
+        "deleteLinhaClienteProduto/",
+        views.deleteLinhaClienteProduto,
+        name="deleteLinhaClienteProduto",
+    ),
+    path("addClientePackage/", views.addClientePackage, name="addClientePackage"),
+    path(
+        "downloadExcelSupplyPackage/",
+        views.downloadExcelSupplyPackage,
+        name="downloadExcelSupplyPackage",
+    ),
+    # path("clienteProduto1/", views.clienteProduto1, name="clienteProduto1"),
     # path('pesquisaHistorico', views.pesquisaHistorico, 'pesquisaHistorico'),
     path("addHistoric/", views.addHistoric, name="addHistoric"),
     path("updateLinhaSupply/", views.updateLinhaSupply, name="updateLinhaSupply"),
@@ -78,12 +96,21 @@ urlpatterns = [
     path("updateInventory/", views.updateInventory, name="updateInventory"),
     path("createStockPackage/", views.createStockPackage, name="createStockPackage"),
     path("updateStockPackage/", views.updateStockPackage, name="updateStockPackage"),
-    path("deleteLinhaStockPackage/",views.deleteLinhaStockPackage, name="deleteLinhaStockPackage",),
-    path("downloadExcelStockPackage/",views.downloadExcelStockPackage,name="downloadExcelStockPackage",),
-    url(r'^view-pdf/$', views.pdf_view, name='pdf_view'),
-
+    path(
+        "deleteLinhaStockPackage/",
+        views.deleteLinhaStockPackage,
+        name="deleteLinhaStockPackage",
+    ),
+    path(
+        "downloadExcelStockPackage/",
+        views.downloadExcelStockPackage,
+        name="downloadExcelStockPackage",
+    ),
+    url(r"^view-pdf/$", views.pdf_view, name="pdf_view"),
     path("uploadStockFile/", views.uploadStockFile, name="uploadStockFile"),
-    path("uploadStockFileStock/", views.uploadStockFileStock, name="uploadStockFileStock"),
+    path(
+        "uploadStockFileStock/", views.uploadStockFileStock, name="uploadStockFileStock"
+    ),
     # Returnable
     path("returnablePacking/", views.returnablePacking, name="returnablePacking"),
     path("createReturnable/", views.createReturnable, name="createReturnable"),
@@ -107,7 +134,9 @@ urlpatterns = [
         name="reportReturnablePackage",
     ),
     path("reportSupplyPackage", views.reportSupplyPackage, name="reportSupplyPackage"),
-        path("createClienteProduto/", views.createClienteProduto, name="createClienteProduto"),
+    path(
+        "createClienteProduto/", views.createClienteProduto, name="createClienteProduto"
+    ),
     path(
         "reportExpendablePackage",
         views.reportExpendablePackage,
@@ -117,6 +146,11 @@ urlpatterns = [
         "reportCustomerPacking",
         views.reportCustomerPacking,
         name="reportCustomerPacking",
+    ),
+    path(
+        "returnListaProdutos",
+        views.returnListaProdutos,
+        name="returnListaProdutos"
     ),
     # Configurations
     path("changeUserGroups/", views.changeUserGroups, name="changeUserGroups"),

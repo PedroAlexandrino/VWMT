@@ -49,16 +49,16 @@ class ArmazemChecklistQPS(models.Model):
         return str(self.oem)
 
 
-
 class SupplyPackage(models.Model):
     part_number = models.CharField(max_length=100)
-    description = models.CharField(max_length=255,blank="true", null=True)
-    comment = models.CharField(max_length=255,blank="true", null=True)
+    description = models.CharField(max_length=255, blank="true", null=True)
+    comment = models.CharField(max_length=255, blank="true", null=True)
     supply_time = models.IntegerField(default=60, blank="true", null=True)
     stock = models.IntegerField(default=0, blank="true", null=True)
     inventario = models.IntegerField(default=0, blank="true", null=True)
     link = models.FileField(upload_to="supplyPackageLink/", blank="true", null="true")
-    #cliente_produto = models.ForeignKey(ClienteProduto, on_delete=models.CASCADE, default=None,blank="true", null="true")
+    # cliente_produto = models.ForeignKey(ClienteProduto, on_delete=models.CASCADE, default=None,blank="true", null="true")
+
 
 class Meta:
     verbose_name = "Supply Package"
@@ -70,23 +70,21 @@ class Meta:
 def __str__(self):
     return f"{self.part_number}"
 
-    
-
 
 class PackageType(Enum):
     EXP = "Expendable"
     RET = "Returnable"
 
+
 class StockPackage(models.Model):
     pn = models.CharField(max_length=50, null=False, db_index=True, blank=False)
-    #produto = models.ForeignKey(Produtos, on_delete=models.CASCADE, default=None,blank="true", null="true")
-    suplyPackage = models.ManyToManyField(SupplyPackage) 
+    # produto = models.ForeignKey(Produtos, on_delete=models.CASCADE, default=None,blank="true", null="true")
+    suplyPackage = models.ManyToManyField(SupplyPackage)
     descricao = models.CharField(max_length=150, null=True)
     link = models.FileField(null=True, upload_to="Users\PMARTI30\Downloads")
     quantidade = models.CharField(max_length=50, null=True)
     inventario = models.CharField(max_length=50, null=True)
     comentario = models.CharField(max_length=255, null=True)
-   
 
     # part_number_tipoEmbalagem = models.ManyToManyField(TipoEmbalagem)
     # part_number_tipoEmbalagem = models.ManyToManyField('vware.TipoEmbalagem',through='vware.TipoEmbalagem',through_fields=('part_number'))
@@ -101,9 +99,10 @@ class StockPackage(models.Model):
         choices=[(tag, tag.value) for tag in PackageType],
     )
 
+
 # bd que é mostrada na tabela do Supply Package
 class TipoEmbalagem(models.Model):
-    #part_number = models.ForeignKey(StockPackage, on_delete=models.CASCADE,blank="true", null="true")
+    # part_number = models.ForeignKey(StockPackage, on_delete=models.CASCADE,blank="true", null="true")
     nome = models.CharField(max_length=100)
     quantidade = models.IntegerField(default=0, blank="true", null=True)
     tempoSupply = models.IntegerField(default=60, blank="true", null=True)
@@ -142,39 +141,14 @@ class Meta:
 def __str__(self):
     return f"{self.pn}"
 
+
 #
- 
- 
-
-
-class Produtos(models.Model):
-    #cliente = models.ManyToManyField(ClientesOEM)
-    tipo = models.ForeignKey(
-        "vware.TipoEmbalagem", on_delete=models.CASCADE, default=None, null=True
-    )
-    nome = models.CharField(max_length=100)
-    descricao = models.CharField(max_length=200, default=None)
-    comentario = models.CharField(max_length=200, default=None)
-    
-
-    def save(self, *args, **kwargs):
-        if isinstance(self.nome, str):
-            self.nome = self.nome.upper()
-        return super(Produtos, self).save(*args, **kwargs)
-
-    # META CLASS
-    class Meta:
-        verbose_name = "Produtos"
-        verbose_name_plural = "Produtos"
-
-    # TO STRING METHOD
-    def __str__(self):
-        return f"{self.nome}"
-   
 class ClientesOEM(models.Model):
     oem = models.CharField(max_length=40, unique=True)
-    suplyPackage = models.ManyToManyField(SupplyPackage)  
-    #produto = models.ManyToManyField(Produtos)
+    suplyPackage = models.ManyToManyField(SupplyPackage)
+    #Aqui à de ser para por uma chave estranja 
+    # cliente_prod = models.ForeignKey(ClienteProduto, on_delete=models.CASCADE, default=None,blank="true", null="true")
+    # produto = models.ManyToManyField(Produtos)
 
     # META CLASS
     class Meta:
@@ -186,25 +160,29 @@ class ClientesOEM(models.Model):
         return str(self.oem)
 
 
-   
-class ClienteProduto(models.Model):
-    client_name = models.ForeignKey(ClientesOEM, on_delete=models.CASCADE, default=None,blank="true", null="true")
-    product_name = models.ForeignKey(Produtos, on_delete=models.CASCADE, default=None,blank="true", null="true")
-    description = models.CharField(max_length=40, unique=True)
-    comment = models.CharField(max_length=40, unique=True)
-    suplyPackage = models.ManyToManyField(SupplyPackage)  
-   # produto = models.ManyToManyField(Produtos)
+
+class Produtos(models.Model):
+    #cliente = models.ForeignKey(ClienteProduto, null=True, on_delete=models.SET_NULL)
+    tipo = models.ForeignKey(
+        "vware.TipoEmbalagem", on_delete=models.CASCADE, default=None, null=True
+    )
+    nome = models.CharField(max_length=100)
 
     # META CLASS
     class Meta:
-        verbose_name = "ClienteProduto"
-        verbose_name_plural = "ClienteProduto"
+        verbose_name = "Produtos"
+        verbose_name_plural = "Produtos"
 
     # TO STRING METHOD
     def __str__(self):
-        return str(self.oem)
-        
+        return f"{self.nome}"
 
+class ClienteProduto(models.Model):
+    cliente = models.ForeignKey(ClientesOEM, on_delete=models.CASCADE,default=None)
+    comment = models.CharField(max_length=200, default=None, blank=True, null=True)
+    produto = models.ForeignKey(Produtos, on_delete=models.CASCADE,default=None)
+
+0
 class Prodlines(models.Model):
     nome = models.CharField(max_length=100)
 

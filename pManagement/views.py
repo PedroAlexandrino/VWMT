@@ -1,5 +1,6 @@
 from http import client
 from re import X
+
 import tablib
 import io
 import os
@@ -7,7 +8,6 @@ import math
 
 from datetime import datetime
 from openpyxl import Workbook
-from openpyxl.worksheet.datavalidation import DataValidation
 from openpyxl.reader.excel import load_workbook
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import ObjectDoesNotExist
@@ -18,12 +18,24 @@ from django.db.models import Q
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 from django.core.paginator import Paginator
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound, Http404
+from django.http import (
+    HttpResponse,
+    HttpResponseBadRequest,
+    HttpResponseNotFound,
+    Http404,
+)
 from django.core.files.storage import FileSystemStorage
 from django.core.files.storage import default_storage
 
 from pManagement.models import *
-from vware.models import Produtos, StockPackage, SupplyPackage, TipoEmbalagem, ClientesOEM,ClienteProduto
+from vware.models import (
+    Produtos,
+    StockPackage,
+    SupplyPackage,
+    TipoEmbalagem,
+    ClientesOEM,
+    ClienteProduto,
+)
 
 from .models import PackageType
 
@@ -100,6 +112,7 @@ def expendablePacking(request):
 )
 def stockPackage(request):
     partnumbers = StockPackage.objects.all()
+    #ver se dá para fazer a query e ordenar os dados por ordem decrescente
     # onde estás a limitar as querys
 
     """  p = Paginator(partnumbers, 20)
@@ -140,14 +153,22 @@ def createStockPackage(request):
         inventario = int(request.POST.get("quantidadeInventarioNovo", 0))
         tipo = PackageType(request.POST["tipo"])
 
-        if len(partNumber) == 0 or inventario == 0:
+        """ if len(partNumber) == 0 or descricao =="":
             return HttpResponseBadRequest("Fill all required fields.")
 
-        if quantidade <= 0:
-            return HttpResponseBadRequest("Expected positive in quantity field, get negative.")
-        if inventario <= 0:
-            return HttpResponseBadRequest("Expected positive in inventory field, get negative.")
-
+        if quantidade < 0:
+            return HttpResponseBadRequest(
+                "Expected positive in quantity field, get negative."
+            )
+        if inventario < 0:
+            return HttpResponseBadRequest(
+                "Expected positive in inventory field, get negative."
+            )
+        if tipo == "":
+            return HttpResponseBadRequest(
+                "Expected value for (tipo) field "
+            ) """
+        
 
         if not StockPackage.objects.filter(pn=partNumber).exists():
             newPartNumber = StockPackage()
@@ -155,6 +176,7 @@ def createStockPackage(request):
             newPartNumber.descricao = descricao
 
             if link:
+                # mudar para pasta do StockPAckage
                 newPartNumber.link = default_storage.save(link.name, link)
 
             newPartNumber.comentario = comentario
@@ -182,8 +204,33 @@ def updateStockPackage(request):
         edit_quantidade = request.POST.get("novoStockEdit")
         edit_tipo = request.POST.get("tipo")
 
-        ref = StockPackage(pn=edit_partNumber,comentario=edit_comentario, descricao=edit_description, quantidade=edit_quantidade, id=rowId)
 
+        if len(edit_partNumber) == 0:
+            return HttpResponseBadRequest("Fill all required fields.")
+
+        if int(edit_quantidade) < 0:
+            return HttpResponseBadRequest(
+                "Expected positive in quantity field, get negative."
+            )
+        if edit_tipo == None:
+            return HttpResponseBadRequest(
+            "Expected value for (tipo) field "
+            )
+        if rowId == "":
+            return HttpResponseBadRequest(
+            "Não tas a reeceber o id "
+            )
+
+
+        ref = StockPackage(
+            pn=edit_partNumber,
+            comentario=edit_comentario,
+            descricao=edit_description,
+            quantidade=edit_quantidade,
+            id=rowId,
+        )
+
+        
         if edit_tipo is not None:
             ref.tipo = edit_tipo
 
@@ -211,10 +258,11 @@ def deleteLinhaStockPackage(request):
     return redirect("pManagement:stockPackage")
 
 
-
 # view para o btn update,  iguala o stock e o inventario
 @login_required()
-@user_passes_test(lambda u: u.groups.filter(Q(name='pManagement') | Q(name='StockPackage')).exists())
+@user_passes_test(
+    lambda u: u.groups.filter(Q(name="pManagement") | Q(name="StockPackage")).exists()
+)
 def updateInventory(request):
     ids = request.POST.getlist("ids[]")
     inventario = request.POST.getlist("inventorys[]")
@@ -229,9 +277,12 @@ def updateInventory(request):
 
     return redirect("pManagement:stockPackage")
 
+
 # view para o btn update, guarda na bd o inventario
 @login_required()
-@user_passes_test(lambda u: u.groups.filter(Q(name='pManagement') | Q(name='StockPackage')).exists())
+@user_passes_test(
+    lambda u: u.groups.filter(Q(name="pManagement") | Q(name="StockPackage")).exists()
+)
 def updateAllStock(request):
     ids = request.POST.getlist("ids[]")
     inventario = request.POST.getlist("inventorys[]")
@@ -324,10 +375,10 @@ def downloadExcelStockPackage(request):
             [
                 "partNumber",
                 "descricao",
-                "link",
+                "comentario",
                 "quantidade",
                 "inventario",
-                "comentario",
+                "link",
                 "tipo",
             ]
         )
@@ -337,10 +388,10 @@ def downloadExcelStockPackage(request):
                 [
                     str(elem.pn),
                     str(elem.descricao),
-                    str(elem.link),
+                    str(elem.comentario),
                     str(elem.quantidade),
                     str(elem.inventario),
-                    str(elem.comentario),
+                    str(elem.link),
                     str(elem.tipo),
                 ]
             )
@@ -408,7 +459,9 @@ def uploadStockFileStock(request):
             return HttpResponseBadRequest("Não recebi nenhum ficheiro :(")
 
         if not file.name.endswith("xlsx"):
-            return HttpResponseBadRequest("Apenas excel no formato .xlsx são permitidos.")
+            return HttpResponseBadRequest(
+                "Apenas excel no formato .xlsx são permitidos."
+            )
 
         # elimina todos os elementos que estavam na base de dados
 
@@ -418,7 +471,9 @@ def uploadStockFileStock(request):
         db.all().delete()
 
         if not sheet:
-            return HttpResponseBadRequest("Não foi encontrado nenhuma sheet no excel...")
+            return HttpResponseBadRequest(
+                "Não foi encontrado nenhuma sheet no excel..."
+            )
 
         if len(list(sheet.columns)) != 7:
             return HttpResponseBadRequest("Ficheiro mal formatado.")
@@ -427,7 +482,9 @@ def uploadStockFileStock(request):
             if index == 0:
                 continue
 
-            pn, desc, link, com, stock, inv, tipo = (i[x].value if len(i)-1 >= x else None for x in range(7))
+            pn, desc, link, com, stock, inv, tipo = (
+                i[x].value if len(i) - 1 >= x else None for x in range(7)
+            )
 
             db.create(
                 pn=pn,
@@ -436,19 +493,22 @@ def uploadStockFileStock(request):
                 inventario=inv,
                 link=link,
                 comentario=com,
-                tipo=tipo
+                tipo=tipo,
             )
 
         return redirect("pManagement:stockPackage")
 
-#upload do supplyPackage
+
+# upload do supplyPackage
 def uploadStockFile(request):
     if request.method == "POST":
         if not (file := request.FILES.get("myfile")):
             return HttpResponseBadRequest("Não recebi nenhum ficheiro :(")
 
         if not file.name.endswith("xlsx"):
-            return HttpResponseBadRequest("Apenas excel no formato .xlsx são permitidos.")
+            return HttpResponseBadRequest(
+                "Apenas excel no formato .xlsx são permitidos."
+            )
 
         # elimina todos os elementos que estavam na base de dados
 
@@ -456,7 +516,9 @@ def uploadStockFile(request):
         sheet = workbook.get_sheet_by_name(workbook.sheetnames[0])
         db = SupplyPackage.objects
         if not sheet:
-            return HttpResponseBadRequest("Não foi encontrado nenhuma sheet no excel...")
+            return HttpResponseBadRequest(
+                "Não foi encontrado nenhuma sheet no excel..."
+            )
 
         if len(list(sheet.columns)) != 9:
             return HttpResponseBadRequest("Ficheiro mal formatado.")
@@ -465,7 +527,9 @@ def uploadStockFile(request):
             if index == 0:
                 continue
 
-            pn, desc, com, cpkg, spkg, stime, stock, inv, link = (i[x].value if len(i)-1 >= x else None for x in range(9))
+            pn, desc, com, cpkg, spkg, stime, stock, inv, link = (
+                i[x].value if len(i) - 1 >= x else None for x in range(9)
+            )
             cpkg = cpkg.split(",") if cpkg else None
             spkg = spkg.split(",") if spkg else None
 
@@ -479,12 +543,12 @@ def uploadStockFile(request):
                 link=link,
             )
 
-            for pkg in (cpkg or []):
+            for pkg in cpkg or []:
                 c = ClientesOEM.objects.get(oem=pkg)
                 c.suplyPackage = ref
                 c.save()
 
-            for pkg in (spkg or []):
+            for pkg in spkg or []:
                 c = StockPackage.objects.get(pn=pkg)
                 c.suplyPackage = ref
                 c.save()
@@ -509,7 +573,7 @@ def stock(request):
         Q(name="pManagement") | Q(name="ReturnablePackage")
     ).exists()
 )
-def     returnablePacking(request):
+def returnablePacking(request):
     partnumbers = PartNumbersReturnable.objects
     return render(
         request, "pManagement/returnablePackage.html", {"partnumbers": partnumbers}
@@ -552,7 +616,6 @@ def deleteLinhaStock(request):
 @user_passes_test(
     lambda u: u.groups.filter(Q(name="pManagement") | Q(name="Supply")).exists()
 )
- 
 @login_required()
 @user_passes_test(
     lambda u: u.groups.filter(Q(name="pManagement") | Q(name="SupplyPackage")).exists()
@@ -670,7 +733,6 @@ def create(request):
     else:
         clientes = ClientesOEM.objects
         return render(request, "pManagement/pedidoExtra.html", {"clientes": clientes})
-
 
 
 # retira produto com a quantidade definida da tabela returnable package e acrescenta à tabela extra orders
@@ -1157,7 +1219,7 @@ def getPNExpendable(request):
     print("CLIENTPACKAGEs-> ", request.GET)
     # falta por ele a devolver os expendable do StockPackage
     if request.method == "GET":
-        idPacote = int(request.GET["idPacote"], base=10)
+        idPacote = int(request.GET["idPacote"])
         s = SupplyPackage.objects.get(id=idPacote)
         pacote = ClientesOEM.objects.filter(suplyPackage=s).values()
 
@@ -1167,7 +1229,7 @@ def getPNExpendable(request):
 def getPNReturnable(request):
     # falta por ele a devolver os returnable do StockPackage
     if request.method == "GET":
-        idPacote = int(request.GET["idPacote"], base=10)
+        idPacote = int(request.GET["idPacote"])
         s = SupplyPackage.objects.get(id=idPacote)
         pacote = StockPackage.objects.filter(suplyPackage=s).values()
 
@@ -1192,9 +1254,32 @@ def getPNClienteProduto(request):
     if request.method == "GET":
         idPacote = int(request.GET["idPacote"], base=10)
         print("IDPACOTE", idPacote)
-        pacote = ClientesOEM.objects.get(id=idPacote)
+        pacote = Produtos.objects.get(cliente=idPacote)
+
+
+def getProdSupplyPackage(request):
+    # falta por ele a devolver os returnable do StockPackage
+    print("BOMB ClienteProduto->", request.GET)
+    # REQUEST VEM {} empty
+    if request.method == "GET":
+        idPacote = int(request.GET["idPacote"], base=10)
+        print("IDPACOTE", idPacote)
+        pacote = Produtos.objects.get(cliente=idPacote)
 
         return JsonResponse({"listaReturnable": pacote.partNumberReturnable})
+
+
+def getClientSupplyPackage(request):
+    # falta por ele a devolver os returnable do StockPackage
+    print("BOMB ClienteProduto->", request.GET)
+    # REQUEST VEM {} empty
+    if request.method == "GET":
+        idPacote = int(request.GET["idPacote"], base=10)
+        print("IDPACOTE", idPacote)
+        pacote = ClienteProduto.objects.get(cliente=idPacote)
+
+        return JsonResponse({"listaReturnable": pacote.partNumberReturnable})
+
 
 
 def reportCustomerPacking(request):
@@ -1394,17 +1479,16 @@ def configurations(request):
 # --------------------//--------------//--------SUPLY--PACKAGE ----------------------- // ---------------------------------------//---------------------------------//-------------------------
 # func que vai carregar a pagina do suply package
 
+
 def supplyPackage(request):
-    #pagina do supplyPackage
-    #clientes = ClientesOEM.produto.through.objects.all() 
-    #produtos =  Produtos.objects.all()
+    # pagina do supplyPackage
+    # clientes = ClientesOEM.produto.through.objects.all()
+    # produtos =  Produtos.objects.all()
     tipoEmbalagem = TipoEmbalagem.objects.all()
     stockPackage_items = StockPackage.objects.all()
-    kits= SupplyPackage.objects.all()
+    kits = SupplyPackage.objects.all()
     cliente_produto = ClienteProduto.objects.all()
 
-
-    lista = []
     listaFinal = []
 
     """  for cliente in clientes:
@@ -1431,23 +1515,26 @@ def supplyPackage(request):
             "kitSuplyPackage": kits,
             "data": listaFinal,
             "stock_package_parts": stockPackage_items,
-            "cliente_produto": cliente_produto
+           "Produtos": Produtos.objects,
+            "cliente_produto": ClienteProduto.objects,
+            "ClientesOEM": ClientesOEM.objects,
         },
     )
-    
+
+
 def downloadExcelSupplyPackage(request):
-    #não tas a apanhar os valores para fazer as comparações para os pores no DataValidation
+    # não tas a apanhar os valores para fazer as comparações para os pores no DataValidation
     if request.method == "GET":
         elementos = SupplyPackage.objects
         stockPackages = StockPackage.objects
         clientes = ClientesOEM.objects
         wbProduction = Workbook()
         file = io.BytesIO()
-        print("Elementos a passar para o excel-> ",elementos.all())
+        print("Elementos a passar para o excel-> ", elementos.all())
         # Não criar um sheet novo e ter um existente ;)
         sheetProduction = wbProduction.get_sheet_by_name("Sheet")
-       
-        #Verificar se ele está a ir buscar os campos à view ou aos models
+
+        # Verificar se ele está a ir buscar os campos à view ou aos models
         sheetProduction.append(
             [
                 "PartNumber",
@@ -1461,21 +1548,23 @@ def downloadExcelSupplyPackage(request):
                 "Link",
             ]
         )
-        
+
         for elem in elementos.all():
-                sheetProduction.append(
-                    [
-                        str(elem.part_number),
-                        str(elem.description),
-                        str(elem.comment),
-                        ",".join(x.oem for x in clientes.filter(suplyPackage=elem).all()),
-                        ",".join(x.pn for x in stockPackages.filter(suplyPackage=elem).all()),
-                        str(elem.supply_time),
-                        str(elem.stock),
-                        str(elem.inventario),
-                        str(elem.link),
-                    ]
-                )
+            sheetProduction.append(
+                [
+                    str(elem.part_number),
+                    str(elem.description),
+                    str(elem.comment),
+                    ",".join(x.oem for x in clientes.filter(suplyPackage=elem).all()),
+                    ",".join(
+                        x.pn for x in stockPackages.filter(suplyPackage=elem).all()
+                    ),
+                    str(elem.supply_time),
+                    str(elem.stock),
+                    str(elem.inventario),
+                    str(elem.link),
+                ]
+            )
 
         wbProduction.save(file)
         # Voltar a pocição inicial do IO file object
@@ -1494,7 +1583,7 @@ def downloadExcelSupplyPackage(request):
     lambda u: u.groups.filter(Q(name="pManagement") | Q(name="SupplyPackage")).exists()
 )
 def addRowSupplyPackage(request):
-    print("REQUEST ADD->",request.POST)
+    print("REQUEST ADD->", request.POST)
     if request.method == "POST":
         pn = request.POST.get("pnAdd")
         kitDescription = request.POST.get("prodDescriptionAdd")
@@ -1503,13 +1592,19 @@ def addRowSupplyPackage(request):
         kitlink = request.FILES.get("novoLinkEdit")
         kit_supplyTime = request.POST.get("supplyTimeAdd", 60) or 60
 
-        stockPackages = request.POST.getlist("stockPackages[]")
+        stockPackages = request.POST.getlist("stockPackages")
         clients = request.POST.getlist("clients[]")
-        
-        ref = SupplyPackage(part_number = pn, description = kitDescription, comment = kitComment,
-        supply_time = kit_supplyTime, stock = kitStock)
+
+        ref = SupplyPackage(
+            part_number=pn,
+            description=kitDescription,
+            comment=kitComment,
+            supply_time=kit_supplyTime,
+            stock=kitStock,
+        )
 
         if kitlink is not None:
+            # Alterar para pasta SupplyPackage
             ref.link = default_storage.save(kitlink.name, kitlink)
 
         ref.save()
@@ -1524,37 +1619,36 @@ def addRowSupplyPackage(request):
 
     return redirect("pManagement:supplyPackage")
 
+
 def addClientePackage(request):
-    #clientes = ClientesOEM.objects.all() 
+    # clientes = ClientesOEM.objects.all()
     clientName = request.POST.get("novoClientName")
-    ref = ClientesOEM(oem = clientName)
+    ref = ClientesOEM(oem=clientName)
     ref.save()
     return JsonResponse({"id": ref.id})
 
- 
+
 def pdf_view(request):
     link = request.GET.get("link")
     filename = link.split("/")[-1]
-
+    # é aqui que vais por o sistema de pastas, ele está a ir ao defaultStorage buscar
     try:
         f = default_storage.open(filename)
     except FileNotFoundError:
         raise Http404("Ficheiro não existe.")
 
     if link.split(".")[-1] == "pdf":
-        response = HttpResponse(f.read(), content_type='application/pdf')
-        #aqui talvez dê para ir buscar o nome do file ao titulo
-        response['Content-Disposition'] = f'filename={link.split("/")[-1]}'
+        response = HttpResponse(f.read(), content_type="application/pdf")
+        # aqui talvez dê para ir buscar o nome do file ao titulo
+        response["Content-Disposition"] = f'filename={link.split("/")[-1]}'
     else:
-        response = FileResponse(
-            f, filename=link, as_attachment=True
-        )
+        response = FileResponse(f, filename=link, as_attachment=True)
     return response
 
 
 def updateSupplyPackage(request):
     print("REquest do update SUPPLY PACKAGE--> ", request.POST)
-   
+
     if request.method == "POST":
         edit_partNumber = request.POST.get("novoPartNumberEdit")
         edit_description = request.POST.get("novoDescriptionEdit")
@@ -1563,32 +1657,42 @@ def updateSupplyPackage(request):
 
         edit_supplyTime = request.POST.get("novoSupplyTimeEdit", 60) or 60
         edit_link = request.FILES.get("novolinkEdit")
-        edit_stockPackages = request.POST.getlist("stockPackages[]")
-        edit_clients = request.POST.getlist("clients[]")
+        edit_stockPackages = request.GET.getlist("stockPackages[]")
+        # edit_clients = request.POST.getlist("clients[]")
         rowId = request.POST["rowIdUpdate"]
+        print("Link->", edit_link)
+        # print("CLIENTS->", edit_clients)
+        # print("StockPackages ->", type(edit_stockPackages))
+        # print("StockPackages ->", edit_stockPackages)
 
-        print("CLIENTS->", edit_clients)
-        print("StockPackages ->", edit_stockPackages)
-        #tenho de apanhar os ids das tables 
-
-        ref = SupplyPackage(part_number = edit_partNumber, description = edit_description, comment = edit_comment,
-        supply_time = edit_supplyTime, stock = edit_stock, id=rowId)
+        ref = SupplyPackage(
+            part_number=edit_partNumber,
+            description=edit_description,
+            comment=edit_comment,
+            supply_time=edit_supplyTime,
+            stock=edit_stock,
+            id=rowId,
+        )
 
         if edit_link is not None:
+            print("LINK", edit_link)
+            # alterar o defaultStorage para a pasta desiganada (supplyPackage)
             ref.link = default_storage.save(edit_link.name, edit_link)
 
+        StockPackage.suplyPackage.through.objects.filter(
+            supplypackage_id=rowId
+        ).delete()
+        ClientesOEM.suplyPackage.through.objects.filter(supplypackage_id=rowId).delete()
+        print("Stock", edit_stockPackages)
+        for stock in edit_stockPackages:
+            print("Stock1", stock[0])
+            s = StockPackage.objects.get(id=int(stock))
+            s.suplyPackage.add(ref)
         ref.save()
 
-        StockPackage.suplyPackage.through.objects.filter(supplypackage_id=rowId).delete()
-        ClientesOEM.suplyPackage.through.objects.filter(supplypackage_id=rowId).delete()
-
-        for stock in edit_stockPackages:
-            s = StockPackage.objects.get(id=stock)
-            s.suplyPackage.add(ref)
-
-        for client in edit_clients:
+        """ for client in edit_clients:
             s = ClientesOEM.objects.get(id=client)
-            s.suplyPackage.add(ref)
+            s.suplyPackage.add(ref) """
     return redirect("pManagement:supplyPackage")
 
 
@@ -1600,8 +1704,9 @@ def deleteSuplyPackage(request):
         ProdutosObj.all().get(id=row_id).delete()
     return redirect("pManagement:supplyPackage")
 
+
 def updateInventorySupplyPackage(request):
-    #print("REQ do btn Update--> ",request.POST)
+    # print("REQ do btn Update--> ",request.POST)
     ids = request.POST.getlist("ids[]")
     inventario = request.POST.getlist("inventorys[]")
     quantidade = request.POST.getlist("quantidades[]")
@@ -1630,6 +1735,7 @@ def updateAllStockSupplyPackage(request):
 
     return redirect("pManagement:supplyPackage")
 
+
 def uploadSupplyPackageFile(request):
     if request.method == "POST":
 
@@ -1652,7 +1758,7 @@ def uploadSupplyPackageFile(request):
                 return raise_err("WRONG FORMAT! Only xlsx files.")
 
             # elimina todos os elementos que estavam na base de dados
-            #FALTA ADICIONAR CAMPOS CERTOS; NO FOR JÀ ESTÂO ALGUNS MAS FALTA DEFINIR COMO GUARDAR AS LISTAS
+            # FALTA ADICIONAR CAMPOS CERTOS; NO FOR JÀ ESTÂO ALGUNS MAS FALTA DEFINIR COMO GUARDAR AS LISTAS
             workbook = load_workbook(file.open("rb"))
             sheet = workbook.get_sheet_by_name(
                 "Sheet1"
@@ -1690,7 +1796,6 @@ def uploadSupplyPackageFile(request):
                 )
 
         return redirect("pManagement:supplyPackage")
-
 
 
 def updateLinhaStock(request):
@@ -1896,11 +2001,9 @@ def updateLinhaSupply(request):
     return redirect("pManagement:supplyPackage")
 
 
-
-
 # BUG SUPLYPACKAGE
 def deleteLinhaSupply(request):
-  
+
     print("TAS NO DELETE DO SUPLYPAKAGE")
     print("Delete supplyPackage", request.POST)
     produto = Produtos.objects
@@ -1947,73 +2050,111 @@ def atualizaTempo(request):
 
 
 def clienteProduto(request):
-     
-    clientes = ClientesOEM.objects.all()
-    #supply_package = SupplyPackage.objects.all()
-    cliente_produto = ClienteProduto.objects.all()
-  
     return render(
         request,
         "pManagement/clienteProduto.html",
         {
-             
-           
-            "stockPackage": stockPackage,
-            "clientes":clientes,
-            "prods_ref":  Produtos.objects,
-            "cliente_produto": cliente_produto
-             
+            "ClienteProduto": ClienteProduto.objects,
+            "Produtos": Produtos.objects,
+            "ClientesOEM": ClientesOEM.objects,
         },
     )
 
-def uploadSupplyFile():
-    ...
 
-""" def clienteProduto1(request):
-     
-    clientes = ClientesOEM.objects.all()
-    supply_package = SupplyPackage.objects.all()
-    stockPackage = StockPackage.objects.all()
-    
-     
-    return render(
-        request,
-        "pManagement/clienteProduto1.html",
-        {
-             
-            "clientes": clientes,
-            "supply": supply_package,
-            "stockPackage": stockPackage,
-             
-        },
-    ) """
+
+def downloadExcelClienteProduto(request):
+    #não tas a apanhar os valores para fazer as comparações para os pores no DataValidation
+    if request.method == "GET":
+        produtos = Produtos.objects
+        #stockPackages = StockPackage.objects
+        cliente_prod = ClienteProduto.objects
+        wbProduction = Workbook()
+        file = io.BytesIO()
+        print("Elementos a passar para o excel-> ",produtos.all())
+        # Não criar um sheet novo e ter um existente ;)
+        sheetProduction = wbProduction.get_sheet_by_name("Sheet")
+       
+        #Verificar se ele está a ir buscar os campos à view ou aos models
+        sheetProduction.append(
+            [
+                "Cliente",
+                "Descricao",
+                "Comentario",
+                "Produto",
+            ]
+        )
+        #CONFIRAR COM O BOSS COMO ELE QUER AS TABLES pois é aqui que vai ser construido o excel
+        for elem in cliente_prod.all():
+                sheetProduction.append(
+                    [
+                        str(elem.cliente),
+                        str(elem.description),
+                        str(elem.comment),
+                        str(elem.produto)
+                    ]
+                )
+
+        wbProduction.save(file)
+        # Voltar a pocição inicial do IO file object
+        file.seek(0)
+
+        data_fmt = datetime.now().strftime("%d-%m-%Y %H:%M")
+        fresp = FileResponse(
+            file, filename=f"ClienteProduto{data_fmt}.xlsx", as_attachment=True
+        )
+        return fresp
+
+def returnListaProdutos(request):
+    if request.method != "GET":
+        raise Http404
+
+    targetId = request.GET.get("targetId")
+    if targetId:
+        prods = Produtos.objects.filter(cliente_id=targetId)
+    else:
+        prods = Produtos.objects.all()
+        
+    return JsonResponse({"listaProds": list(prods.values())})
+
 
 def createClienteProduto(request):
-    print("REQS CLIAPROD--> ", request.POST)
-    
-    #falta receber id dos items dos popupsFF
+    # falta receber id dos items dos popupsFF
     if request.method == "POST":
-        #tem que vir um id/nome para os clientes e para os produtos
-        clientName = request.POST["newName"]
-        prod_name = request.POST["newProdName"]
-        prod_description = request.POST["newProdDescription"]
-        prod_comment = request.POST["newProdComment"]
-         
-        if (
-            clientName  == "" or prod_name ==""       
-        ):
-            return render(
-                request,
-                "pManagement/clienteProduto.html",
-                {"erro2": "Fill all required fields"},
-            )
-            #tens de fazer isto para o edit e delete
-              # Clientes.produtos.through.objects.filter(clientes_id=rowId)
-              # Produtos.produtos.through.objects.filter(produtos_id=rowId)
-        ClienteProduto(client_name=clientName)
-        #ClientesOEM(oem=client_name).save()
+        # tem que vir um id/nome para os clientes e para os produtos
+        print("REQUEST EDIT CLIENTEPROD",request.POST)
+        cliente = request.POST["newClient"]
+        prods = request.POST["newProd"]
+        comment = request.POST["newComment"]
+        print("CLIENTE->", cliente)
+        print("PRODUTOS->", prods)
+        
+        if not ClientesOEM.objects.filter(oem=cliente).exists():
+            ref = ClientesOEM()
+            ref.oem = cliente
+            ref.save()
+
+        ref= ClientesOEM.objects.get(oem=cliente)
+        
+        if not Produtos.objects.filter(nome=prods):
+            prod = Produtos()
+            prod.nome = prods
+            prod.save()
+
+        prod = Produtos.objects.get(nome=prods)
+
+        rel = ClienteProduto(
+            cliente=ref,
+            comment=comment,
+            produto = prod,
+        )
+        rel.save()
+
+      
 
     return redirect("pManagement:clienteProduto")
+
+
+
 
 
 # Edita uma linha da table table(html) e faz edição na db
@@ -2022,17 +2163,42 @@ def createClienteProduto(request):
     lambda u: u.groups.filter(Q(name="pManagement") | Q(name="StockPackage")).exists()
 )
 def updateClienteProduto(request):
+    print("REQUEST", request.POST)
+    print("Update CLIENTE PRODUTO --------->")
     if request.method == "POST":
+
         rowId = request.POST["rowIdUpdate"]
-        edit_name = request.POST.get("novoNameEdit")
-        edit_prod_name = request.POST.get("novoProdNameEdit")
-        edit_description = request.POST.get("novoProdDescriptionEdit")
-        edit_comentario = request.POST.get("novoProdCommentEdit")
- 
-        ref = ClientesOEM.objects.get(id=rowId)
-      # StockPackage.suplyPackage.through.objects.filter(supplypackage_id=rowId)
-        Produtos(id=ref.id,nome=edit_prod_name,cliente_id=rowId,descricao=edit_description,comentario=edit_comentario).save()
-        ClientesOEM(id=ref.id, oem=edit_name).save()
+        edit_client = request.POST.get("getCliente")
+        edit_prod = request.POST.get("getProds", "")
+        edit_comentario = request.POST.get("editComment")
+
+        print("MAMBOS->",edit_comentario)
+        client_ref = ClientesOEM.objects
+        if not ClientesOEM.objects.filter(oem=edit_client).exists():
+            client_ref.oem = edit_client
+
+        prod_ref = Produtos.objects
+        if not Produtos.objects.filter(nome=edit_prod).exists():
+            prod_ref.nome = edit_prod
+        
+
+        ref_client = ClientesOEM.objects.get(oem=edit_client)
+        ref_prod = Produtos.objects.get(nome=edit_prod)
+        ref = ClienteProduto(
+            id = rowId,
+            comment=edit_comentario,
+            produto = ref_prod,
+            cliente=ref_client,
+        )
+        
+        #Produtos.objects.filter(cliente_id=rowId).update(cliente_id=None)
+        """ for prod in edit_prod:
+            s = Produtos.objects.get(id=prod)
+            s.cliente = ref 
+            s.save()"""
+
+        ref.save()
+
 
     return redirect("pManagement:clienteProduto")
 
@@ -2043,8 +2209,10 @@ def updateClienteProduto(request):
     lambda u: u.groups.filter(Q(name="pManagement") | Q(name="StockPackage")).exists()
 )
 def deleteLinhaClienteProduto(request):
+    print("REQUEST", request.POST)
     if request.method == "POST":
         row_id = request.POST["rowIdDelete"]
-          # StockPackage.suplyPackage.through.objects.filter(supplypackage_id=rowId)
-        Produtos.objects.filter(cliente=row_id).delete()
+        print("ID TO DELETE", row_id)
+        # StockPackage.suplyPackage.through.objects.filter(supplypackage_id=rowId)
+        ClienteProduto.objects.filter(id=row_id).delete()
     return redirect("pManagement:clienteProduto")
