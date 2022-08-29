@@ -57,7 +57,7 @@ class SupplyPackage(models.Model):
     stock = models.IntegerField(default=0, blank="true", null=True)
     inventario = models.IntegerField(default=0, blank="true", null=True)
     link = models.FileField(upload_to="supplyPackageLink/", blank="true", null="true")
-    # cliente_produto = models.ForeignKey(ClienteProduto, on_delete=models.CASCADE, default=None,blank="true", null="true")
+    #cliente_produto = models.ForeignKey("vware.ClienteProduto", on_delete=models.CASCADE, default=None,blank="true", null="true")
 
 
 class Meta:
@@ -160,7 +160,6 @@ class ClientesOEM(models.Model):
         return str(self.oem)
 
 
-
 class Produtos(models.Model):
     #cliente = models.ForeignKey(ClienteProduto, null=True, on_delete=models.SET_NULL)
     tipo = models.ForeignKey(
@@ -181,8 +180,9 @@ class ClienteProduto(models.Model):
     cliente = models.ForeignKey(ClientesOEM, on_delete=models.CASCADE,default=None)
     comment = models.CharField(max_length=200, default=None, blank=True, null=True)
     produto = models.ForeignKey(Produtos, on_delete=models.CASCADE,default=None)
+    supply_pkg = models.ManyToManyField(SupplyPackage)
 
-0
+
 class Prodlines(models.Model):
     nome = models.CharField(max_length=100)
 

@@ -26,7 +26,7 @@ def beginSchedule():
     # updateLineRequestDia1()
     # updateICDRDia1()
 
-    # scheduler.add_job(enviarEmailSchedule, 'interval', seconds = 10, max_instances=1, misfire_grace_time=None)
+    #scheduler.add_job(enviarEmailSchedule, 'interval', seconds = 10, max_instances=1, misfire_grace_time=None)
 
     # T*A A FUNCIONAR (enviarEmailSchedule)
     scheduler.add_job(

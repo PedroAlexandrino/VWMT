@@ -264,7 +264,6 @@
                         <button type="button"  title="Download Excel" class="btn btn-primary buttons"  onclick="uploadStockPackage()" style="background-color: #21127251" id="excel">Excel</button>
                   -->
     <!-- Modal onde é adicionada uma nova linha -->
-    {% csrf_token %}
     <div
       class="modal fade"
       id="addLinha"
@@ -342,7 +341,7 @@
             <button
               type="submit"
               class="btn btn-primary"
-              id="CreateNewRowBotton"
+              id="CreateNewRowButton"
             >
               Create
             </button>
@@ -811,17 +810,20 @@
         $(document).on("click", "#botaoEdit", function () {
           var data = table.row($(this).parents("tr")).data();
           var cliente = data[0];
+          var prod = data[1];
           var commentario = data[2];
 
           console.log("cliente", cliente);
           console.log("commentario", commentario);
-          $('#clienteEdit option[data-name="' + cliente + '"]')
+          /* $('#clienteEdit option[data-name="' + cliente + '"]')
             .show()
-            .prop("selected", true);
+            .prop("selected", true); */
+          document.getElementById("getClienteEdit").value = cliente;
+          document.getElementById("getProdsEdit").value = prod;
           document.getElementById("editComment").value = commentario;
           document.getElementById("rowIdUpdate").value = data[4];
 
-          tableReturnable.rows().deselect();
+        /*   tableReturnable.rows().deselect();
           $.each(tableReturnable.rows().nodes(), function (i, item) {
             var row = tableReturnable.row(i);
 
@@ -832,7 +834,7 @@
               }
               return false;
             });
-          });
+          }); */
         });
 
         function ClearFilters() {
@@ -845,9 +847,9 @@
 
         $(document).on("click", "#excel", function () {
           console.log("PRINT");
-         // window.location.replace(
-            //"{% url 'pManagement:downloadExcelClienteProduto' %}"
-          //);
+          window.location.replace(
+            "{% url 'pManagement:downloadExcelClienteProduto' %}"
+          );
         });
 
         /* --------------------/////--------------------------------BTNS COM POPUPS-----------------//------ */
@@ -926,21 +928,23 @@
 
         /* Clicavel da cell ClientPackage */
         /* Verificar os nomes para conseguires enviar para a view o ID do item selecionado */
-        $(document).on("click", "#CreateNewRowBotton", function () {
+        $(document).on("click", "#CreateNewRowButton", function () {
           var newComment = $("#newComment").val();
 
           var clienteAdd = $("#getCliente").val();
           var produtos =  $("#getProds").val();
+          console.log("FOI CLICADO NO ADD")
          // var newClient = clienteAdd.querySelector('[value='${"#clientList"}) 
 
           //console.log("campos-> ",prods,el,clienteAdd, produtos, newComment)
           console.log("CLIENTES", clienteAdd)
-          if(clienteAdd == "" || produtos == ""){
-            alert("Preencha os campos obrigatorios")
-            console.log("campos-> ", produtos, newComment)
-            return
+          
+          if(clienteAdd =="" || clienteAdd == undefined){
+            return alert("Introduza um cliente")
           }
-
+          if(produtos =="" || produtos == undefined){
+            return alert("Introduza um produto")
+          }
 
           $.ajax({
             type: "POST",
@@ -952,7 +956,7 @@
               newComment: newComment,
             },
             complete: function () {
-              //window.location.replace("{% url 'pManagement:clienteProduto' %}");
+              window.location.replace("{% url 'pManagement:clienteProduto' %}");
             },
           });
         });

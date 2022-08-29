@@ -172,7 +172,7 @@
                     </div>
                     <br/>
                 {% endif %}
-                <table id="example" class="stripe hover cell-border " style="width:100%">
+                <table id="example" class="stripe hover cell-border " style="width:100%; overflow:auto" >
                     <thead>
                     <tr>
                         <td >Part-number</td>
@@ -244,7 +244,7 @@
                         <th></th>
                         <th></th>
                         <th></th>
-                        <th></th>
+                        <th style="display: none" ></th>
                         
                     </tr>
                     </tfoot>
@@ -279,7 +279,7 @@
                                 <button type="button" title="Update" style="margin-left: 79%" class="btn btn-primary btn btn-primary buttonsUpdate2" data-toggle="modal" data-target="#updateStock"  > Update </button>
 
 
-                                <form method="POST" class="form" action="{% url 'pManagement:updateAllStock' %}?page="(current_page)
+                                <form method="POST" class="form" action="{% url 'pManagement:updateAllStock' %}"
                                 enctype="multipart/form-data">
                               {% csrf_token %}
                               <div class="modal fade" id="updateStock" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -347,7 +347,7 @@
                             <tbody>
                             <tr>
                                 <th scope="row" style="color: black"><h6><b>Part-number</b></h6></th>
-                                <td><input type="text" name="partNumberNovo" id="partNumberNovo"/></td>
+                                <td><input type="text" name="partNumberNovo" id="partNumberNovo" required/></td>
                             </tr>
                             {% if erro %}
                                 <div class="text-center mb-n2">
@@ -376,12 +376,12 @@
                             </tr>
 
                             <tr>
-                                <th scope="row" style="color: black"><h6><b>tipo</b></h6></th>
+                                <th scope="row" style="color: black" ><h6><b>tipo</b></h6></th>
                                 <td><input type="radio" id="Returnable" name="tipo" value="Returnable">
                                     <label for="Returnable">Returnable</label><br>
 
                                 <input type="radio" id="Expendable" name="tipo" value="Expendable">
-                                <label for="Expendable">Expendable </label>
+                                <label for="Expendable">Expendable </label> </td>
                             </tr>
 
                             </tbody>
@@ -428,8 +428,8 @@
     </form>
 
     <!-- Modal onde é feito EDIT de cada linha -->
-    <form method="POST" class="form" action="{% url 'pManagement:updateStockPackage' %}" enctype="multipart/form-data">
-        {% csrf_token %}
+    <!-- <form method="POST" class="form" action="{% url 'pManagement:updateStockPackage' %}" enctype="multipart/form-data"> -->
+       <!--  {% csrf_token %} -->
         <div class="modal fade" id="updateLinha" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -459,22 +459,34 @@
                             <h6 class="mt-1">Link: </h6>
                                    <td><input type="file"  style="margin-left: 67px" name="novoLinkEdit"  id="novoLinkEdit" value="{{ link }}"/></td>
                         </div>
+
                         <div class="form-inline mt-3">
                             <h6 class="mt-1">Comment: </h6>
-                            <input placeholder="New comment" type="form" name="novoCommentEdit"
-                                   id="novoCommentEdit" style="margin-left: 31px; width: 300px" value="{{comentario}}">
+                            <input placeholder="New description" type="form" name="novoCommentEdits"
+                                   id="novoCommentEdit" style="margin-left: 21px; width: 300px"  value="{{ comentario }}">
                         </div>
 
+
+
+                      
                         <div class="form-inline mt-3">
                             <h6 class="mt-1">Stock: </h6>
                             <input placeholder="New Stock"  min="0" type="number" type="form" name="novoStockEdit"
                                    id="novoStockEdit" style="margin-left: 60px">
                         </div>
+
+
                         <div class="form-inline mt-3">
-                      
-                            <input placeholder="New Inventory" type="hidden" type="form"  name="quantidadeInventarioNovoEdit"
-                                   id="quantidadeInventarioNovoEdit" style="margin-left: 30px" value="{{ inventario }}">
+                           
+                            <input placeholder="New Stock"  min="0" type="hidden" type="form" name="quantidadeInventarioNovoEdit"
+                                   id="quantidadeInventarioNovoEdit" style="margin-left: 60px">
                         </div>
+
+                        <!-- <div class="form-inline mt-3">
+                           
+                            <input placeholder="New Inventory" type="hidden" type="form"  name="quantidadeInventarioEdit"  value="{{ inventario }}"
+                                   id="quantidadeInventarioNovoEdit" style="margin-left: 30px">
+                        </div> -->
                         
                         <div>
                             <input type="radio" id="ReturnablePkg" name="tipo" value="Returnable">
@@ -483,16 +495,15 @@
                             <input type="radio" id="ExpendablePkg" name="tipo" value="Expendable">
                                 <label for="ExpendablePkg">Expendable </label>
                         </div>
-                        <td style="display: none" value="{{ partnumber.id }}">{{ partnumber.id }}</td>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <button type="submit" id="btnEdit" class="btn btn-primary">Save changes</button>
+                        <button type="submit" id="EditRowButton" class="btn btn-primary">Save changes</button>
                     </div>
                 </div>
             </div>
         </div>
-    </form>
+  <!--   </form> -->
 
 {% endblock %}
 
@@ -518,23 +529,33 @@
             var stock = $("#novoStock").val()
             var inv = $("#quantidadeInventarioNovo").val()
             var link = document.getElementById("linkNovo").files[0]
+
+            var linknew = $("#linkNovo").val()
             var tipo = $("input[name=tipo]:checked").val()
             var csrfmiddlewaretoken = $('input[name=csrfmiddlewaretoken]').val()
 
-            if (!tipo.length) {
-                alert("You must set at least 1 type.")
-                return;
+            console.log("DADOS--->",typeof tipo)
+
+            if (tipo ==undefined) {
+                return alert("You must set at least 1 type.")
             }
             if(!pn.length){
-                alert("You must set a Part-Number")
+                return alert("You must set a Part-Number")
             }
-            if(!stock.length){
-                alert("You must set a Part-Number")
+            if(stock <0){
+                
+                return alert("You must set a valid Stock")
             }
             
-
-
-
+            if(link == undefined || link == ""){
+                alert("Link vazio")
+            }
+            else{
+                if(!link.name.endsWith("pptx")){
+                return alert("Not a valid file");
+            }
+        }
+            
 
             var dataForm = new FormData();
             dataForm.append(
@@ -554,6 +575,10 @@
             )
             dataForm.append(
                 "linkNovo", link
+                
+            )
+            dataForm.append(
+                "linkNew", linknew
             )
             dataForm.append(
                 "tipo", tipo
@@ -590,48 +615,141 @@ $('#example thead th').each(function (i) {
     var title = $('#example thead th').eq($(this).index()).text();
     $(this).html('<input class="form-control" style="margin-left: -18px" type="text" placeholder="Search ' + title + '" data-index="' + i + '" />');
 });
+});
 
+/* Aqui está o codigo que vai popular os campos que estão no model do edit */
+$(document).on("click", "#botaoEdit", function () {
+            var data = table.row($(this).parents("tr")).data();
+            console.log("NOVO EDIT",data)
+            var pn = data[0];
+            var desc = data[1];
+            var comment =data[2];
+            var link = data[3];
+            var stock = data[4];
+            var inv = $(data[5]).val();
+            var tipo = data[6];
+            var rowIdUpdate = data[8];
 
-$('#example tbody').on('click', '#botaoEdit', function () {
-        var data = table.row($(this).parents('tr')).data();
-        console.log("DATA Edit -> ",data);
-        var partNumber = data[0];
-        var descricao = data[1];
-        var comentario = data[2]
-        var link = data[3];
-        var quantidade = data[4];
-        // nao preciso de editar o inventario, pois ele é editado diretamente no html
-        var inventario = $(data[5]).val();
+            var linknew = $("#botaoShowPdf").val()
 
-        document.getElementById("novoPartNumberEdit").value = partNumber
-        document.getElementById("novoDescriptionEdit").value = descricao
-        document.getElementById("novoCommentEdit").value = comentario
-        document.getElementById("novoStockEdit").value = quantidade
-        document.getElementById("quantidadeInventarioNovoEdit").value = inventario
-
-        if (!tipo.length) {
-                alert("You must set at least 1 type.")
-                return;
+            if (tipo ==undefined) {
+                return alert("Deve introduzir um tipo.")
             }
             if(!pn.length){
-                alert("You must set a Part-Number")
+                return alert("Deve introduzir um Part-Number")
             }
-            if(!stock.length){
-                alert("You must set a Part-Number")
+            if(stock <0){
+                
+                return alert("You must set a valid Stock")
             }
+
+            const returnableBtn = document.getElementById("ReturnablePkg");
+            const expendableBtn = document.getElementById("ExpendablePkg");
+            returnableBtn.checked  = false;
+            expendableBtn.checked  = false;
+            if(tipo == "Returnable"){
+            returnableBtn.checked  = true;
+            expendableBtn.checked  = false;
+            }
+            else{
+            returnableBtn.checked  = false;
+            expendableBtn.checked  = true;
+            }
+
+            console.log("commentario", tipo);
+    
+            document.getElementById("novoPartNumberEdit").value = pn;
+            document.getElementById("novoDescriptionEdit").value = desc;
+            document.getElementById("novoCommentEdit").value = comment;
+            document.getElementById("novoStockEdit").value = stock;
+            //document.getElementById("novoLinkEdit").files[0] = link;
+            document.getElementById("novoLinkEdit").innerHTML.value = link;
+
+            document.getElementsByName("tipo").value = tipo;
+
+            document.getElementById("quantidadeInventarioNovoEdit").value=inv;
+            document.getElementById("rowIdUpdate").value = data[8];
             
-        // preset code
-        //document.getElementsByName("RetPackage")[0].checked = false
-        //document.getElementsByName("ExpPackage")[0].checked = false
-        //if (tipo == "ReturnablePackage")
-        //    document.getElementsByName("RetPackage")[0].checked = true
-        //else
-        //    document.getElementsByName("ExpPackage")[0].checked = true
+            });
 
-        $('#rowIdUpdate').val($(data[5]).attr("id"));
 
-    });
-});
+
+/* AQUI ESTÀ O AJAX PARA O EDIT, NESTE CASO È DO CLIENTEPRODUTO */
+$(document).on("click", "#EditRowButton", function () {
+          /* $("#example tbody").on("click", "#EditRowButton", function () { */
+      
+
+          console.log("Cliscas-te no save");
+          var rowIdUpdate = $("#rowIdUpdate").val();
+          var pn = $("#novoPartNumberEdit").val();
+          var descricao= $("#novoDescriptionEdit").val();
+            
+          var link = document.getElementById("novoLinkEdit").files[0] //$("#novoLinkEdit").val();
+          var linkOld = document.getElementById("botaoShowPdf").value
+                    
+          var novoCommentEdit = $("#novoCommentEdit").val();
+          var stock = $("#novoStockEdit").val();
+          var inv =  $("#quantidadeInventarioNovoEdit").val();
+          var tipo =  $("input[name=tipo]:checked").val()  // document.getElementsByName("tipo").value
+      
+          console.log("LINK OLD",linkOld, "link new",link)
+          console.log("REQUEST A CAMINHO COM.... --> ",link,tipo)
+     
+            
+            if(!pn.length){
+                return alert("You must set a Part-Number")
+            }
+            if(stock <0){
+                return alert("You must set a valid Stock")
+                 
+            }
+            if(link == undefined || link == ""){
+                alert("Link vazio")
+            }
+            else{
+                if(!link.name.endsWith("pptx")){
+                return alert("Not a valid file");
+            }
+        }
+          var dataForm = new FormData();
+          dataForm.append("rowIdUpdate", rowIdUpdate);
+          dataForm.append("partNumberEdit", pn);
+          dataForm.append("descricaoEdit", descricao);
+
+          dataForm.append("linkEdits", linkOld);
+          dataForm.append("linkEdit", link);
+
+          dataForm.append("commentEdit", novoCommentEdit);
+          dataForm.append("stockEdit", stock);
+          dataForm.append("invEdit",inv);
+          dataForm.append("tipoEdit", tipo);
+          dataForm.append(
+            "csrfmiddlewaretoken",
+            $("input[name=csrfmiddlewaretoken]").val()
+          );
+
+          $.ajax({
+            type: "POST",
+            url: "{% url 'pManagement:updateStockPackage' %}",
+            contentType: false,
+            processData: false,
+            waitMsg: 'Uploading your request...',
+            data: dataForm,
+            success: function () {
+              console.log("[API] Callback to the endpoint sucess");
+            },
+            complete: function () {
+              setTimeout(function() {
+                window.location.reload()
+               }, 1000);  
+            },
+          });
+        });
+
+
+
+
+
 
 $('#example').on('change', 'input', function () {
     //Get the cell of the input
@@ -650,8 +768,10 @@ $('#example').on('change', 'input', function () {
                 "paging": false,
                 orderCellsTop: true,
                 fixedHeader: true,
-                "scrollY": 400,
+                overflow: true,
                 "info": false,
+                "scrollCollapse": true,
+               
 
                 
                 select: {
@@ -769,43 +889,67 @@ $('#example').on('change', 'input', function () {
             });
 
           
-            $('#example tbody').on('click', '#botaoShowPdf', function () {
-                var data = table.row($(this).parents('tr')).data();
-                var link = data[2]
-                document.getElementById("botaoShowPdf").value = link
+         
+
+        $('#example tbody').on('click', '#botaoShowPdf', function () {
+            var data = table.row($(this).parents('tr')).data();
+            var link = data[3]
+            
+             if(link==""){
+                 return alert("Este campo não tem link")
+              }
+            var popup = confirm("Deseja abrir o ficheiro?")
+            console.log(popup)
+            if (popup == true) {
+                console.log("true")
                 window.open("{% url 'pManagement:pdf_view' %}?link=" + link, '_blank').focus();
-        });
+            } else {
+                console.log("false")
+                window.open("{% url 'pManagement:pdf_view1' %}?link=" + link, '_blank').focus();
+            }
+    
+});
+
+
+
+
             
             $('#example tbody').on('click', '#btnEdit', function () {
+                console.log("CLICADO NO EDIT")
                 var data = table.row($(this).parents('tr')).data();
-                console.log("DATA Edit -> ",data);
+                console.log("SSSDATAAASSS Edit -> ",data);
                 var partNumber = data[0];
                 var descricao = data[1];
-                var comentario = data[2]
-                var link = data[3]
+                var comentario = data[2];
+                var link = data[3];
                 var stock = data[4];
+                var inv = data[5];
                 var tipo = data[7]
                 var rowIdUpdate = data[8]
-                console.log("ID TO UPDATE-> ",rowIdUpdate)
-
+                
+                if (!tipo.length) {
+                alert("You must set at least 1 type.")
+                return;
+                }
+                if(!partNumber.length){
+                    alert("You must set a Part-Number")
+                    return;
+                }
+                if(!stock.length){
+                    alert("You must set a Part-Number")
+                    return;
+                }
+                if(stock.val() <0){
+                    return alert("not a positive number");
+                 }
                 document.getElementById("novoPartNumberEdit").value = partNumber
                 document.getElementById("novoDescriptionEdit").value = descricao
                 /* document.getElementById("novoLinkEdit").value = link */
                 document.getElementById("novoCommentEdit").value = comentario
                 document.getElementById("novoStockEdit").value = stock
-                /* document.getElementById("quantidadeInventarioNovoEdit").value = inventario */
+                document.getElementById("quantidadeInventarioNovoEdit").value = inv
                 document.getElementById("tipo").value = tipo
                 document.getElementById("rowIdUpdate").value = rowIdUpdate
-                if (!tipo.length) {
-                alert("You must set at least 1 type.")
-                return;
-                }
-                if(!pn.length){
-                    alert("You must set a Part-Number")
-                }
-                if(!stock.length){
-                    alert("You must set a Part-Number")
-                }
                 // preset code
                 //document.getElementsByName("RetPackage")[0].checked = false
                 //document.getElementsByName("ExpPackage")[0].checked = false
@@ -818,6 +962,7 @@ $('#example').on('change', 'input', function () {
                 $.ajax({
                 type: 'POST',
                 url: "{% url 'pManagement:updateStockPackage' %}",
+                waitMsg: 'Uploading your request...',
                 data: {
                     csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
                     partNumber: partNumber,
@@ -832,8 +977,8 @@ $('#example').on('change', 'input', function () {
                     console.log("[API] Callback to the endpoint sucess")
                 },
                 complete: function () {
-                    //window.location.replace("{% url 'pManagement:pdf_view' %}?page=" + (current_page))
-                   // window.location.reload()
+                   // window.location.replace("{% url 'pManagement:pdf_view' %}")
+                    window.location.reload()
                 }
             })
             });
@@ -879,6 +1024,9 @@ $('#example').on('change', 'input', function () {
             for (var i = 1, n = table.rows.length - 1; i < n; i++){
                 var row = $(table.rows[i].cells[5].innerHTML)
                 inventorys.push(row.val())
+                if(row.val() < 0){
+                    return alert("You must set a valid Stock in all entries")
+                }
                 ids.push(row.attr("id"))  
             }
 
@@ -894,7 +1042,7 @@ $('#example').on('change', 'input', function () {
                     console.log("[API] Callback to the endpoint sucess")
                 },
                 complete: function () {
-                    window.location.replace("{% url 'pManagement:stockPackage' %}?page=" + (current_page))
+                    //window.location.replace("{% url 'pManagement:stockPackage' %}")
                    // window.location.reload()
                 }
             })
@@ -908,14 +1056,16 @@ $('#example').on('change', 'input', function () {
 
             var table = document.getElementById('example');
             
-        
             for (var i = 1, n = table.rows.length - 1; i < n; i++){
                 quantidades.push(table.rows[i].cells[4].innerHTML)
                 var row = $(table.rows[i].cells[5].innerHTML)
                 inventorys.push(row.val())
+                
+                if(row.val() <0){
+                    return alert("All Inventory items must be a positive number");
+                }
                 ids.push(row.attr("id"))  
             }
-
             console.log("Making the request at updateInventory")
            
            
@@ -933,9 +1083,9 @@ $('#example').on('change', 'input', function () {
                     console.log("[API] Callback to the endpoint sucess")
                 },
                 complete: function () {
-                    window.location.replace("{% url 'pManagement:stockPackage' %}?page=" + (current_page))
-                    //window.location.reload()
+                        window.location.replace("{% url 'pManagement:stockPackage' %}")
                 }
+                
             }) 
     
         }
@@ -956,6 +1106,10 @@ $('#example').on('change', 'input', function () {
             console.log("Button upload")
             var data = new FormData()
             var file = $("#myfile")[0].files[0]
+            /* if(file.endsWith(".xlsx") == false){
+                alert("Only Excel files are acepted")
+                return false
+            } */
             data.append("myfile", file)
             data.append("csrfmiddlewaretoken", $('input[name=csrfmiddlewaretoken]').val())
 

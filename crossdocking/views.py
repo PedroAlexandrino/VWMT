@@ -689,22 +689,32 @@ def enviarEmailSchedule():
     #'%d.%m.%Y') + ".xlsx"
     print(textPath + " :TEXTPATH")
     fmt_num1 = nextDay.strftime("%d_%m_%Y")
+    fmt_num2 = nextDay.strftime("%d-%m-%Y")
+    fmt_num3 = nextDay.strftime("%d/%m/%Y")
     textPath1 = f"//PAVPD002/E_Proj/sharedir/MP&L/Schedule/{nextDay.year}/{month} {nextDay.year}/Daily_Schedule_{fmt_num1}.xlsx"
-
+    textPath2 = f"//PAVPD002/E_Proj/sharedir/MP&L/Schedule/{nextDay.year}/{month} {nextDay.year}/Daily_Schedule_{fmt_num2}.xlsx"
+    textPath3 = f"//PAVPD002/E_Proj/sharedir/MP&L/Schedule/{nextDay.year}/{month} {nextDay.year}/Daily_Schedule_{fmt_num3}.xlsx"
     def defineBook():
         try:
-            workbook = openpyxl.load_workbook(textPath)
+            workbook = openpyxl.load_workbook(textPath) 
             return workbook
         except:
-            workbook = openpyxl.load_workbook(textPath1)
-            return workbook
+            try: 
+             workbook = openpyxl.load_workbook(textPath1)
+            except:
+                try:
+                    workbook = openpyxl.load_workbook(textPath2)
+                    return workbook
+                except:
+                    workbook = openpyxl.load_workbook(textPath3)
+                    return workbook
 
-    # textPath = '//PAVPD002/E_Proj/sharedir/MP&L/Schedule/2021/Novembro 2021/Daily_Schedule_03.11.2021.xlsx'
+    # textPath = '//PAVPD002/E_Proj/sharedir/MP&L/Schedule/2021/Novembro 2021/#Daily_Schedule_03.11.2021.xlsx'
 
     table = '</br><table class="display"><thead style="background-color: lightgray"><tr><th>Line</th><th>Site</th><th>Due Date</th><th>Item Number</th><th>Description</th><th>To Complete</th><th>Receiving</th><th>Comentário Receiving</th><th>Shipping</th><th>Comentário Shipping</th></tr></thead><tbody>'
 
     if (
-        (timeNow > timeEnd and timeNow > timeBefore)
+        (timeNow < timeEnd and timeNow > timeBefore)
         and (actualDay.strftime("%A") != "Saturday")
         and (actualDay.strftime("%A") != "Sunday")
     ):
@@ -752,7 +762,13 @@ def enviarEmailSchedule():
                     "Wh Production " + nextDay.strftime("%d-%m-%Y"),
                     "noreply@visteon.com",
                     ["pmarti30@visteon.com"],
-                )
+                    
+                ) 
+                """ ,'npires2@visteon.com',
+                     'abrandao@visteon.com','sanasta1@visteon.com',
+                    'rsalgue2@visteon.com', 'nlopes8@visteon.com',
+                    'abilro1@visteon.com', 'jrodri80@visteon.com',
+                    'evenanc1@visteon.com' """
                 msg = EmailMultiAlternatives(subject, table, from_email, to)
                 msg.attach_alternative(table, "text/html")
                 print(msg + " Mensagem a ser enviada no mail")
@@ -792,7 +808,7 @@ def enviarEmailSchedule():
                     subject, from_email, to = (
                         "Wh Production " + nextDay.strftime("%d-%m-%Y"),
                         "noreply@visteon.com",
-                        ["pmarti30@visteon.com"],
+                       ["pmarti30@visteon.com"],
                     )
                     msg = EmailMultiAlternatives(subject, table, from_email, to)
                     msg.attach_alternative(table, "text/html")

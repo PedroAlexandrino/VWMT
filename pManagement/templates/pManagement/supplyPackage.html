@@ -46,7 +46,7 @@
     }
 
     .buttonAddClient{
-        height: 45px;
+        height: 25px;
        
        font-family: Arial, "Helvetica", sans-serif;
        font-size: 15px;
@@ -185,154 +185,147 @@
 
 
 {% block body_content %}
-    <div class="containerPath mt-4" style="margin-left: 30px">
-        <div class="path" id="uploadClass">
-            <div class="mt-3">
-                {% if erro %}
-                    <br/>
-                    <div class="text-center">
-                        <h1><b>{{ erro }}</b></h1>
-                    </div>
-                    <br/>
-                {% endif %}
-                <table id="example" class="stripe hover cell-border " style="width:100%">
-                    <thead>
-                    <tr>
-                        <td>Part-number</td>
-                        <td>Description</td>
-                        <td>Comment</td>
-                        <td>
-                            <div class="text-center fas fa-square">Client Package</div>
-                        </td>
-                        <td>
-                            <div class="text-center far fa-square"></div>
-                            Stock Package
-                        </td>
-                        <td>
-                            <div class="fas fa-stopwatch">Suply Time</div>
-                        </td>
-                        <td>Stock</td>
-                        <td>Inventario</td>
-                        <td>Link</td>
-                        <td></td>
-                        <td></td>
-                        
-                    </tr>
-                    </thead>
-                    <tbody>
-                      
-                            {%for kitSuplyPackage in kitSuplyPackage.all%}
-                                <tr>
-                                    <td title="{{ kitSuplyPackage.part_number|default:'Empty'}}">{{ kitSuplyPackage.part_number }}</td>
-                                    <td title="{{ kitSuplyPackage.description|default:'Empty'}}">{{ kitSuplyPackage.description }}</td>
-                                    <td title="{{ kitSuplyPackage.comment|default:'Empty'}}">{{ kitSuplyPackage.comment }}</td> 
-                                    
-                                    <td>
-                                        <button type="button" class="btn btn-success" data-toggle="modal" id="somevalue" data-target="#listaClientProd"style="background-color: #FBA51A; margin-left: 30%">
-                                            <li class="fa fa-plus fa-fw"></li>
-                                        </button>
-                                    </td>
-
-
-                                    <td>
-                                        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#listaStockPackage"style="background-color: #FBA51A; margin-left: 30%">
-                                            <li class="fa fa-plus fa-fw"></li>
-                                        </button>
-                                    </td>
-
-                                    <td>{{ kitSuplyPackage.supply_time }}</td>
-                                    <td class="text-center">{{ kitSuplyPackage.stock }}</td>
-                                    <th><input style="width: 70px; margin-left: 8px" class=""
-                                        type="number"
-                                        name="{{ kitSuplyPackage.id }}" min="0" id="{{ kitSuplyPackage.id }}"
-                                        value="{{ kitSuplyPackage.inventario}}"></th>
-                                           
-                                    <td class="text-center" id="link">{{ kitSuplyPackage.link }}</td>
-                                    <td>
-                                        <div class="form-inline">
-                                            <a type="button"  id="botaoEdit" title="edit" class="fas fa-pen-square"
-                                            style="height: 18px; margin-left: 10px"
-                                            data-toggle="modal" data-target="#updateLinha">
-                                            </a>
-                                            <a type="button" id="botaoDelete" title="delete" class="fas fa-trash-alt"
-                                            style="height: 18px; margin-left: 15px"
-                                            data-toggle="modal" data-target="#deleteLinha">
-                                            </a>
-                                        </div>
-                                    </td>
-                                    <td style="display: none" value="{{ kitSuplyPackage.id }}">{{ kitSuplyPackage.id }}</td>
-                                   
-
-                                </tr>  
-                              
-                    {% endfor %}  
-                      
+<div class="containerPath mt-4" style="margin-left: 30px">
+    <div class="path" id="uploadClass">
+        <div class="mt-3">
+            {% if erro %}
+                <br/>
+                <div class="text-center">
+                    <h1><b>{{ erro }}</b></h1>
+                </div>
+                <br/>
+            {% endif %}
+            <table id="example" class="stripe hover cell-border " style="width:100%">
+                <thead>
+                <tr>
+                    <td>Part-number</td>
+                    <td>Description</td>
+                    <td>Comment</td>
+                    <td>
+                        <div class="text-center fas fa-square">Client Package</div>
+                    </td>
+                    <td>
+                        <div class="text-center far fa-square"></div>
+                        Stock Package
+                    </td>
+                    <td>
+                        <div class="fas fa-stopwatch">Suply Time</div>
+                    </td>
+                    <td>Stock</td>
+                    <td>Inventario</td>
+                    <td>Link</td>
+                    <td></td>
+                    <td style="display: none"></td>
                     
-                  
-                    </tbody>
-                    <tfoot>
-                    <tr>
-                        <th>Part-number</th>
-                        <th>Descrição</th>
-                        <th>Comentario</th>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                        
-                        
-                    </tr>
-                    </tfoot>
-                </table>
-                
-                    <div style="width: 30%; margin-left: 30%; bottom: 10%; position: absolute; border: 3px solid transparent; text-align: center">
-                        <button type="submit" class="button"  data-toggle="modal"
-                                data-target="#addLinha">
-                            NOVO ITEM
-                        </button>
-                    </div>
+                </tr>
+                </thead>
+                <tbody>
+                    
+                        {%for kitSuplyPackage in kitSuplyPackage.all%}
+                            <tr>
+                                <td title="{{ kitSuplyPackage.part_number|default:'Empty'}}">{{ kitSuplyPackage.part_number }}</td>
+                                <td title="{{ kitSuplyPackage.description|default:'Empty'}}">{{ kitSuplyPackage.description }}</td>
+                                <td title="{{ kitSuplyPackage.comment|default:'Empty'}}">{{ kitSuplyPackage.comment }}</td> 
+                                
+                                <td>
+                                    <button type="button" class="btn btn-success" id="ClientePackageButton" style="background-color: #FBA51A; margin-left: 30%">
+                                        <li class="fa fa-plus fa-fw"></li>
+                                    </button>
+                                </td>
 
-                    <div style="position: absolute;">
-                        <button type="button" class="form-control" style="background-color: lightgrey" id="excel">Excel</button>
-                    </div>
-                        <!-- <button type="button"  title="Download Excel" class="btn btn-primary buttons"  onclick="uploadStockPackage()" style="background-color: #21127251" id="excel">Excel</button> -->
-                        <!-- vai haver um btn para dar upload do excel -->
+
+                                <td>
+                                    <button type="button" class="btn btn-success" id="StockPackageButton" style="background-color: #FBA51A; margin-left: 30%">
+                                        <li class="fa fa-plus fa-fw"></li>
+                                    </button>
+                                </td>
+
+                                <td>{{ kitSuplyPackage.supply_time }}</td>
+                                <td class="text-center">{{ kitSuplyPackage.stock }}</td>
+                                <td><input style="width: 70px; margin-left: 8px" class=""
+                                    type="number"
+                                    name="{{ kitSuplyPackage.id }}" min="0" id="{{ kitSuplyPackage.id }}"
+                                    value="{{ kitSuplyPackage.inventario|default:'0'}}"></td>
+                                        
+                                <td class="text-center" id="link">{{ kitSuplyPackage.link }}</td>
+                                <td>
+                                    <div class="form-inline">
+                                        <a type="button"  id="botaoEdit" title="edit" class="fas fa-pen-square"
+                                        style="height: 18px; margin-left: 10px"
+                                        data-toggle="modal" data-target="#updateLinha">
+                                        </a>
+                                        <a type="button" id="botaoDelete" title="delete" class="fas fa-trash-alt"
+                                        style="height: 18px; margin-left: 15px"
+                                        data-toggle="modal" data-target="#deleteLinha">
+                                        </a>
+                                    </div>
+                                </td>
+                                <td style="display: none" value="{{ kitSuplyPackage.id }}">{{ kitSuplyPackage.id }}</td>
+                            </tr>  
+                {% endfor %}  
+                </tbody>
+                <tfoot>
+                <tr>
+                    <th>Part-number</th>
+                    <th>Descrição</th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th style="display: none"></th>
+                </tr>
+                </tfoot>
+            </table>
+            
+                <div style="width: 30%; margin-left: 30%; bottom: 10%; position: absolute; border: 3px solid transparent; text-align: center">
+                    <button type="submit" class="button"  data-toggle="modal"
+                            data-target="#addLinha">
+                        NOVO ITEM
+                    </button>
+                </div>
+
+                <div style="position: absolute;">
+                    <button type="button" class="form-control" style="background-color: lightgrey" id="excel">Excel</button>
+                </div>
+                    <!-- <button type="button"  title="Download Excel" class="btn btn-primary buttons"  onclick="uploadStockPackage()" style="background-color: #21127251" id="excel">Excel</button> -->
+                    <!-- vai haver um btn para dar upload do excel -->
+                    {% csrf_token %}
+                    
+                        <button   title="Gravar" type="submit" style="margin-left: 71%"  class="btn btn-primary buttonsUpdate1"id ="botaoUpdateStocks" onclick="botaoUpdateStock()" > Gravar </button>
                         {% csrf_token %}
-                       
-                            <button   title="Gravar" type="submit" style="margin-left: 71%"  class="btn btn-primary buttonsUpdate1"id ="botaoUpdateStocks" onclick="botaoUpdateStock()" > Gravar </button>
+
+                            <button type="button" title="Update" style="margin-left: 64%"   class="btn btn-primary btn btn-primary buttonsUpdate2" data-toggle="modal" data-target="#updateStock"  > Update </button>
+
+
+                            <form method="POST" class="form" action="{% url 'pManagement:updateAllStockSupplyPackage' %}?page="(current_page)
+                            enctype="multipart/form-data">
                             {% csrf_token %}
+                            <div class="modal fade" id="updateStock" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h3 class="modal-title" id="myModalLabel"><b>Deseja fazer Update ao Stock?</b></h3>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                                    aria-hidden="true">&times;</span></button>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">Não</button>
+                                            <button onclick="botaoUpdateInventario()" type="submit" class="btn btn-primary">Sim</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
 
-                                <button type="button" title="Update" style="margin-left: 64%"   class="btn btn-primary btn btn-primary buttonsUpdate2" data-toggle="modal" data-target="#updateStock"  > Update </button>
-
-
-                                <form method="POST" class="form" action="{% url 'pManagement:updateAllStockSupplyPackage' %}?page="(current_page)
-                                enctype="multipart/form-data">
-                              {% csrf_token %}
-                              <div class="modal fade" id="updateStock" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-                                  <div class="modal-dialog" role="document">
-                                      <div class="modal-content">
-                                          <div class="modal-header">
-                                              <h3 class="modal-title" id="myModalLabel"><b>Deseja fazer Update ao Stock?</b></h3>
-                                              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                                                      aria-hidden="true">&times;</span></button>
-                                          </div>
-                                         <div class="modal-footer">
-                                              <button type="button" class="btn btn-default" data-dismiss="modal">Não</button>
-                                              <button onclick="botaoUpdateInventario()" type="submit" class="btn btn-primary">Sim</button>
-                                          </div>
-                                      </div>
-                                  </div>
-                              </div>
-                          </form>
-
-                          <div class="form-inline" style="width: 570px">
-                          <h4 class="mt-3">IMPORT XLSX FILE:</h4>
-                          <input style="margin-left: 20px; margin-top: 1px" type="file" name="myfile" id="myfile"
-                                 title="Choose File"></br>
-      </div>
+                        <div class="form-inline" style="width: 570px">
+                        <h4 class="mt-3">IMPORT XLSX FILE:</h4>
+                        <input style="margin-left: 20px; margin-top: 1px" type="file" name="myfile" id="myfile"
+                                title="Choose File"></br>
+    </div>
      
       <button title="Upload Excel" class="btn btn-outline-primary" style="margin-left: 154px" onclick="uploadStockPackage()" type="submit">
           Upload
@@ -390,9 +383,6 @@
                         </div>
                         <div class="form-inline mt-3">
                             <h6 class="mt-1">Clients: </h6> <!-- partNumbersExpendable -->
-                            <!-- <button type="button" id="openClientPackage" name="openClientPackage" style="margin-left: 33px"> 
-                                Open
-                            </button> -->
                             <button type="button" class="btn btn-success" data-toggle="modal" data-target="#partNumbersExpendable"style="background-color: #FBA51A;margin-left: 95px">
                                 <li class="fa fa-plus fa-fw"></li> Open
                             </button>
@@ -400,16 +390,13 @@
                        
                         <div class="form-inline mt-3">
                             <h6 class="mt-1">Stock Packages: </h6>
-                            <!-- <button type="button" id="openBomb" name="openBomb" style="margin-left: 30px">
-                                Open
-                            </button> -->
-                            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#partNumbersReturnable"style="background-color: #FBA51A; margin-left: 45px">
+                            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#partNumbersReturnable"style="background-color: #FBA51A; margin-left: 44px">
                                 <li class="fa fa-plus fa-fw"></li> Open
                             </button>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <div style="width: 25%; margin-right: 48%; bottom: 2%; position: absolute; border: 1px solid transparent; text-align: center">
+                        <div style="width: 50%; margin-right: 36%; bottom: 2%; position: absolute; border: 1px solid transparent; text-align: center">
                             <button type="submit" class="buttonAddClient" data-toggle="modal"
                                     data-target="#addClientPackage">
                                 NOVO CLIENTE
@@ -453,6 +440,29 @@
             </div>
         </div>
     </form>
+
+
+    <div class="modal fade" id="deleteLinha" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="myModalLabel"><b>Delete this row?</b></h3>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <p id="infoDelete"></p></br>
+                    
+                    <input type="hidden" id="rowIdDelete" name="rowIdDelete" value="{{rowIdDelete}}">
+                   
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Modal onde é feito EDIT de cada linha -->
     <div class="modal fade" id="updateLinha" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -511,7 +521,7 @@
                                 <td><input type="file"  style="margin-left: 67px" name="novolinkEdit"  id="novolinkEdit" value="{{ kitSuplyPackage.link }}"/></td>
                     </div>
                     <div class="form-inline mt-3">
-                        <h6 class="mt-1">Clients: </h6> <!-- partNumbersExpendable -->
+                        <h6 class="mt-1">Client Product: </h6> <!-- partNumbersExpendable -->
                         <!-- <button type="button" id="openClientPackage" name="openClientPackage" style="margin-left: 33px"> 
                             Open
                         </button> -->
@@ -522,9 +532,6 @@
                     
                     <div class="form-inline mt-3">
                         <h6 class="mt-1">Stock Packages: </h6>
-                        <!-- <button type="button" id="openBomb" name="openBomb" style="margin-left: 30px">
-                            Open
-                        </button> -->
                         <button type="button" class="btn btn-success" data-toggle="modal" data-target="#partNumbersReturnable"style="background-color: #FBA51A;margin-left: 5px">
                             <li class="fa fa-plus fa-fw"></li> Open
                         </button>
@@ -558,39 +565,54 @@
 
                 </div>
                 <div class="modal-body">
-                    <h3><b> Create: </b></h3>
-                    <div class="form-inline mt-3">
-                        <h6 class="mt-1">Nome:   </h6>
-                        <input list="clientList" id="getCliente" name="getCliente" />
-                        <datalist id="clientList">
-                          {% for clientes in ClientesOEM.all %}
-                          <option value="{{clientes.oem}}" ></option>
-                          {% endfor %}
-                        </datalist>
-                        <!-- input seguinte é para sair -->
-                        <input placeholder=" New client " type="form" name="novoClientName" id="NewClienteInput">
-                        </div>
-                          <div class="form-inline mt-3">
-                        <h6 class="mt-1">Nome Produto:   </h6>
-                        <input list="prodList" id="getProds" name="getProds"  />
-                        <datalist id="prodList">
-                          {% for produtos in Produtos.all %}
-                          <option value="{{produtos.nome}}"></option>
-                          {% endfor %}
-                        </datalist>
-                        <!-- input seguinte é para sair -->
-                        <input placeholder=" New client " type="form" name="novoClientName" id="NewClienteInput">
+                    <table class="table table-borderless mb-n1">
+                      <thead></thead>
+                      <tbody>
+                        <div class="form-inline">
+                          <p class="mt-2">Cliente</p>
+                          <input list="clientList" id="getCliente" name="getCliente" />
+                          <datalist id="clientList">
+                            {% for clientes in ClientesOEM.all %}
+                            <option value="{{clientes.oem}}" ></option>
+                            {% endfor %}
+                          </datalist>
+                          
+        
+                           
                         </div>
                         <div class="form-inline mt-3">
-                        <h6 class="mt-1">Descrição Produto:   </h6>
-                        <input placeholder=" New client " type="form" name="novoClientName" id="NewClienteInput">
-                         </div>
-                        <div class="form-inline mt-3">
-                        <h6 class="mt-1">Comentario Produto:   </h6>
-                        <input placeholder=" New client " type="form" name="novoClientName" id="NewClienteInput">
-                        </div>  
-                    
-                    
+                          <h6 class="mt-1" >Product:</h6>
+                          <input list="prodList" id="getProds" name="getProds"  />
+                          <datalist id="prodList">
+                            {% for produtos in Produtos.all %}
+                            <option value="{{produtos.nome}}"></option>
+                            {% endfor %}
+                          </datalist>
+                        </div>
+                        {% if erro %}
+                        <div class="text-center mb-n2">
+                          <b>{{ erro }}</b>
+                        </div>
+                        {% endif %}
+        
+                        <tr></tr>
+        
+                        <tr>
+                          <th scope="row" style="color: black">
+                            <h6><b>Comment</b></h6>
+                          </th>
+                          <td>
+                            <input type="text" name="newComment" id="newComment" />
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    {% if erro2 %}
+                    <div class="text-center">
+                      <b>{{ erro2 }}</b>
+                    </div>
+                    {% endif %}
+                  
                     
                     <!-- <td style="display: none" id="rowIdUpdate" name="rowIdUpdate" value="{{ rowIdUpdate }}"></td> -->
                     <!-- <td style="display: none" value="{{ kitSuplyPackage.id }}">{{ kitSuplyPackage.id }}</td> -->
@@ -692,7 +714,6 @@
                             <th style="display: none"></th>
                         </tr>
                         </thead>
-                            <!-- Aqui nao apanha nada porque tens as vars mal dobriga -->
                         <tbody>
                         {% for pn in stock_package_parts.all %}
                             <tr>
@@ -731,97 +752,94 @@
     <div class="modal-dialog" role="document">
        <div class="modal-content">
            <div class="modal-header">
-               <h3 class="modal-title" id="myModalLabel"><b>Clientes V1</b></h3>
+               <h3 class="modal-title" id="myModalLabel"><b>Cliente Produto</b></h3>
                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                        aria-hidden="true">&times;</span></button>
            </div>
            <div class="modal-body">
                <p id="listaLinhaReturnable"></p></br>
-               <table id="listaPnReturnable" class="display" style="width:100%">
-                   <thead style="width:100%">
-                   <tr>
-                    <th></th>
-                    <th>Products</th>
-                    <th></th>
-                   </tr>
+               <table id="ListaClientes" class="stripe hover cell-border" style="width:100%">
+                   <thead>
+                    <tr>
+                        <th>Clients</th>
+                        <th>Products</th>
+                        <th>Comment</th>
+                      
+                    </tr>
                    </thead>
                    <tbody>
-                   {% for pn in produts.all %}
-                   <!-- % if pn.produts.id == idShow % -->
-                       <tr>
+                    </tr>
                         <td></td>
-                        <td> {{ pn.nome }} </td>
-                        <td style="display: none">{{ pn.id }}</td>
-                       </tr>
-                   {% endfor %}
-                   </tbody>
+                        <td></td>
+                        <td></td>
+                         
+                    </tr>
+                    </tbody>
                    <tfoot>
-                   <tr>
-                    <td></td>
-                    <td></td>
-                    <th></th>
-                   </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                       
+                    </tr>
                    </tfoot>
                </table>
            </div>
            <div class="modal-footer">
                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-               <button type="submit" id="savePNReturnable" class="btn btn-primary">Save</button>
            </div>
        </div>
     </div>
     </div>
 
     <!-- TABELA PARA O STOCKPACKAGE QUE VAI RECEBER UM ID E VAI MOSTRAR TODOS OS STOCKS PACKAGES SELECIONADOS ANTERIORMENTE -->
-    <div class="modal fade" id="listaStockPackage" data-backdrop="false" tabindex="-1" role="dialog"
+<div class="modal fade" id="listaStockPackage" data-backdrop="false" tabindex="-1" role="dialog"
 aria-labelledby="myModalLabel">
 <div class="modal-dialog" role="document">
    <div class="modal-content">
        <div class="modal-header">
-           <h3 class="modal-title" id="myModalLabel"><b>ProductsV1</b></h3>
+           <h3 class="modal-title" id="myModalLabel"><b>Products</b></h3>
            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                    aria-hidden="true">&times;</span></button>
        </div>
        <div class="modal-body">
            <p id="listaLinhaReturnable"></p></br>
-           <table id="listaPnReturnable" class="display" style="width:100%">
-               <thead style="width:100%">
-               <tr>
-                <th></th>
-                <th>Products</th>
-                <th></th>
-               </tr>
+           <table id="listaPnReturnable" class="stripe hover cell-border" style="width:100%">
+               <thead>
+                <tr>
+                    <th>Part Number</th>
+                    <th>Description</th>
+                    <th>Stock</th>
+                    <th>Type</th>
+                   
+                </tr>
                </thead>
                <tbody>
-               {% for pn in produts.all %}
-               <!-- % if pn.produts.id == idShow % -->
-                   <tr>
+                <tr>
                     <td></td>
-                    <td> {{ pn.nome }} </td>
-                    <td style="display: none">{{ pn.id }}</td>
-                   </tr>
-               {% endfor %}
-               </tbody>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                  
+                </tr>
+                </tbody>
                <tfoot>
-               <tr>
-                <td></td>
-                <td></td>
-                <th></th>
-               </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                     
+                    </tr>
                </tfoot>
            </table>
        </div>
        <div class="modal-footer">
            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-           <button type="submit" id="savePNReturnable" class="btn btn-primary">Save</button>
        </div>
    </div>
 </div>
 </div>
-
-
-
-
 
 
 <!-- Clicavéis da tabela (btn azul) (antigo, foi substituido pelas tabelas)-->
@@ -863,8 +881,9 @@ aria-labelledby="myModalLabel">
         </div>
     </div>
 
-
     
+
+
 <!-- MODAL DOS CLICAVEIS DO ADD/EDIT-->
   
 
@@ -885,7 +904,176 @@ aria-labelledby="myModalLabel">
             })
         ;
 
-        $(document).ready(function () {
+$(document).ready(function () {
+
+    $('#example tbody').on('click', '#link', function () {
+        var data = table.row($(this).parents('tr')).data();
+        var link = data[8]
+        
+         if(link==""){
+            return alert("Este campo não tem link")
+        }
+        var popup = confirm("Deseja abrir o ficheiro?")
+        console.log(popup)
+        if (popup == true) {
+            console.log("true")
+            window.open("{% url 'pManagement:pdf_view' %}?link=" + link, '_blank').focus();
+        } else {
+            console.log("false")
+            window.open("{% url 'pManagement:pdf_view1' %}?link=" + link, '_blank').focus();
+        }
+    
+});
+ 
+
+
+
+// --------- Defenição de DataTabales --------- //
+
+var table = $('#configs').DataTable({
+    "info": false,
+    "scrollY": "594",
+    "paging": false,
+    "ordering": false,
+    "orderCellsTop": true,
+    "fixedHeader": true,
+
+    select: {
+        style: 'os',
+        selector: 'th:first-child',
+        blurable: true
+    },
+    
+    order: [[0, 'asc']],
+
+    initComplete: function () {
+        
+        this.api().columns([0, 1, 2]).every(function () {
+            console.log("AO CARREGAR A PAGINA OS FILTROS");
+            var column = this;
+            var select = $('<select class="form-control" style="margin-left: -9px" id="selected"><option value=""></option></select>')
+                .appendTo($(column.footer()).empty())
+                .on('change', function () {
+                    var val = $.fn.dataTable.util.escapeRegex(
+                        $(this).val()
+                    );
+                    //pode ser daqui o erro, não está a conseguir chegar ao spot
+                    column
+                        .search(val ? '^' + val + '$' : '', true, false)
+                        .draw();
+                });
+
+            column.data().unique().sort().each(function (d, j) {
+                console.log("NESTE BLOCO MOSTRA INFOS DOS FILTOS EM BAIXO DA ROW 1/3"+ d)
+                select.append('<option value="' + d  + '">' + d + '</option>')
+            });
+        });
+    },
+});
+
+var tableReturnable = $('#pnReturnable').DataTable({    
+    "info": false,
+    "paging": false,
+    "scrollCollapse": true,
+    "scrollY": "420px",
+    columnDefs: [{
+        orderable: false,
+        className: 'select-checkbox',
+        targets: 0
+    }],
+    select: {
+        style: 'multi',
+        selector: 'td:first-child'
+    },
+    
+    order: [[1, 'asc']],
+    initComplete: function () {
+
+        this.api().columns([1]).every(function () {
+            var that = this;
+
+
+            //$('#pnReturnable tfoot tr').appendTo('#pnReturnable thead');   // To displays the search boxs at the top instead to the bottom of the table
+            $('input', this.footer()).on('keyup change clear', function () {
+                console.log("print6")
+                if (that.search() !== this.value) {
+                    that
+                        .search(this.value)
+                        .draw();
+                }
+            });
+        });
+    }
+});
+
+var tableExpendable = $('#pnExpendableTable').DataTable({
+    "info": false,
+    "paging": false,
+    "scrollCollapse": true,
+    "scrollY": "420px",
+    columnDefs: [{
+        orderable: false,
+        className: 'select-checkbox',
+        targets: 0,
+    }],
+    select: {
+        style: 'multi',
+        selector: 'td:first-child'
+    },
+    order: [[1, 'asc']],
+
+    initComplete: function () {
+        this.api().columns([1]).every(function () {
+            
+            var that = this;
+            //$('#pnExpendable tfoot tr').appendTo('#pnExpendable thead');   // To displays the search boxs at the top instead to the bottom of the table
+            $('input', this.footer()).on('keyup change clear', function () {
+                console.log("print10")
+                if (that.search() !== this.value) {
+                    that
+                        .search(this.value)
+                        .draw();
+                }
+            });
+        });
+    }
+});
+
+var listaClientes = $("#ListaClientes").DataTable({
+    "info": false,
+    "scrollY": "294",
+    "paging": false,
+    "ordering": false,
+    "orderCellsTop": true,
+    "fixedHeader": true,
+    select: {
+        style: 'os',
+        selector: 'th:first-child',
+        blurable: true
+    },
+
+    order: [[0, 'asc']],
+})
+
+var listaPnReturnable = $("#listaPnReturnable").DataTable({
+    "info": false,
+    "scrollY": "294",
+    "paging": false,
+    "ordering": false,
+    "orderCellsTop": true,
+    "fixedHeader": true,
+    select: {
+        style: 'os',
+        selector: 'th:first-child',
+        blurable: true
+    },
+
+    order: [[0, 'asc']],
+})
+
+// --------- Fim Da Defenição de DataTabales --------- //
+
+
 
 // Setup - add a text input to each footer cell
 $('#example thead th').each(function (i) {
@@ -902,41 +1090,6 @@ $('#example thead th').each(function (i) {
                 $(this).html('<input class="form-control" style="margin-left: -18px" type="text" placeholder="Search ' + title + '" data-index="' + i + '" />');
                 console.log("print11");
             });
-            var tableReturnable = $('#pnReturnable').DataTable({
-              
-                "info": false,
-                "paging": false,
-                "scrollCollapse": true,
-                "scrollY": "420px",
-                columnDefs: [{
-                    orderable: false,
-                    className: 'select-checkbox',
-                    targets: 0
-                }],
-                select: {
-                    style: 'multi',
-                    selector: 'td:first-child'
-                },
-                
-                order: [[1, 'asc']],
-                initComplete: function () {
-
-                    this.api().columns([1]).every(function () {
-                        var that = this;
-
-
-                        //$('#pnReturnable tfoot tr').appendTo('#pnReturnable thead');   // To displays the search boxs at the top instead to the bottom of the table
-                        $('input', this.footer()).on('keyup change clear', function () {
-                            console.log("print6")
-                            if (that.search() !== this.value) {
-                                that
-                                    .search(this.value)
-                                    .draw();
-                            }
-                        });
-                    });
-                }
-            });
       
       /* TABELA do popup BOMB */
     $('#pnExpendableTable tfoot th').each(function (i) {
@@ -948,88 +1101,118 @@ $('#example thead th').each(function (i) {
               $(this).html('<input class="form-control" style="margin-left: -18px" type="text" placeholder="Search ' + title + '" data-index="' + i + '" />');
              
           });
-          var tableExpendable = $('#pnExpendableTable').DataTable({
-              "info": false,
-              "paging": false,
-              "scrollCollapse": true,
-              "scrollY": "420px",
-              columnDefs: [{
-                  orderable: false,
-                  className: 'select-checkbox',
-                  targets: 0,
-              }],
-              select: {
-                  style: 'multi',
-                  selector: 'td:first-child'
-              },
-              order: [[1, 'asc']],
+        
+$(document).on("click", "#ClientePackageButton", function (e) {
+    var data = table.row($(this).parents('tr')).data();
+    let cliente_p;
 
-              initComplete: function () {
-                
-
-                  this.api().columns([1]).every(function () {
-                      
-                      var that = this;
-                      //$('#pnExpendable tfoot tr').appendTo('#pnExpendable thead');   // To displays the search boxs at the top instead to the bottom of the table
-                      $('input', this.footer()).on('keyup change clear', function () {
-                          console.log("print10")
-                          if (that.search() !== this.value) {
-                              that
-                                  .search(this.value)
-                                  .draw();
-                          }
-                      });
-                  });
-              }
-          });
-          //Tabela necessarias 
-var table = $('#configs').DataTable({
-                "info": false,
-                "scrollY": "594",
-                "paging": false,
-                "ordering": false,
-                "orderCellsTop": true,
-                "fixedHeader": true,
-
-                select: {
-                    style: 'os',
-                    selector: 'th:first-child',
-                    blurable: true
-                },
-                
-                order: [[0, 'asc']],
-
-                initComplete: function () {
-                    
-                    this.api().columns([0, 1, 2]).every(function () {
-                        console.log("AO CARREGAR A PAGINA OS FILTROS");
-                        var column = this;
-                        var select = $('<select class="form-control" style="margin-left: -9px" id="selected"><option value=""></option></select>')
-                            .appendTo($(column.footer()).empty())
-                            .on('change', function () {
-                                var val = $.fn.dataTable.util.escapeRegex(
-                                    $(this).val()
-                                );
-                                //pode ser daqui o erro, não está a conseguir chegar ao spot
-                                column
-                                    .search(val ? '^' + val + '$' : '', true, false)
-                                    .draw();
-                            });
-
-                        column.data().unique().sort().each(function (d, j) {
-                            console.log("NESTE BLOCO MOSTRA INFOS DOS FILTOS EM BAIXO DA ROW 1/3"+ d)
-                            select.append('<option value="' + d  + '">' + d + '</option>')
-                        });
-                    });
-                },
+    $("#listaClientProd").modal('show');
+    $.ajax({
+        type: 'GET',
+        url: "{% url 'pManagement:get_cliente_produto_rel' %}",
+        data: {
+            Id: data[10],
+        },
+        success: function (resp) {
+            console.log("Sucesso", resp["data"])
+            cliente_p = resp["data"]
+            listaClientes.clear()
+            cliente_p.forEach(element => {
+                listaClientes.row.add(
+                    [
+                        element["clienteproduto"]["cliente"]["oem"],
+                        element["clienteproduto"]["produto"]["nome"],
+                        element["clienteproduto"]["comment"],
+                        element["id"]
+                    ]
+                )
             });
+            listaClientes.draw()
+},
+        error: function (jqXHR, textStatus, errorThrown) {
+            alert("Error ao carregar os clientes...");
+        }
+    ,})
+})
 
-            $('#example tbody').on('click', '#link', function () {
-                var data = table.row($(this).parents('tr')).data();
-                var link = data[8]
-                window.open("{% url 'pManagement:pdf_view' %}?link=" + link, '_blank').focus();
 
-        });
+$(document).on("click", "#StockPackageButton", function (e) {
+    var data = table.row($(this).parents('tr')).data();
+    let cliente_p;
+
+    $("#listaStockPackage").modal('show');
+    $.ajax({
+        type: 'GET',
+        url: "{% url 'pManagement:get_stock_package_rel' %}",
+        data: {
+            Id: data[10],
+        },
+        success: function (resp) {
+            console.log("Sucesso", resp["data"])
+            cliente_p = resp["data"]
+            listaPnReturnable.clear()
+            cliente_p.forEach(element => {
+                console.log("Element", element)
+                listaPnReturnable.row.add(
+                    [
+                        element["stockpackage"]["pn"],
+                        element["stockpackage"]["descricao"],
+                        element["stockpackage"]["quantidade"],
+                        element["stockpackage"]["tipo"],
+                        element["id"],
+                    ]
+                )
+            });
+            listaPnReturnable.draw()
+},
+        error: function (jqXHR, textStatus, errorThrown) {
+            alert("Error ao carregar os clientes...");
+        }
+    ,})
+})
+
+
+
+/* Clicavél da cell ClientPackage */
+$(document).on('click', '#clientPackage', function () {
+    console.log("returnable")
+    var data = table.row($(this).parents('tr')).data();
+
+    var idPacote = data[10]
+    $.ajax({
+        type: 'GET',
+        url: '/packing/getPNExpendable',
+        data: {
+            idPacote: idPacote,
+        },
+        success: function (response) {
+            var myModal = new bootstrap.Modal(document.getElementById('showPartNumbersExpendable'))
+            myModal.show()
+            if (response["listaExpendable"] != null) {
+                console.log("entrou no if")
+                var myArray = response["listaExpendable"]
+                var myFinalString = ""
+                for (var key in myArray) {
+                    for (var k in myArray[key]) {
+                        myFinalString += "<strong>" + k + "</strong>" + ": " + myArray[key][k]
+                        myFinalString += "</br>"
+                    }
+                    myFinalString += "\n<br></br>"
+                }
+                $('#listPartNumbersExpendable').html(myFinalString);
+            } else {
+                $('#listPartNumbersExpendable').html(null);
+            }
+        }
+    })
+});
+
+$('#partNumbersReturnable').on('shown.bs.modal', function (e) {
+    $.fn.dataTable.tables({visible: true, api: true}).columns.adjust();
+});
+
+
+
 $(document).on('click', '#EditRowButton', function () {
     var rowIdUpdate = $("#rowIdUpdate").val()
     var novoPartNumberEdit = $("#novoPartNumberEdit").val()
@@ -1041,17 +1224,46 @@ $(document).on('click', '#EditRowButton', function () {
     var clients = []
     var stockPackages = []
 
+    if(novoPartNumberEdit=="" || novoPartNumberEdit == undefined){
+        return alert("Deve introduzir um Part-Number");
+    }
+    if(novoStockProdutoEdit <0){
+        return alert("O stock deve ser um valor positivo")
+    }
+    if(novolinkEdit == undefined || novolinkEdit == ""){
+                alert("Link vazio")
+            }
+            else{
+                if(!novolinkEdit.name.endsWith("pptx")){
+                return alert("Not a valid file");
+            }
+        }
+
+    console.log("DADOS->", rowIdUpdate,novoPartNumberEdit,novoDescriptionEdit,novoStockProdutoEdit,novoSupplyTimeEdit,novoLinkEdit)
     $.each(tableReturnable.rows('.selected').nodes(), function (i, item) {
         var data = tableReturnable.row(this).data();
-        console.log("tableReturnable", data);
+        console.log("tableReturnableasd", data);
         stockPackages.push(data[3])
     });
 
     $.each(tableExpendable.rows('.selected').nodes(), function (i, item) {
         var data = tableExpendable.row(this).data();
-        console.log("tableExpendable", data);
-        clients.push(data[3])
+        console.log("tableExpendablesade", data);
+        clients.push(data[5])
     });
+
+    console.log("CLIENTES",clients)
+    console.log("STOCKPACK",stockPackages)
+
+    if(!novoPartNumberEdit.length){
+        return alert("Part-number is not valid")
+    }
+    if(novoStockProdutoEdit < 0){
+        return alert("You must set a valid Stock")
+    }
+    if(novoSupplyTimeEdit < 0){
+        return alert("You must set a valid Supply-Time")
+    }
 
     var dataForm = new FormData();
     dataForm.append(
@@ -1081,9 +1293,10 @@ $(document).on('click', '#EditRowButton', function () {
     dataForm.append(
         "stockPackages", stockPackages
     )
-/*     dataForm.append(
+        dataForm.append(
         "csrfmiddlewaretoken", $('input[name=csrfmiddlewaretoken]').val()
-    ) */
+    ) 
+  
 
     $.ajax({
             type: 'POST',
@@ -1101,35 +1314,32 @@ $(document).on('click', '#EditRowButton', function () {
 })
         
 $(document).on('click', '#CreateClienteSubmiteButton', function () {
-    var newCliente = $("#NewClienteInput").val()
+        var newComment = $("#newComment").val();
+        console.log("TESTE")
+        var clienteAdd = $("#getCliente").val();
+        var produtos =  $("#getProds").val();
 
     $.ajax({
         type: 'POST',
-        url: "{% url 'pManagement:addClientePackage' %}",
+        url: "{% url 'pManagement:createClienteProduto' %}",
         data: {
             csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
-            novoClientName: newCliente,
+            newClient : clienteAdd,
+            newProd : produtos,
+            newComment: newComment,
         },
         success: function (resp) {
-            tableExpendable.row.add(
-            [
-                "",
-                newCliente,
-                "",
-                resp["id"]
-            ]
-            )
+           
+            
             console.log("[API] Callback to the endpoint sucess")
-            $("addClientPackage").hide()
+            $("CreateClienteSubmiteButton").hide()
         },
-        error: function(a, b, c) {
-            alert("Já existe um cliente com o mesmo nome")
-        }
+       
     })
 })
 $(document).on('click', '#CreateSubmiteButton', function () {
     /* var prodNameAdd = $("prodNameAdd").val(); */
-    //POPUPS NÂO TÂO AINDA
+   
     var pnAdd = $("#pnAdd").val()
     var supplyDescriptionAdd = $("#supplyDescriptionAdd").val();
     var supplyCommentAdd = $("#supplyCommentAdd").val();
@@ -1149,10 +1359,28 @@ $(document).on('click', '#CreateSubmiteButton', function () {
     $.each(tableExpendable.rows('.selected').nodes(), function (i, item) {
         var data = tableExpendable.row(this).data();
         console.log("tableExpendable", data);
-        clients.push(data[3])
+        clients.push(data[5])
     });
-    console.log("clients ",clients)
+    
+    console.log("Dados ",pnAdd,supplyDescriptionAdd,supplyCommentAdd,supplyTimeAdd,supplyStockAdd,novoLinkEdit)
 
+    if(!pnAdd.length){
+        return alert("Part-number não é válido")
+    }
+    if(supplyStockAdd < 0){
+        return alert("O stock deve ser um valor positivo")
+    }
+    if(supplyTimeAdd < 0 ){
+        return alert("Supply-Time em de ser um valor positivo")
+    }
+    if(novoLinkEdit == undefined || novoLinkEdit == ""){
+            alert("Link vazio")
+    }else{
+        if(!novoLinkEdit.name.endsWith("pptx")){
+            return alert("Not a valid file");
+        }}
+
+    console.log("StockPackage/ Clientes", stockPackages,clients)
     var dataForm = new FormData();
     dataForm.append(
         "pnAdd", pnAdd
@@ -1191,7 +1419,7 @@ $(document).on('click', '#CreateSubmiteButton', function () {
                 console.log("[API] Callback to the endpoint sucess")
             },
             complete: function () {
-                window.location.replace("{% url 'pManagement:supplyPackage' %}")
+               // window.location.replace("{% url 'pManagement:supplyPackage' %}")
             }
         }) 
 });
@@ -1319,38 +1547,34 @@ $('#example').on('change', 'input', function () {
     table.cell($(cella)).invalidate().draw();
 
 });
-            var table = $('#example').DataTable({
-                "paging": false,
-                orderCellsTop: true,
-                fixedHeader: true,
-                "scrollY": 400,
-                "info": false,
-               
-                
-                
-                select: {
-                    style: 'os',
-                    selector: 'th:first-child',
-                    blurable: true
-                },
-                
-                order: [[0, 'asc']],
-                
-                
-                
-                
-                initComplete: function () {
-                    this.api().columns([0, 1]).every(function () {
-                        $(document).ready(function() {
-  $("td").hover(
-    function() {
-      $(this).css('color', '#000000');
-    }, 
-    function() {
-      $(this).css('background-color', 'none');
-      $(this).css('color', 'black'); // or whatever your original color was
-    }
-  );
+    var table = $('#example').DataTable({
+        "paging": false,
+        orderCellsTop: true,
+        fixedHeader: true,
+        "scrollY": 400,
+        "info": false,
+        
+        
+        
+        select: {
+            style: 'os',
+            selector: 'th:first-child',
+            blurable: true
+        },
+        
+        order: [[0, 'asc']],
+        initComplete: function () {
+            this.api().columns([0, 1]).every(function () {
+                $(document).ready(function() {
+                    $("td").hover(
+                        function() {
+                        $(this).css('color', '#000000');
+                        }, 
+                        function() {
+                        $(this).css('background-color', 'none');
+                        $(this).css('color', 'black'); // or whatever your original color was
+                        }
+                    );
 });
                         var column = this;
                         
@@ -1387,8 +1611,8 @@ $('#example').on('change', 'input', function () {
 
             
             $('#example tbody').on('click', 'button', function () {
-
                 var data = table.row($(this).parents('tr')).data();
+                console.log("CLICASTE EM ALgo", data)
                 //alert(data[0] + "'s quantity of " + data[2] + " is: " + data[4]);
                 //$("#myModal").modal('show');
                 // Add response in Modal body
@@ -1417,11 +1641,11 @@ $('#example').on('change', 'input', function () {
                 $('#descricao').html(descricao);
                 $('#link').val(link);
                 $('#comentario').val(comentario);
-                $('#quantidade').val(quantidade);
+                // $('#quantidade').val(quantidade); //BUG
                 $('#inventario').val(inventario);
-                $('#quantidadeEdit').val(quantidade);
+                // $('#quantidadeEdit').val(quantidade);
                 $('#inventarioEdit').val(inventario);
-                $('#tipo').val(tipo);
+                // $('#tipo').val(tipo);
             });
 
             $('#example tbody').on('click', '#botaoDelete', function () {
@@ -1466,10 +1690,12 @@ $('#example').on('change', 'input', function () {
                 var rowIdUpdate = data[10]
                 if(!partNumber.length){
                     alert("Introduza um Part-Number válido")
+                    return true;
                 }
                 
                 if(inventario < 0){
                     alert("Introduza Inventario válido")
+                    return true;
                 }
                 document.getElementById("novoPartNumberEdit").value = partNumber
                 document.getElementById("novoDescriptionEdit").value = descricao
@@ -1516,14 +1742,16 @@ $('#example').on('change', 'input', function () {
                     success: function (response) {
                         $.each(tableExpendable.rows().nodes(), function (i, item) {
                             var row = tableExpendable.row(i)
-
+                    //FALTA VERIFICAR SE CONSEGUES RETORNAR OS VALORES QUE ETÂO GUARDADOS NA TABLE
                             for (var x = 0; x < response["listaExpendable"].length; x++) {
                                 var val = response["listaExpendable"][x]
-                                if (val["id"] == row.data()[3]) {
+                                console.log("coisa a selecionar",val, row.data())
+                                if (val["id"] == row.data()[5]) {
+                                    console.log("Vai selecionar")
                                     row.select()
                                     break
                                 }
-                            }
+                            }console.log("concluio")
                         });
                     },
                 })
@@ -1567,10 +1795,15 @@ $('#example').on('change', 'input', function () {
             var ids = []
 
             var table = document.getElementById('example');
-                
+            
             for (var i = 1, n = table.rows.length - 1; i < n; i++){
                 var row = $(table.rows[i].cells[7].innerHTML)
+               
                 inventorys.push(row.val())
+                if(row.val() <0){
+                   return alert("You must set a valid Stock in all entries")
+                    console.log("ENTROI")
+            }
                 ids.push(row.attr("id"))  
             }
 
@@ -1606,7 +1839,11 @@ $('#example').on('change', 'input', function () {
                 console.log("I--> ", i)
                 quantidades.push(table.rows[i].cells[8].innerHTML)
                 var row = $(table.rows[i].cells[7].innerHTML)
+              
                 inventorys.push(row.val())
+                if(row.val() <0){
+                    return alert("You must set a valid Stock in all entries")
+                }
                 ids.push(row.attr("id"))  
             }
 
@@ -1628,6 +1865,8 @@ $('#example').on('change', 'input', function () {
                 },
                 complete: function () {
                     window.location.reload()
+                
+                console.log("[API] Callback to the endpoint went bad")
                 }
             }) 
     
@@ -1652,6 +1891,7 @@ $('#example').on('change', 'input', function () {
             data.append("myfile", file)
             data.append("csrfmiddlewaretoken", $('input[name=csrfmiddlewaretoken]').val())
 
+
             console.log("Seding API REQ")
             $.ajax({
                 type: 'POST',
@@ -1671,29 +1911,12 @@ $('#example').on('change', 'input', function () {
             })
         }
 
-        $(document).on('click', '#excel', function () {
-            window.location.replace("{% url 'pManagement:downloadExcelSupplyPackage' %}")
-        });
-
-
-        (document).on('click', '#openExpendable', function () {
-                
-                tableExpendable.rows().deselect();
-                var myModal = new bootstrap.Modal(document.getElementById('partNumbersExpendable'))
-                console.log("clicou"+ myModal)
-                myModal.show()
+            $(document).on('click', '#excel', function () {
+                window.location.replace("{% url 'pManagement:downloadExcelSupplyPackage' %}")
             });
 
             $('#partNumbersExpendable').on('shown.bs.modal', function (e) {
                 $.fn.dataTable.tables({visible: true, api: true}).columns.adjust();
-            });
-
-            $(document).on('click', '#openReturnable', function () {
-                console.log("LOOOLO");
-                tableReturnable.rows().deselect();
-                var myModal = new bootstrap.Modal(document.getElementById('partNumbersReturnable'))
-                console.log("clicou"+myModal)
-                myModal.show()
             });
 
             $('#partNumbersReturnable').on('shown.bs.modal', function (e) {
@@ -1860,5 +2083,9 @@ $('#example').on('change', 'input', function () {
                     }
                 })
             });
+
+ 
+
+            
     </script>
 {% endblock %}

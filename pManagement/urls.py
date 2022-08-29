@@ -45,6 +45,9 @@ urlpatterns = [
     # Pedido extra Packing
     path("createExtra/", views.create, name="pedidoExtra"),
     path("getPNClienteProduto/", views.getPNClienteProduto, name="getPNClienteProduto"),
+    path("get_cliente_produto/", views.get_cliente_produto, name="get_cliente_produto"),
+    path("get_cliente_produto_rel/", views.get_cliente_produto_rel, name="get_cliente_produto_rel"),
+    path("get_stock_package_rel/", views.get_stock_package_rel, name="get_stock_package_rel"),
     # Supply
     path("supply/", views.supply, name="supply"),
     path("atualizaEstado", views.atualizaEstado, name="atualizaEstado"),
@@ -55,7 +58,6 @@ urlpatterns = [
         views.deleteLinhaClienteProduto,
         name="deleteLinhaClienteProduto",
     ),
-    path("addClientePackage/", views.addClientePackage, name="addClientePackage"),
     path(
         "downloadExcelSupplyPackage/",
         views.downloadExcelSupplyPackage,
@@ -107,6 +109,7 @@ urlpatterns = [
         name="downloadExcelStockPackage",
     ),
     url(r"^view-pdf/$", views.pdf_view, name="pdf_view"),
+    url(r"^view1-pdf/$", views.pdf_view1, name="pdf_view1"),
     path("uploadStockFile/", views.uploadStockFile, name="uploadStockFile"),
     path(
         "uploadStockFileStock/", views.uploadStockFileStock, name="uploadStockFileStock"
