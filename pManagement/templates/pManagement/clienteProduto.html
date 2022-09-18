@@ -163,22 +163,15 @@
 {% endblock %}
 {% block body_content %}
 <!-- MAIN -->
-<div class="containerPath mt-4" style="margin-left: 30px">
-  <div class="path" id="uploadClass" <div class="mt-3">
-    {% if erro %}
-    <br />
-    <div class="text-center">
-      <h1><b>{{ erro }}</b></h1>
-    </div>
-    <br />
-    {% endif %}
+  <p></p>
+   
     <table id="example" class="stripe hover cell-border" style="width: 100%">
       <thead>
         <tr>
-          <td>Client</td>
-          <td>Product Name</td>
-          <td>Comment</td>
-          <td></td>
+          <td style="text-align: center">Client</td>
+          <td style="text-align: center">Product Name</td>
+          <td style="text-align: center">Comment</td>
+          <td style="text-align: center"></td>
           <td style="display: none"></td>
         </tr>
       </thead>
@@ -264,6 +257,8 @@
                         <button type="button"  title="Download Excel" class="btn btn-primary buttons"  onclick="uploadStockPackage()" style="background-color: #21127251" id="excel">Excel</button>
                   -->
     <!-- Modal onde é adicionada uma nova linha -->
+   <form id="createNewRow">
+    {% csrf_token %}
     <div
       class="modal fade"
       id="addLinha"
@@ -290,8 +285,9 @@
               <thead></thead>
               <tbody>
                 <div class="form-inline">
-                  <p class="mt-2">Cliente</p>
-                  <input list="clientList" id="getCliente" name="getCliente" />
+                  <p class="mt-2" style="margin-left: 10px;">Cliente</p>
+                  <input  type="text"  list="clientList" id="getCliente" style="margin-left: 42px" name="getCliente"required/>
+                 
                   <datalist id="clientList">
                     {% for clientes in ClientesOEM.all %}
                     <option value="{{clientes.oem}}" ></option>
@@ -302,37 +298,26 @@
                    
                 </div>
                 <div class="form-inline mt-3">
-                  <h6 class="mt-1" >Product:</h6>
-                  <input list="prodList" id="getProds" name="getProds"  />
-                  <datalist id="prodList">
+                  <h6 class="mt-1" style="margin-left: 10px;" >Product:</h6>
+                  <input type="text" list="prodList" id="getProds" style="margin-left: 34px;" name="getProds"required/>
+                  <datalist required id="prodList">
                     {% for produtos in Produtos.all %}
-                    <option value="{{produtos.nome}}"></option>
+                    <option  value="{{produtos.nome}}"></option>
                     {% endfor %}
                   </datalist>
                 </div>
-                {% if erro %}
-                <div class="text-center mb-n2">
-                  <b>{{ erro }}</b>
-                </div>
-                {% endif %}
-
-                <tr></tr>
-
+                 
                 <tr>
-                  <th scope="row" style="color: black">
+                  <th scope="row" style="color: black;width: 1%;">
                     <h6><b>Comment</b></h6>
                   </th>
                   <td>
-                    <input type="text" name="newComment" id="newComment" />
+                    <input type="text" style="margin-left: 1%" name="newComment" id="newComment" />
                   </td>
                 </tr>
               </tbody>
             </table>
-            {% if erro2 %}
-            <div class="text-center">
-              <b>{{ erro2 }}</b>
-            </div>
-            {% endif %}
+         
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss="modal">
@@ -341,7 +326,7 @@
             <button
               type="submit"
               class="btn btn-primary"
-              id="CreateNewRowButton"
+              id="CreateButtonNew"
             >
               Create
             </button>
@@ -349,6 +334,7 @@
         </div>
       </div>
     </div>
+  </form>
 
     <!-- Modal onde é feito o delete de uma linha especifica -->
     <form
@@ -402,81 +388,84 @@
       </div>
     </form>
     <!-- Modal onde é feito EDIT de cada linha -->
-
-    <div
-      class="modal fade"
-      id="updateLinha"
-      tabindex="-1"
-      role="dialog"
-      aria-labelledby="myModalLabel"
-    >
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h3 class="modal-title" id="myModalLabel"><b>Edit Row</b></h3>
-            <button
-              type="button"
-              class="close"
-              data-dismiss="modal"
-              aria-label="Close"
-            >
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <input
-              type="hidden"
-              id="rowIdUpdate"
-              name="rowIdUpdate"
-              value="{{ rowIdUpdate }}"/>
-
-            <h3><b>Replace by: </b></h3>
-            <div class="form-inline">
-               
-              <input list="clientList" id="getClienteEdit" name="getClienteEdit" list="clientList" />
-
-              <datalist id="clientList">
-                {% for clientes in ClientesOEM.all %}
-                <option value="{{clientes.oem}}"></option>
-                {% endfor %}
-              </datalist>
-             
-
+    <form id="editForm" >
+      {% csrf_token %}
+      <div
+        class="modal fade"
+        id="updateLinha"
+        tabindex="-1"
+        role="dialog"
+        aria-labelledby="myModalLabel"
+      >
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <!-- modal onde vai ser adicionado nova relação -->
+              <h3 class="modal-title" id="myModalLabel"><b>Edit Row</b></h3>
+              <input type="hidden" id="rowIdUpdate" name="rowIdUpdate" value="{{ ref.id }}">
+              <button
+                type="button"
+                class="close"
+                data-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
             </div>
-            <div class="form-inline mt-3">
-              <input list="prodList" id="getProdsEdit" name="getProdsEdit" list="prodList" />
-              <datalist id="prodList">
-                {% for produtos in Produtos.all %}
-                <option value="{{produtos.nome}}"></option>
-                {% endfor %}
-              </datalist>
+            <div class="modal-body">
+              <table class="table table-borderless mb-n1">
+                <thead></thead>
+                <tbody>
+                  <h3><b>Replace by: </b></h3>
+                  <div class="form-inline">
+                    <p class="mt-2" style="margin-left: 10px;">Cliente</p>
+                    <input  type="text"  list="clientList" id="getClienteEdit" style="margin-left: 42px" name="getCliente"required/>
+                   
+                    <datalist id="clientList">
+                      {% for clientes in ClientesOEM.all %}
+                      <option value="{{clientes.oem}}" ></option>
+                      {% endfor %}
+                    </datalist>
+                     
+                  </div>
+                  <div class="form-inline mt-3">
+                    <h6 class="mt-1" style="margin-left: 10px;" >Product:</h6>
+                    <input type="text" list="prodList" id="getProdsEdit" style="margin-left: 34px;" name="getProds"required/>
+                    <datalist required id="prodList">
+                      {% for produtos in Produtos.all %}
+                      <option  value="{{produtos.nome}}"></option>
+                      {% endfor %}
+                    </datalist>
+                  </div>
+                   
+                  <tr>
+                    <th scope="row" style="color: black;width: 1%;">
+                      <h6><b>Comment</b></h6>
+                    </th>
+                    <td>
+                      <input type="text" style="margin-left: 1%" name="editComment" id="editComment" />
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+           
             </div>
-            {% if erro %}
-            <div class="text-center mb-n2">
-              <b>{{ erro }}</b>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">
+                Close
+              </button>
+              <button
+                type="submit"
+                class="btn btn-primary"          
+                  
+              >
+                Create
+              </button>
             </div>
-            {% endif %}
-
-            <tr></tr>
-
-            <tr>
-              <th scope="row" style="color: black">
-                <h6><b>Comment</b></h6>
-              </th>
-              <td><input type="text" name="editComment" id="editComment" /></td>
-            </tr>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">
-              Close
-            </button>
-            <button type="submit" class="btn btn-primary" id="EditRowButton">
-              Save
-            </button>
           </div>
         </div>
       </div>
-
+    </form>
       <!-- MODAL DOS CLICAVEIS DO ADD/EDIT-->
       <div
         class="modal fade"
@@ -651,13 +640,83 @@
         </div>
       </div>
     </div>
+    <div id="alerts"></div>
+
+ 
 
     {% endblock %} {% block javascript %}
     <script>
 
+function CreateNewRowButton() {
+  var newComment = $("#newComment").val();
 
+  var clienteAdd = $("#getCliente").val();
+  var produtos =  $("#getProds").val();
+  console.log("FOI CLICADO NO ADD")
+  // var newClient = clienteAdd.querySelector('[value='${"#clientList"}) 
 
+  //console.log("campos-> ",prods,el,clienteAdd, produtos, newComment)
+  console.log("CLIENTES", clienteAdd)
+  var elem = document.getElementById("CreateButtonNew")
+  elem.disabled = true
+  $.ajax({
+    type: "POST",
+    url: "{% url 'pManagement:createClienteProduto' %}",
+    data: {
+      csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
+      newClient : clienteAdd,
+      newProd : produtos,
+      newComment: newComment,
+    },
+    success: function () {
+      elem.disabled = false
+      window.location.replace("{% url 'pManagement:clienteProduto' %}");
+    },
+  });
+}
+        function EditRowButton(scope){
+          console.log("Cliscas-te no save");
+          var rowIdUpdate = $("#rowIdUpdate").val();
+          var cliente = $("#getClienteEdit").val();
+          var prods =  $("#getProdsEdit").val();
+          var novoCommentEdit = $("#editComment").val();
 
+          console.log("REQUEST A CAMINHO COM.... --> ", novoCommentEdit)
+
+          var dataForm = new FormData();
+         // var stockPackages = document.getElementById('getProds').value;
+          dataForm.append("rowIdUpdate", rowIdUpdate);
+          dataForm.append("editComment", novoCommentEdit);
+          dataForm.append("getCliente", cliente);
+          dataForm.append("getProds", prods);
+          dataForm.append(
+            "csrfmiddlewaretoken",
+            $("input[name=csrfmiddlewaretoken]").val()
+          );
+
+          $.ajax({
+            type: "POST",
+            url: "{% url 'pManagement:updateClienteProduto' %}",
+            contentType: false,
+            processData: false,
+            csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
+            data: dataForm,
+          
+            success: function () {
+              elem.disabled = true
+              window.location.reload()
+            },
+          });
+        }
+      
+
+function addAlert(message) {
+  console.log("ENtroi no alerta")
+    $('#alerts').append(
+        '<div class="modal fade">' +
+            '<button type="button" class="close" data-dismiss="alert">' +
+            '&times;</button>' + message + '</div>');
+}
 
       $(".clearable.example .ui.selection.dropdown").dropdown({
         clearable: true,
@@ -668,11 +727,22 @@
       });
 
       $(document).ready(function () {
+          $("#editForm").submit((ev) => {
+            console.log("Running the event")
+            ev.preventDefault()
+            EditRowButton($(this))
+          })
+
+          $("#createNewRow").submit((ev) => {
+            ev.preventDefault()
+            CreateNewRowButton($(this))
+          })
+
         // Setup - add a text input to each footer cell
         $("#example thead th").each(function (i) {
           var title = $("#example thead th").eq($(this).index()).text();
           $(this).html(
-            '<input class="form-control" style="margin-left: -18px" type="text" placeholder="Search ' +
+            '<input class="form-control" style="margin-left: -15px" type="text" placeholder="Search ' +
               title +
               '" data-index="' +
               i +
@@ -699,19 +769,34 @@
           fixedHeader: true,
           height: 1,
           overflowY : "scroll",
+          scrollX: true,
+          scrollY: 460,
+          scrollCollapse: true,
           info: false,
-        
+          order: [[0, 'desc']],
+   
           select: {
             style: "os",
             selector: "th:first-child",
             blurable: true,
           },
+          columnDefs: [{
+                    targets: "_all",
+                    render: function (data, type, row) {
+                        if (data.startsWith('<')) {
+                            return data
+                        }
+                        return data.length > 19 ?
+                            data.substr(0, 19) + '…' :
+                            data;
+                    }
+                }],
 
-          order: [[0, "asc"]],
+          
 
           initComplete: function () {
             this.api()
-              .columns([0, 1])
+              .columns([0, 1, 2])
               .every(function () {
                 $(document).ready(function () {
                   $("td").hover(
@@ -795,7 +880,7 @@
           //alert(data[0] + "'s quantity of " + data[2] + " is: " + data[4]);
           //$("#myModal").modal('show');
           // Add response in Modal body
-          console.log("CLICAS_TE EM ALGO")
+          
           var cliente = data[0];
           var comment = data[2];
           var produto = data[1];
@@ -928,214 +1013,7 @@
 
         /* Clicavel da cell ClientPackage */
         /* Verificar os nomes para conseguires enviar para a view o ID do item selecionado */
-        $(document).on("click", "#CreateNewRowButton", function () {
-          var newComment = $("#newComment").val();
-
-          var clienteAdd = $("#getCliente").val();
-          var produtos =  $("#getProds").val();
-          console.log("FOI CLICADO NO ADD")
-         // var newClient = clienteAdd.querySelector('[value='${"#clientList"}) 
-
-          //console.log("campos-> ",prods,el,clienteAdd, produtos, newComment)
-          console.log("CLIENTES", clienteAdd)
-          
-          if(clienteAdd =="" || clienteAdd == undefined){
-            return alert("Introduza um cliente")
-          }
-          if(produtos =="" || produtos == undefined){
-            return alert("Introduza um produto")
-          }
-
-          $.ajax({
-            type: "POST",
-            url: "{% url 'pManagement:createClienteProduto' %}",
-            data: {
-              csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
-              newClient : clienteAdd,
-              newProd : produtos,
-              newComment: newComment,
-            },
-            complete: function () {
-              window.location.replace("{% url 'pManagement:clienteProduto' %}");
-            },
-          });
-        });
-
-        $(document).on("click", "#EditRowButton", function () {
-          /* $("#example tbody").on("click", "#EditRowButton", function () { */
       
-
-          console.log("Cliscas-te no save");
-          var rowIdUpdate = $("#rowIdUpdate").val();
-          var cliente = $("#getClienteEdit").val();
-          var prods =  $("#getProdsEdit").val();
-          var novoCommentEdit = $("#editComment").val();
-
-
-          console.log("REQUEST A CAMINHO COM.... --> ", novoCommentEdit)
-          /* var stockPackages = [];
-          getProds
-          $.each(tableReturnable.rows(".selected").nodes(), function (i, item) {
-            var data = tableReturnable.row(this).data();
-            stockPackages.push(data[2]);
-          });
- */
-          var dataForm = new FormData();
-         // var stockPackages = document.getElementById('getProds').value;
-          dataForm.append("rowIdUpdate", rowIdUpdate);
-          dataForm.append("editComment", novoCommentEdit);
-          dataForm.append("getCliente", cliente);
-          dataForm.append("getProds", prods);
-          dataForm.append(
-            "csrfmiddlewaretoken",
-            $("input[name=csrfmiddlewaretoken]").val()
-          );
-
-          $.ajax({
-            type: "POST",
-            url: "{% url 'pManagement:updateClienteProduto' %}",
-            contentType: false,
-            processData: false,
-            data: dataForm,
-            success: function () {
-              console.log("[API] Callback to the endpoint sucess");
-            },
-            complete: function () {
-              setTimeout(function(){
-                //window.location.replace("{% url 'pManagement:clienteProduto' %}");
-
-                }, 1300);  
-            },
-          });
-        });
-
-        //----------------------------- para apagar -----------------------------\\
-/*
-        $(document).on("click", "#savePNReturnable", function () {
-          console.log("clicou no antigo returnable");
-          var todosReturnable = [];
-          let todosReturnableFinal = "";
-          $.each(tableReturnable.rows(".selected").nodes(), function (i, item) {
-            var data = tableReturnable.row(this).data();
-            console.log(data[1]);
-            todosReturnable.push(data[1]);
-          });
-          //alert("Part numbers:  " + todosExpendable);
-
-          for (let member in todosReturnable) {
-            todosReturnableFinal += todosReturnable[member];
-            todosReturnableFinal += ",";
-          }
-
-          var pacote = document.getElementById("idPacote").value;
-          var oemEdit = document.getElementById("clienteEdit").value;
-          var produtoEdit = document.getElementById("produtoEdit").value;
-          var commentEdit = document.getElementById("editComment").value;
-
-           $.ajax({
-            type: "POST",
-            url: "/packing/savePNReturnable",
-            data: {
-              csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
-              idReturnable: pacote,
-              listaPNReturnable: todosReturnableFinal,
-            },
-            success: function () {
-              $("#partNumbersReturnable").hide();
-              $("#updateLinha").hide();
-              $(".modal-backdrop").remove();
-
-              $.ajax({
-                type: "GET",
-                url: "/packing/getPNReturnable",
-                data: {
-                  idPacote: pacote,
-                },
-                success: function (response) {
-                  global_listaReturnable = response["listaReturnable"];
-                  console.log("success");
-                  $.ajax({
-                    type: "GET",
-                    url: "/packing/getPNExpendable",
-                    data: {
-                      idPacote: pacote,
-                    },
-                    success: function (response) {
-                      global_listaExpendable = response["listaExpendable"];
-                      console.log("success");
-                      var myModal = new bootstrap.Modal(
-                        document.getElementById("updateLinha")
-                      );
-                      myModal.show();
-
-                      var modalInfo =
-                        "<p>" +
-                        "Client:&emsp;&emsp;" +
-                        oemEdit +
-                        "</p>" +
-                        "<p>" +
-                        "Product: &emsp;" +
-                        produtoEdit +
-                        "</p>" +
-                        "<p>" +
-                        "Comentario:&emsp;<b>" +
-                        commentEdit +
-                        "</b></p>" +
-                        "<p>" +
-                        "Part number Expendable:&emsp;" +
-                        global_listaExpendable +
-                        "</p>";
-
-                      $("#infoEdit").html(modalInfo);
-                      $("#clienteEdit").val(oemEdit);
-                      $("#produtoEdit").val(produtoEdit);
-                      $("#editComment").val(commentEdit);
-                    },
-                  });
-                },
-              });
-            },
-          });
-        });
-
-        var listaLinhaReturnable = $("#listaLinhaReturnable").DataTable({
-          autoWidth: true,
-          info: false,
-          paging: false,
-          scrollCollapse: true,
-          scrollY: "420px",
-          order: [[1, "asc"]],
-        });
-
-        var rows = undefined;
-        $.ajax({
-          type: "GET",
-          url: "{% url 'pManagement:returnListaProdutos' %}",
-          data: {
-            csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
-          },
-          success: function (response) {
-            console.log("Sucesso!!!");
-            rows = response["listaProds"];
-          },
-        });
-
-        $(document).on("click", "#ShowRelProdutsButton", function () {
-          var data = table.row($(this).parents("tr")).data();
-          var relId = data[4];
-          listaLinhaReturnable.clear();
-
-          rows.forEach((element) => {
-            if (relId == element["cliente_id"]) {
-              listaLinhaReturnable.row.add([element["nome"], element["id"]]);
-            }
-          });
-          listaLinhaReturnable.draw();
-          //este callback serve para mostrar a tabela do btn da cell
-          $("#listaClientProd").modal("show");
-        });
-      });
- */
       $(document).on("click", "#excel", function () {
         $.ajax({
           type: "GET",
@@ -1153,12 +1031,10 @@
             element.click();
 
             document.body.removeChild(element);
-          },
+          }});
         });
       });
-    });
     </script>
     {% endblock %}
   </div>
 </div>
- 

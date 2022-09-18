@@ -658,8 +658,12 @@ def enviaEmailShipping(request, user):
 
 
 def enviarEmailSchedule():
+    """  ["pmarti30@visteon.com",'npires2@visteon.com',
+                     'abrandao@visteon.com','sanasta1@visteon.com',
+                    'rsalgue2@visteon.com', 'nlopes8@visteon.com',
+                    'abilro1@visteon.com', 'jrodri80@visteon.com',
+                    'evenanc1@visteon.com'] """
     import locale
-
     locale.setlocale(locale.LC_ALL, "pt-PT")
     timeNow = datetime.datetime.now()
     timeEnd = timeNow.replace(hour=8, minute=10)
@@ -682,6 +686,7 @@ def enviarEmailSchedule():
     if nextDay.strftime("%A") == "Sunday":
         nextDay = datetime.datetime.today() + datetime.timedelta(days=2)
     month = nextDay.strftime("%B")
+    mes = nextDay.strftime("%m")
     fmt_num = nextDay.strftime("%d.%m.%Y")
     mensagem = ""
     textPath = f"//PAVPD002/E_Proj/sharedir/MP&L/Schedule/{nextDay.year}/{month} {nextDay.year}/Daily_Schedule_{fmt_num}.xlsx"  # + nextDay.strftime(
@@ -761,7 +766,7 @@ def enviarEmailSchedule():
                 subject, from_email, to = (
                     "Wh Production " + nextDay.strftime("%d-%m-%Y"),
                     "noreply@visteon.com",
-                    ["pmarti30@visteon.com"],
+                    ["pmarti30@visteon.com "],
                     
                 ) 
                 """ ,'npires2@visteon.com',

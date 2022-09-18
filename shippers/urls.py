@@ -10,9 +10,19 @@ app_name = "shippers"
 
 urlpatterns = [
     path("shippersTracking/", views.shippersTracking, name="shippersTracking"),
+    path("deleteRowTracking/", views.deleteRowTracking, name="deleteRowTracking"),
     path(
         "shippersConfirmation/", views.shippersConfirmation, name="shippersConfirmation"
     ),
+    #Nova PaginaTrackingPage
+    path("trackingPage/", views.trackingPage, name="trackingPage"),
+    path("addLine/", views.addLine, name="addLine"),
+    path("addData/", views.addData, name="addData"),
+    path("addInicioPrep/", views.addInicioPrep, name="addInicioPrep"),
+    path("addFimPrep/", views.addFimPrep, name="addFimPrep"),
+    path("addConfirmacao/", views.addConfirmacao, name="addConfirmacao"),
+    path("addNewRowTracking/", views.addNewRowTracking, name="addNewRowTracking"),
+    #Fim do TrackingPage
     path("tracking/", views.tracking, name="tracking"),
     path("tracking2/", views.tracking2, name="tracking2"),
     path("security/", views.security, name="security"),

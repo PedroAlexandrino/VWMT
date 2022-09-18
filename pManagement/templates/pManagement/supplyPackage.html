@@ -4,9 +4,7 @@
 
 {% block body_title %}
 <style>
-
     .button {
-     
         height: 70px;
        
         font-family: Arial, "Helvetica", sans-serif;
@@ -28,13 +26,7 @@
         box-shadow: inset 0px 1px 0px #FBA51A, 0px 5px 0px 0px #cb7b25, 0px 10px 5px #999;
    
     }
-    
-    .tr-hover
-    {  
-        background-color:#fefefe;
-    }
 
-    
     .buttons{
         padding: 15px 25px;
         background: #FBA51A;
@@ -103,79 +95,30 @@
         text-align: center;
         
     }
-    .buttonFirst{
+
+    .containerPrincipal {
+            height: 70%;
+            width: 100%;
+            top: 11px;
+            left: 0px;
+            position: relative;
+            border-bottom: 3px solid transparent;
+        }
+
+    .containerSecundario {
+        height: 30%;
+        width: 100%;
+        top: 75%;
+        left: 0px;
         position: relative;
-        right:    0;
-        background: #FBA51A;
-        text-align: center;
-        margin: 0;
-        height: auto;
-
-        padding: 2px 5px;
-        font-size: 15px;
-        width: 4%;
-        margin-left: 80%;
-        bottom:   121px;
-
-
+        border: 3px solid transparent;
     }
-    .buttonPrevious{
-        position: relative;
-        right:    0;
-        background: #FBA51A;
-        text-align: center;
-        margin: 0;
-        height: auto;
 
-        padding: 2px 5px;
-        font-size: 15px;
-        width: 4%;
-        margin-left: 84%;
-        bottom:   145px;
-    }
-    .buttonActual{
-        position: relative;
-        right:    0;
-        background: #FBA51A;
-        text-align: center;
-        margin: 0;
-        height: auto;
-
-        padding: 2px 5px;
-        font-size: 15px;
-        width: 2%;
-        margin-left: 88%;
-        bottom:   169px;
-    }
-    .buttonNext{
-        position: relative;
-        right:    0;
-        background: #FBA51A;
-        text-align: center;
-        margin: 0;
-        height: auto;
-
-        padding: 2px 5px;
-        font-size: 15px;
-        width: 3%;
-        margin-left: 90%;
-        bottom:   193px;
-    }
-    .buttonLast{
-        position: relative;
-        right:    0;
-        background: #FBA51A;
-        text-align: center;
-        margin: 0;
-        height: auto;
-
-        padding: 2px 5px;
-        font-size: 15px;
-        width: 3%;
-        margin-left: 93%;
-        bottom:   217px;
+    .custom_link:hover {
+        color: rgb(27, 50, 255);
     }
   
+
  </style>
     <div class="text-primary" xmlns="http://www.w3.org/1999/html">
         <h6><b><i class="fa fa-home text-secondary"></i><a href={% url 'main:main' %}><span
@@ -185,16 +128,8 @@
 
 
 {% block body_content %}
-<div class="containerPath mt-4" style="margin-left: 30px">
-    <div class="path" id="uploadClass">
-        <div class="mt-3">
-            {% if erro %}
-                <br/>
-                <div class="text-center">
-                    <h1><b>{{ erro }}</b></h1>
-                </div>
-                <br/>
-            {% endif %}
+<p></p>
+<div class="containerPrincipal">
             <table id="example" class="stripe hover cell-border " style="width:100%">
                 <thead>
                 <tr>
@@ -212,7 +147,7 @@
                         <div class="fas fa-stopwatch">Suply Time</div>
                     </td>
                     <td>Stock</td>
-                    <td>Inventario</td>
+                    <td>Inventory</td>
                     <td>Link</td>
                     <td></td>
                     <td style="display: none"></td>
@@ -247,7 +182,7 @@
                                     name="{{ kitSuplyPackage.id }}" min="0" id="{{ kitSuplyPackage.id }}"
                                     value="{{ kitSuplyPackage.inventario|default:'0'}}"></td>
                                         
-                                <td class="text-center" id="link">{{ kitSuplyPackage.link }}</td>
+                                <td style="width: 5%" id="link"><a style="color: rgb(27, 50, 255)">{{ kitSuplyPackage.link }}</a></td>
                                 <td>
                                     <div class="form-inline">
                                         <a type="button"  id="botaoEdit" title="edit" class="fas fa-pen-square"
@@ -272,39 +207,34 @@
                     <th></th>
                     <th></th>
                     <th></th>
-                    <th></th>
-                    <th></th>
+                    <th style="text-align: center"> 
+                        <button type="button" title="Update"    class="btn btn-primary btn btn-primary" data-toggle="modal" style="background: #FBA51A;" onclick="botaoUpdateInventario()" > Update </button></th> <!-- Stock -->
+                    <th style="text-align: center"> 
+                        <button   title="Gravar" type="submit"   class="btn btn-primary"id ="botaoUpdateStocks" style="background: #FBA51A;" onclick="botaoUpdateStock()" > Gravar </button>
+                    </th>  <!-- Inv -->
                     <th></th>
                     <th></th>
                     <th style="display: none"></th>
                 </tr>
                 </tfoot>
             </table>
-            
-                <div style="width: 30%; margin-left: 30%; bottom: 10%; position: absolute; border: 3px solid transparent; text-align: center">
+            </div>
+                <div style="width: 30%; margin-left: 30%; bottom: -10%; position: absolute; border: 3px solid transparent; text-align: center">
                     <button type="submit" class="button"  data-toggle="modal"
                             data-target="#addLinha">
                         NOVO ITEM
                     </button>
                 </div>
 
-                <div style="position: absolute;">
+                <div style="position: absolute; bottom: -5%; margin-left: 1%">
                     <button type="button" class="form-control" style="background-color: lightgrey" id="excel">Excel</button>
                 </div>
                     <!-- <button type="button"  title="Download Excel" class="btn btn-primary buttons"  onclick="uploadStockPackage()" style="background-color: #21127251" id="excel">Excel</button> -->
                     <!-- vai haver um btn para dar upload do excel -->
-                    {% csrf_token %}
-                    
-                        <button   title="Gravar" type="submit" style="margin-left: 71%"  class="btn btn-primary buttonsUpdate1"id ="botaoUpdateStocks" onclick="botaoUpdateStock()" > Gravar </button>
-                        {% csrf_token %}
-
-                            <button type="button" title="Update" style="margin-left: 64%"   class="btn btn-primary btn btn-primary buttonsUpdate2" data-toggle="modal" data-target="#updateStock"  > Update </button>
-
-
                             <form method="POST" class="form" action="{% url 'pManagement:updateAllStockSupplyPackage' %}?page="(current_page)
                             enctype="multipart/form-data">
                             {% csrf_token %}
-                            <div class="modal fade" id="updateStock" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                            <div class="modal fade" id="updateStocks" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
                                 <div class="modal-dialog" role="document">
                                     <div class="modal-content">
                                         <div class="modal-header">
@@ -332,6 +262,7 @@
       </button>
 
     <!-- Modal onde é adicionada uma nova linha -->
+      <form id="createSupplyPkg">
         {% csrf_token %}
         <div class="modal fade" id="addLinha" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
             <div class="modal-dialog" role="document">
@@ -344,13 +275,13 @@
                     <div class="modal-body">
                         <div class="form-inline">
                             <p class="mt-2">Package Part number: </p>
-                            <input style="margin-left: 20px" type="text" id="pnAdd" name="pnAdd" value="{{ kitSuplyPackage.part_number}}">
+                            <input style="margin-left: 20px" type="text" id="pnAdd" name="pnAdd" value="{{ kitSuplyPackage.part_number}}"required>
                         </div>
                   
                         <div class="form-inline">
                             <p class="mt-2">Package desctription: </p>
                             <input style="margin-left: 21px" type="text" id="supplyDescriptionAdd" name="prodDescriptionAdd"
-                                   value="{{ kitSuplyPackage.description }}">
+                                   value="{{ kitSuplyPackage.description }}"required>
                         </div>
                         <div class="form-inline">
                             <p class="mt-2">Comment: </p>
@@ -359,7 +290,7 @@
                         </div>
                         <div class="form-inline">
                             <p class="mt-2">Supply Time </p>
-                            <select style="margin-left: 73px; width: 160px" name="supplyTimeAdd" id="supplyTimeAdd">
+                            <select style="margin-left: 73px; width: 160px" name="supplyTimeAdd" id="supplyTimeAdd"required>
                                 <option value=""></option>
                                 <option value="30">30</option>
                                 <option value="60">60</option>
@@ -375,7 +306,7 @@
                         <div class="form-inline">
                             <p class="mt-2">Stock: </p>
                             <input style="margin-left: 110px" type="number" min="0" id="supplyStockAdd" name="prodStockAdd"
-                                   value="{{ kitSuplyPackage.inventario}}">
+                                   value="{{ kitSuplyPackage.inventario}}"required>
                         </div>
                         <div class="form-inline mt-3">
                             <h6 class="mt-1">Link: </h6>
@@ -403,7 +334,7 @@
                             </button>
                     </div>
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary" id="CreateSubmiteButton">Create</button>
+                        <button type="submit" class="btn btn-primary">Create</button>
                     </div>
                 </div>
               
@@ -412,7 +343,7 @@
                 </div>
                
         </div>
-
+    </form>
 
     <!-- Modal onde é feito o delete de uma linha especifica -->
     <form method="POST" class="form" action="{% url 'pManagement:deleteSuplyPackage' %}"
@@ -441,7 +372,6 @@
         </div>
     </form>
 
-
     <div class="modal fade" id="deleteLinha" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -465,6 +395,8 @@
     </div>
 
     <!-- Modal onde é feito EDIT de cada linha -->
+<form id="editSupplyPkg">
+    {% csrf_token %}
     <div class="modal fade" id="updateLinha" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -480,12 +412,12 @@
                     <div class="form-inline mt-3">
                         <h6 class="mt-1">Part Number: </h6>
                         <input placeholder="New description" type="form" name="novoPartNumberEdit"
-                                id="novoPartNumberEdit" style="margin-left: 21px; width: 300px"  value="{{ kitSuplyPackage.part_number}}">
+                                id="novoPartNumberEdit" style="margin-left: 21px; width: 300px"  value="{{ kitSuplyPackage.part_number}}" required>
                     </div>
                     <div class="form-inline mt-3">
                         <h6 class="mt-1">Description: </h6>
                         <input placeholder="New description" type="form" name="novoDescriptionEdit"
-                                id="novoDescriptionEdit" style="margin-left: 25px; width: 300px"  value="{{ kitSuplyPackage.description }}">
+                                id="novoDescriptionEdit" style="margin-left: 25px; width: 300px"  value="{{ kitSuplyPackage.description }}"required>
                     </div>
                     <div class="form-inline mt-3">
                         <h6 class="mt-1">Comment: </h6>
@@ -499,12 +431,12 @@
                             <input style="width: 70px; margin-left: 40px" min="0" class="" 
                             type="number"
                             name="novoStockProdutoEdit" id="novoStockProdutoEdit"
-                            value="{{ kitSuplyPackage.inventario|default:"" }}">
+                            value="{{ kitSuplyPackage.inventario|default:"" }}" required>
                         </th>
                     </div>
                     <div class="form-inline mt-3">
                         <h6 class="mt-1">Supply Time: </h6>
-                        <select style="margin-left: 20px" name="novoSupplyTimeEdit" id="novoSupplyTimeEdit">
+                        <select style="margin-left: 20px" name="novoSupplyTimeEdit" id="novoSupplyTimeEdit"required>
                             <option value=""></option>
                             <option value="30">30</option>
                             <option value="60">60</option>
@@ -518,14 +450,11 @@
                     </div>
                     <div class="form-inline mt-3">
                         <h6 class="mt-1">Link: </h6>
-                                <td><input type="file"  style="margin-left: 67px" name="novolinkEdit"  id="novolinkEdit" value="{{ kitSuplyPackage.link }}"/></td>
+                                <td><input type="file"  style="margin-left: 67px;" name="novolinkEdit"  id="novolinkEdit" value="{{ kitSuplyPackage.link }}"/></td>
                     </div>
                     <div class="form-inline mt-3">
                         <h6 class="mt-1">Client Product: </h6> <!-- partNumbersExpendable -->
-                        <!-- <button type="button" id="openClientPackage" name="openClientPackage" style="margin-left: 33px"> 
-                            Open
-                        </button> -->
-                        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#partNumbersExpendable"style="background-color: #FBA51A; margin-left: 55px"> 
+                        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#partNumbersExpendable"style="background-color: #FBA51A; margin-right: 10px"> 
                             <li class="fa fa-plus fa-fw"></li> Open
                         </button>
                     </div>
@@ -546,88 +475,92 @@
                             NOVO CLIENTE
                         </button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary" id="EditRowButton">Save changes</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
                 </div>
                 
             </div>
             
         </div>
     </div>
+</form>
 
+<!-- Por como form para dar os erros de "empty" -->
+    <form id="CreateCliente">
+        {% csrf_token %}
+<div class="modal fade" id="addClientPackage" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="myModalLabel"><b>New Client/Product</b></h3>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
 
-    <div class="modal fade" id="addClientPackage" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 class="modal-title" id="myModalLabel"><b>New Client/Product</b></h3>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                            aria-hidden="true">&times;</span></button>
-
-                </div>
-                <div class="modal-body">
-                    <table class="table table-borderless mb-n1">
-                      <thead></thead>
-                      <tbody>
-                        <div class="form-inline">
-                          <p class="mt-2">Cliente</p>
-                          <input list="clientList" id="getCliente" name="getCliente" />
-                          <datalist id="clientList">
-                            {% for clientes in ClientesOEM.all %}
-                            <option value="{{clientes.oem}}" ></option>
-                            {% endfor %}
-                          </datalist>
-                          
-        
-                           
-                        </div>
-                        <div class="form-inline mt-3">
-                          <h6 class="mt-1" >Product:</h6>
-                          <input list="prodList" id="getProds" name="getProds"  />
-                          <datalist id="prodList">
-                            {% for produtos in Produtos.all %}
-                            <option value="{{produtos.nome}}"></option>
-                            {% endfor %}
-                          </datalist>
-                        </div>
-                        {% if erro %}
-                        <div class="text-center mb-n2">
-                          <b>{{ erro }}</b>
-                        </div>
-                        {% endif %}
-        
-                        <tr></tr>
-        
-                        <tr>
-                          <th scope="row" style="color: black">
-                            <h6><b>Comment</b></h6>
-                          </th>
-                          <td>
-                            <input type="text" name="newComment" id="newComment" />
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                    {% if erro2 %}
-                    <div class="text-center">
-                      <b>{{ erro2 }}</b>
+            </div>
+            <div class="modal-body">
+                <table class="table table-borderless mb-n1">
+                  <thead></thead>
+                  <tbody>
+                    <div class="form-inline">
+                      <p class="mt-2">Cliente</p>
+                      <input list="clientList" id="getCliente" name="getCliente"required/>
+                      <datalist id="clientList">
+                        {% for clientes in ClientesOEM.all %}
+                        <option value="{{clientes.oem}}" ></option>
+                        {% endfor %}
+                      </datalist>
+                      
+    
+                       
+                    </div>
+                    <div class="form-inline mt-3">
+                      <h6 class="mt-1" >Product:</h6>
+                      <input list="prodList" id="getProds" name="getProds" required />
+                      <datalist id="prodList">
+                        {% for produtos in Produtos.all %}
+                        <option value="{{produtos.nome}}"></option>
+                        {% endfor %}
+                      </datalist>
+                    </div>
+                    {% if erro %}
+                    <div class="text-center mb-n2">
+                      <b>{{ erro }}</b>
                     </div>
                     {% endif %}
-                  
-                    
-                    <!-- <td style="display: none" id="rowIdUpdate" name="rowIdUpdate" value="{{ rowIdUpdate }}"></td> -->
-                    <!-- <td style="display: none" value="{{ kitSuplyPackage.id }}">{{ kitSuplyPackage.id }}</td> -->
-                    <td style="display: none" value="{{ kitSuplyPackage.id }}">{{ kitSuplyPackage.id }}</td>
+    
+                    <tr></tr>
+    
+                    <tr>
+                      <th scope="row" style="color: black">
+                        <h6><b>Comment</b></h6>
+                      </th>
+                      <td>
+                        <input type="text" name="newComment" id="newComment" />
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                {% if erro2 %}
+                <div class="text-center">
+                  <b>{{ erro2 }}</b>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary"  id="CreateClienteSubmiteButton">Save changes</button>
-                </div>
+                {% endif %}
+              
+                
+                <!-- <td style="display: none" id="rowIdUpdate" name="rowIdUpdate" value="{{ rowIdUpdate }}"></td> -->
+                <!-- <td style="display: none" value="{{ kitSuplyPackage.id }}">{{ kitSuplyPackage.id }}</td> -->
+                <td style="display: none" value="{{ kitSuplyPackage.id }}">{{ kitSuplyPackage.id }}</td>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary"  id="CreateButtonNew">Save changes</button>
             </div>
         </div>
     </div>
-
+</div>
+</form>
     <!-- tabelas dos clicaveis -->
     <!-- Clicavél da tablea -->
+
     <div class="modal fade" id="partNumbersExpendable" data-backdrop="false" tabindex="-1" role="dialog"
     aria-labelledby="myModalLabel">
     <div class="modal-dialog" role="document">
@@ -639,6 +572,7 @@
            </div>
            <div class="modal-body">
                <p id="infoLinhaExpendable"></p></br>
+               <div class="containerPrincipal">
                <table id="pnExpendableTable" class="display" style="width: 100%">
                    <thead>
                    <tr>
@@ -648,21 +582,18 @@
                        <th>Prod Comentario</th>
                        <th></th>
                        <th></th>
-                      
                    </tr>
                    </thead>
                    <tbody>
                    {% for pn in cliente_produto.all %}
-                    
-                            <tr>
-                                <td></td>
-                                <td>{{ pn.cliente.oem }}</td>
-                                <td>{{ pn.produto.nome }}</td>
-                                <th>{{ pn.comment }}</th>
-                                <th></th>
-                                <td style="display: none">{{ pn.id }}</td>
-                            </tr>
-                            
+                    <tr>
+                        <td></td>
+                        <td>{{ pn.cliente.oem }}</td>
+                        <td>{{ pn.produto.nome }}</td>
+                        <th>{{ pn.comment }}</th>
+                        <th></th>
+                        <td style="display: none">{{ pn.id }}</td>
+                    </tr>
                    {% endfor %}
                    </tbody>
                    <tfoot>
@@ -678,7 +609,7 @@
                    
                    </tfoot>
                </table>
-               <div class="modal-footer">
+               </div><div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 <!-- <button type="submit" id="savePNExpendable" class="btn btn-primary">Save</button> -->
             </div>
@@ -758,12 +689,13 @@
            </div>
            <div class="modal-body">
                <p id="listaLinhaReturnable"></p></br>
+               
                <table id="ListaClientes" class="stripe hover cell-border" style="width:100%">
                    <thead>
                     <tr>
-                        <th>Clients</th>
-                        <th>Products</th>
-                        <th>Comment</th>
+                        <th style="text-align: center">Clients</th>
+                        <th style="text-align: center">Products</th>
+                        <th style="text-align: center">Comment</th>
                       
                     </tr>
                    </thead>
@@ -784,6 +716,7 @@
                     </tr>
                    </tfoot>
                </table>
+              
            </div>
            <div class="modal-footer">
                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -799,18 +732,17 @@ aria-labelledby="myModalLabel">
    <div class="modal-content">
        <div class="modal-header">
            <h3 class="modal-title" id="myModalLabel"><b>Products</b></h3>
-           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                   aria-hidden="true">&times;</span></button>
+           
        </div>
        <div class="modal-body">
            <p id="listaLinhaReturnable"></p></br>
-           <table id="listaPnReturnable" class="stripe hover cell-border" style="width:100%">
+           <table id="listaPnReturnable" class="stripe hover cell-border" style="width:100%;">
                <thead>
                 <tr>
-                    <th>Part Number</th>
-                    <th>Description</th>
-                    <th>Stock</th>
-                    <th>Type</th>
+                    <th style="text-align: center">Part Number</th>
+                    <th style="text-align: center">Description</th>
+                    <th style="text-align: center">Stock</th>
+                    <th style="text-align: center">Type</th>
                    
                 </tr>
                </thead>
@@ -881,10 +813,7 @@ aria-labelledby="myModalLabel">
         </div>
     </div>
 
-    
-
-
-<!-- MODAL DOS CLICAVEIS DO ADD/EDIT-->
+      
   
 
 {% endblock %}
@@ -904,9 +833,239 @@ aria-labelledby="myModalLabel">
             })
         ;
 
-$(document).ready(function () {
+/* $(document).on('click', '#CreateSubmiteButton', function () { */
+    function CreateSubmiteButton(scope){
+    var elem = document.getElementById("CreateButtonNew")//Ver o id do btn(save)
+    elem.disabled = true
+    var pnAdd = $("#pnAdd").val()
+    var supplyDescriptionAdd = $("#supplyDescriptionAdd").val();
+    var supplyCommentAdd = $("#supplyCommentAdd").val();
+    var supplyTimeAdd = $("#supplyTimeAdd").val();
+    var supplyStockAdd = $("#supplyStockAdd").val();
+    var novoLinkEdit = document.getElementById("novoLinkEdit").files[0]//$("#novoLinkEdit").val();
+    var clients = []
+    var stockPackages = []
+    var tableReturnable = $('#pnReturnable').DataTable()
+    var tableExpendable = $('#pnExpendableTable').DataTable()
 
-    $('#example tbody').on('click', '#link', function () {
+    $.each(tableReturnable.rows('.selected').nodes(), function (i, item) {
+        var data = tableReturnable.row(this).data();
+        console.log("tableReturnable", data);
+        stockPackages.push(data[3])
+    });
+    console.log("stockPackages ",stockPackages)
+
+    $.each(tableExpendable.rows('.selected').nodes(), function (i, item) {
+        var data = tableExpendable.row(this).data();
+        console.log("tableExpendable", data);
+        clients.push(data[5])
+    });
+    console.log("VALUES", pnAdd,supplyDescriptionAdd,supplyCommentAdd,supplyStockAdd)
+    console.log("StockPackage/ Clientes", stockPackages,clients)
+    var elem = document.getElementById("CreateButtonNew")
+            elem.disabled = true
+    var dataForm = new FormData();
+    dataForm.append(
+        "pnAdd", pnAdd
+    )
+    dataForm.append(
+        "prodDescriptionAdd", supplyDescriptionAdd
+    )
+    dataForm.append(
+        "prodCommentAdd", supplyCommentAdd
+    )
+    dataForm.append(
+        "supplyTimeAdd", supplyTimeAdd
+    )
+    dataForm.append(
+        "prodStockAdd", supplyStockAdd
+    )
+    dataForm.append(
+        "novoLinkEdit", novoLinkEdit
+    )
+    dataForm.append(
+        "clients", clients
+    )
+    dataForm.append(
+        "stockPackages", stockPackages
+    )
+    dataForm.append(
+        "csrfmiddlewaretoken", $("input[name=csrfmiddlewaretoken]").val()
+    )
+  
+    $.ajax({
+            type: 'POST',
+            url: "{% url 'pManagement:addRowSupplyPackage' %}",
+            contentType: false,
+            processData: false,
+            data: dataForm,
+            success: function () {
+                console.log("[API] Callback to the endpoint sucess")
+                elem.disabled = false
+                return true;
+            },
+            complete: function () {
+                return true;
+                elem.disabled = false
+                window.location.reload()
+            }
+        }) 
+};
+
+/* $(document).on('click', '#EditRowButton', function () { */
+function EditRowButton(scope) {
+    console.log("Doing the edit callback.")
+    var rowIdUpdate = $("#rowIdUpdate").val()
+    var novoPartNumberEdit = $("#novoPartNumberEdit").val()
+    var novoDescriptionEdit = $("#novoDescriptionEdit").val()
+    var novoCommentEdit = $("#novoCommentEdit").val()
+    var novoStockProdutoEdit = $("#novoStockProdutoEdit").val()
+    var novoSupplyTimeEdit = $("#novoSupplyTimeEdit").val()
+    var novolinkEdit = document.getElementById("novolinkEdit").files[0]
+    var clients = []
+    var stockPackages = []
+    var tableReturnable = $('#pnReturnable').DataTable()
+    var tableExpendable = $('#pnExpendableTable').DataTable()
+
+ /*    if(novoPartNumberEdit=="" || novoPartNumberEdit == undefined){
+        return alert("Deve introduzir um Part-Number");
+    }
+    if(novoStockProdutoEdit <0){
+        return alert("O stock deve ser um valor positivo")
+    }
+    if(novolinkEdit == undefined || novolinkEdit == ""){
+                alert("Link vazio")
+            }
+            else{
+                if(!novolinkEdit.name.endsWith("pptx")){
+                return alert("Not a valid file");
+            }
+        } */
+
+    console.log("DADOS->", rowIdUpdate,novoPartNumberEdit,novoDescriptionEdit,novoStockProdutoEdit,novoSupplyTimeEdit,novoLinkEdit)
+    $.each(tableReturnable.rows('.selected').nodes(), function (i, item) {
+        var data = tableReturnable.row(this).data();
+        console.log("tableReturnableasd", data);
+        stockPackages.push(data[3])
+    });
+
+    $.each(tableExpendable.rows('.selected').nodes(), function (i, item) {
+        var data = tableExpendable.row(this).data();
+        console.log("tableExpendablesade", data);
+        clients.push(data[5])
+    });
+
+    console.log("CLIENTES",clients)
+    console.log("STOCKPACK",stockPackages)
+
+    if(!novoPartNumberEdit.length){
+        return alert("Part-number is not valid")
+    }
+    if(novoStockProdutoEdit < 0){
+        return alert("You must set a valid Stock")
+    }
+    if(novoSupplyTimeEdit < 0){
+        return alert("You must set a valid Supply-Time")
+    }
+
+    var dataForm = new FormData();
+    dataForm.append(
+        "rowIdUpdate", rowIdUpdate
+    )
+    dataForm.append(
+        "novoPartNumberEdit", novoPartNumberEdit
+    )
+    dataForm.append(
+        "novoDescriptionEdit", novoDescriptionEdit
+    )
+    dataForm.append(
+        "novoCommentEdit", novoCommentEdit
+    )
+    dataForm.append(
+        "novoStockProdutoEdit", novoStockProdutoEdit
+    )
+    dataForm.append(
+        "novoSupplyTimeEdit", novoSupplyTimeEdit
+    )
+    dataForm.append(
+        "novolinkEdit", novolinkEdit
+    )
+    dataForm.append(
+        "clients", clients
+    )
+    dataForm.append(
+        "stockPackages", stockPackages
+    )
+    dataForm.append(
+        "csrfmiddlewaretoken", $('input[name=csrfmiddlewaretoken]').val()
+    ) 
+
+    
+    $.ajax({
+            type: 'POST',
+            url: "{% url 'pManagement:updateSupplyPackage' %}",
+            contentType: false,
+            processData: false,
+            data: dataForm,
+            success: function () {
+                console.log("[API] Callback to the endpoint sucess")
+                window.location.reload()
+            },
+            complete: function () {
+            }
+        }) 
+}
+        
+ function CreateClienteSubmiteButton(scope) {
+    var newComment = $("#newComment").val();
+    var clienteAdd = $("#getCliente").val();
+    var produtos =  $("#getProds").val();
+    var tableExpendable = $('#tableExpendable').DataTable();
+
+    $.ajax({
+        type: 'POST',
+        url: "{% url 'pManagement:createClienteProduto' %}",
+        data: {
+            csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+            newClient : clienteAdd,
+            newProd : produtos,
+            newComment: newComment,
+        },
+        success: function (resp) {
+            console.log(resp)
+            console.log("Chegou ao  DRAW")
+            tableExpendable.row.add(
+                ["", clienteAdd, produtos, newComment, "", resp["id"]]
+            ).draw()//BUG tabela não esta visivél aqui
+            console.log("PASSOU O DRAW")
+            $("#addClientPackage").modal('hide');
+            console.log("[API] Callback to the endpoint sucess")
+        },
+    })
+}
+  
+
+
+$(document).ready(function () {
+    $("#createSupplyPkg").submit((ev) => {
+        console.log("createSupplyPkg")
+        ev.preventDefault()
+        CreateSubmiteButton($(this))
+    })
+
+    $("#editSupplyPkg").submit((ev) => {
+        console.log("editSupplyPkg")
+        ev.preventDefault()
+        EditRowButton($(this))
+    })
+
+    $("#CreateCliente").submit((ev) => {
+        console.log("CreateCliente")
+        ev.preventDefault()
+        CreateClienteSubmiteButton($(this))
+    })
+
+   /*  $('#example tbody').on('click', '#linka', function () {
         var data = table.row($(this).parents('tr')).data();
         var link = data[8]
         
@@ -923,8 +1082,30 @@ $(document).ready(function () {
             window.open("{% url 'pManagement:pdf_view1' %}?link=" + link, '_blank').focus();
         }
     
+}); */
+
+$('#example tbody').on('click', '#link', function () {
+    var data = table.row($(this).parents('tr')).data();
+    var link = $(data[8]).html()
+    if(link == "" || link == undefined){return}
+
+    const DefaultMixinCss = Swal.mixin({
+        customClass: {
+            confirmButton: 'btn btn-primary',
+            cancelButton: 'btn btn-danger'
+        },
+        buttonsStyling: false
+    }).fire({
+        title: 'Are you sure you want to continue?',
+        showCancelButton: true,
+        confirmButtonText: 'Yes',
+        cancelButtonText: `No`,
+        }).then((result) => {
+        if (result.isConfirmed) {
+            window.open("{% url 'pManagement:pdf_view1' %}?link=" + link, '_blank').focus();
+        }
+    })
 });
- 
 
 
 
@@ -1041,7 +1222,7 @@ var tableExpendable = $('#pnExpendableTable').DataTable({
 
 var listaClientes = $("#ListaClientes").DataTable({
     "info": false,
-    "scrollY": "294",
+    
     "paging": false,
     "ordering": false,
     "orderCellsTop": true,
@@ -1057,7 +1238,7 @@ var listaClientes = $("#ListaClientes").DataTable({
 
 var listaPnReturnable = $("#listaPnReturnable").DataTable({
     "info": false,
-    "scrollY": "294",
+     
     "paging": false,
     "ordering": false,
     "orderCellsTop": true,
@@ -1080,8 +1261,6 @@ $('#example thead th').each(function (i) {
     var title = $('#example thead th').eq($(this).index()).text();
     $(this).html('<input class="form-control" style="margin-left: -18px" type="text" placeholder="Search ' + title + '" data-index="' + i + '" />');
 });
-
-
 
     //Tabela do primeiro btn (ClientPackage)
     $('#pnReturnable tfoot th').each(function (i) {
@@ -1213,216 +1392,10 @@ $('#partNumbersReturnable').on('shown.bs.modal', function (e) {
 
 
 
-$(document).on('click', '#EditRowButton', function () {
-    var rowIdUpdate = $("#rowIdUpdate").val()
-    var novoPartNumberEdit = $("#novoPartNumberEdit").val()
-    var novoDescriptionEdit = $("#novoDescriptionEdit").val()
-    var novoCommentEdit = $("#novoCommentEdit").val()
-    var novoStockProdutoEdit = $("#novoStockProdutoEdit").val()
-    var novoSupplyTimeEdit = $("#novoSupplyTimeEdit").val()
-    var novolinkEdit = document.getElementById("novolinkEdit").files[0]
-    var clients = []
-    var stockPackages = []
 
-    if(novoPartNumberEdit=="" || novoPartNumberEdit == undefined){
-        return alert("Deve introduzir um Part-Number");
-    }
-    if(novoStockProdutoEdit <0){
-        return alert("O stock deve ser um valor positivo")
-    }
-    if(novolinkEdit == undefined || novolinkEdit == ""){
-                alert("Link vazio")
-            }
-            else{
-                if(!novolinkEdit.name.endsWith("pptx")){
-                return alert("Not a valid file");
-            }
-        }
-
-    console.log("DADOS->", rowIdUpdate,novoPartNumberEdit,novoDescriptionEdit,novoStockProdutoEdit,novoSupplyTimeEdit,novoLinkEdit)
-    $.each(tableReturnable.rows('.selected').nodes(), function (i, item) {
-        var data = tableReturnable.row(this).data();
-        console.log("tableReturnableasd", data);
-        stockPackages.push(data[3])
-    });
-
-    $.each(tableExpendable.rows('.selected').nodes(), function (i, item) {
-        var data = tableExpendable.row(this).data();
-        console.log("tableExpendablesade", data);
-        clients.push(data[5])
-    });
-
-    console.log("CLIENTES",clients)
-    console.log("STOCKPACK",stockPackages)
-
-    if(!novoPartNumberEdit.length){
-        return alert("Part-number is not valid")
-    }
-    if(novoStockProdutoEdit < 0){
-        return alert("You must set a valid Stock")
-    }
-    if(novoSupplyTimeEdit < 0){
-        return alert("You must set a valid Supply-Time")
-    }
-
-    var dataForm = new FormData();
-    dataForm.append(
-        "rowIdUpdate", rowIdUpdate
-    )
-    dataForm.append(
-        "novoPartNumberEdit", novoPartNumberEdit
-    )
-    dataForm.append(
-        "novoDescriptionEdit", novoDescriptionEdit
-    )
-    dataForm.append(
-        "novoCommentEdit", novoCommentEdit
-    )
-    dataForm.append(
-        "novoStockProdutoEdit", novoStockProdutoEdit
-    )
-    dataForm.append(
-        "novoSupplyTimeEdit", novoSupplyTimeEdit
-    )
-    dataForm.append(
-        "novolinkEdit", novolinkEdit
-    )
-    dataForm.append(
-        "clients", clients
-    )
-    dataForm.append(
-        "stockPackages", stockPackages
-    )
-        dataForm.append(
-        "csrfmiddlewaretoken", $('input[name=csrfmiddlewaretoken]').val()
-    ) 
-  
-
-    $.ajax({
-            type: 'POST',
-            url: "{% url 'pManagement:updateSupplyPackage' %}",
-            contentType: false,
-            processData: false,
-            data: dataForm,
-            success: function () {
-                console.log("[API] Callback to the endpoint sucess")
-            },
-            complete: function () {
-                window.location.replace("{% url 'pManagement:updateSupplyPackage' %}")
-            }
-        }) 
-})
         
-$(document).on('click', '#CreateClienteSubmiteButton', function () {
-        var newComment = $("#newComment").val();
-        console.log("TESTE")
-        var clienteAdd = $("#getCliente").val();
-        var produtos =  $("#getProds").val();
 
-    $.ajax({
-        type: 'POST',
-        url: "{% url 'pManagement:createClienteProduto' %}",
-        data: {
-            csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
-            newClient : clienteAdd,
-            newProd : produtos,
-            newComment: newComment,
-        },
-        success: function (resp) {
-           
-            
-            console.log("[API] Callback to the endpoint sucess")
-            $("CreateClienteSubmiteButton").hide()
-        },
-       
-    })
-})
-$(document).on('click', '#CreateSubmiteButton', function () {
-    /* var prodNameAdd = $("prodNameAdd").val(); */
-   
-    var pnAdd = $("#pnAdd").val()
-    var supplyDescriptionAdd = $("#supplyDescriptionAdd").val();
-    var supplyCommentAdd = $("#supplyCommentAdd").val();
-    var supplyTimeAdd = $("#supplyTimeAdd").val();
-    var supplyStockAdd = $("#supplyStockAdd").val();
-    var novoLinkEdit = document.getElementById("novoLinkEdit").files[0]//$("#novoLinkEdit").val();
-    var clients = []
-    var stockPackages = []
 
-    $.each(tableReturnable.rows('.selected').nodes(), function (i, item) {
-        var data = tableReturnable.row(this).data();
-        console.log("tableReturnable", data);
-        stockPackages.push(data[3])
-    });
-    console.log("stockPackages ",stockPackages)
-
-    $.each(tableExpendable.rows('.selected').nodes(), function (i, item) {
-        var data = tableExpendable.row(this).data();
-        console.log("tableExpendable", data);
-        clients.push(data[5])
-    });
-    
-    console.log("Dados ",pnAdd,supplyDescriptionAdd,supplyCommentAdd,supplyTimeAdd,supplyStockAdd,novoLinkEdit)
-
-    if(!pnAdd.length){
-        return alert("Part-number não é válido")
-    }
-    if(supplyStockAdd < 0){
-        return alert("O stock deve ser um valor positivo")
-    }
-    if(supplyTimeAdd < 0 ){
-        return alert("Supply-Time em de ser um valor positivo")
-    }
-    if(novoLinkEdit == undefined || novoLinkEdit == ""){
-            alert("Link vazio")
-    }else{
-        if(!novoLinkEdit.name.endsWith("pptx")){
-            return alert("Not a valid file");
-        }}
-
-    console.log("StockPackage/ Clientes", stockPackages,clients)
-    var dataForm = new FormData();
-    dataForm.append(
-        "pnAdd", pnAdd
-    )
-    dataForm.append(
-        "prodDescriptionAdd", supplyDescriptionAdd
-    )
-    dataForm.append(
-        "prodCommentAdd", supplyCommentAdd
-    )
-    dataForm.append(
-        "supplyTimeAdd", supplyTimeAdd
-    )
-    dataForm.append(
-        "prodStockAdd", supplyStockAdd
-    )
-    dataForm.append(
-        "novoLinkEdit", novoLinkEdit
-    )
-    dataForm.append(
-        "clients", clients
-    )
-    dataForm.append(
-        "stockPackages", stockPackages
-    )
-    dataForm.append(
-        "csrfmiddlewaretoken", $('input[name=csrfmiddlewaretoken]').val()
-    )
-    $.ajax({
-            type: 'POST',
-            url: "{% url 'pManagement:addRowSupplyPackage' %}",
-            contentType: false,
-            processData: false,
-            data: dataForm,
-            success: function () {
-                console.log("[API] Callback to the endpoint sucess")
-            },
-            complete: function () {
-               // window.location.replace("{% url 'pManagement:supplyPackage' %}")
-            }
-        }) 
-});
 
 /* Aqui trata do clicavél do (novo Item) o clientPackage */
         $(document).on('click', '#openClientPackage', function () {
@@ -1553,7 +1526,17 @@ $('#example').on('change', 'input', function () {
         fixedHeader: true,
         "scrollY": 400,
         "info": false,
-        
+        columnDefs: [{
+                    targets: "_all",
+                    render: function (data, type, row) {
+                        if (data.startsWith('<')) {
+                            return data
+                        }
+                        return data.length > 19 ?
+                            data.substr(0, 19) + '…' : 
+                            data;
+                    }
+                }],
         
         
         select: {
@@ -1790,7 +1773,12 @@ $('#example').on('change', 'input', function () {
         */
 
         function botaoUpdateStock() {
-            console.log("tas no btn GRAVAR")
+            const DefaultMixinCss = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-primary',
+                    cancelButton: 'btn btn-danger'
+                },
+                buttonsStyling: false})
             var inventorys = []
             var ids = []
 
@@ -1801,8 +1789,14 @@ $('#example').on('change', 'input', function () {
                
                 inventorys.push(row.val())
                 if(row.val() <0){
-                   return alert("You must set a valid Stock in all entries")
-                    console.log("ENTROI")
+                    DefaultMixinCss.fire({
+                title: 'All Stocks must be valid numbers',
+                showCancelButton: false,
+                confirmButtonText: 'Yes',
+                })
+                     return false
+
+
             }
                 ids.push(row.attr("id"))  
             }
@@ -1826,30 +1820,44 @@ $('#example').on('change', 'input', function () {
         }
 
 
+
+
         function botaoUpdateInventario() {
-            console.log("TAS NO BTN UPDATE")
-            var inventorys = []
+            // FAZEr verificação antes do ouytro popup, caso haja negativos ele nem mostra o outro..
+            const DefaultMixinCss = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-primary',
+                    cancelButton: 'btn btn-danger'
+                },
+                buttonsStyling: false
+            })
+             DefaultMixinCss.fire({
+                title: 'Are you sure you want to continue to Update?',
+                showCancelButton: true,
+                confirmButtonText: 'Yes',
+                cancelButtonText: `No`,
+                }).then((result) => {
+                if (result.isConfirmed) {
+                    var inventorys = []
             var ids = []
             var quantidades = []
-
             var table = document.getElementById('example');
-            
-        
             for (var i = 1, n = table.rows.length - 1; i < n; i++){
-                console.log("I--> ", i)
                 quantidades.push(table.rows[i].cells[8].innerHTML)
                 var row = $(table.rows[i].cells[7].innerHTML)
-              
                 inventorys.push(row.val())
+                
                 if(row.val() <0){
-                    return alert("You must set a valid Stock in all entries")
+                    DefaultMixinCss.fire({
+                title: 'All Stocks must be valid numbers',
+                showCancelButton: false,
+                confirmButtonText: 'Yes',
+                })
+                     return false
                 }
-                ids.push(row.attr("id"))  
+            ids.push(row.attr("id"))  
             }
-
             console.log("Making the request at updateInventory")
-           
-           
             $.ajax({
                 type: 'POST',
                 url: "{% url 'pManagement:updateInventorySupplyPackage' %}",
@@ -1860,18 +1868,16 @@ $('#example').on('change', 'input', function () {
                     quantidades: quantidades,
                 },
                 success: function () {
-
                     console.log("[API] Callback to the endpoint sucess")
                 },
                 complete: function () {
                     window.location.reload()
-                
-                console.log("[API] Callback to the endpoint went bad")
                 }
             }) 
-    
+                }
+            })
         }
-
+      
 
         function ClearFilters() {
             $('.form-control').val('');  // Clear ext and select inputs with classname form-control
@@ -1885,9 +1891,25 @@ $('#example').on('change', 'input', function () {
         }
 
         function uploadStockPackage() {
+            const DefaultMixinCss = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-primary',
+                    cancelButton: 'btn btn-danger'
+                },
+                buttonsStyling: false
+            })
             console.log("Button upload")
             var data = new FormData()
             var file = $("#myfile")[0].files[0]
+            if(file==undefined){
+               return DefaultMixinCss.fire({
+                title: 'No file to upload',
+                showCancelButton: false,
+                confirmButtonText: 'OK',
+                
+                })
+
+            }
             data.append("myfile", file)
             data.append("csrfmiddlewaretoken", $('input[name=csrfmiddlewaretoken]').val())
 
@@ -1902,9 +1924,7 @@ $('#example').on('change', 'input', function () {
                 success: function () {
                     console.log("[API] Callback to the endpoint sucess")
                 },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    alert(jqXHR.responseText);
-                },
+               
                 complete: function () {
                     window.location.reload()
                 }
@@ -1989,7 +2009,6 @@ $('#example').on('change', 'input', function () {
 
     
             $(document).on('click', '#savePNReturnable', function () {
-                console.log("clicou no antigo returnable")
                 var todosReturnable = []
                 let todosReturnableFinal = ""
                 $.each(tableReturnable.rows('.selected').nodes(), function (i, item) {

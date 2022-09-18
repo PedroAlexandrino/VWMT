@@ -1,0 +1,382 @@
+{% extends "vware/baseArmazem.html" %}
+{% load static %}
+<!-- TRACKING ORIGINAL -->
+
+{% block body_title %}
+  <div class="text-primary" xmlns="http://www.w3.org/1999/html">
+    <h6>
+      <b
+        ><i class="fa fa-home text-secondary"></i><a href={% url 'main:main' %}><span class="text-secondary"> 
+          Home | </span></a> Tracking Page</b>
+    </h6>
+  </div>
+  {% endblock %}
+  {% block body_content %}
+  <p></p>
+
+  <div class="containerPrincipal">
+    <table id="example" class="stripe hover cell-border " style="width:100%;" >
+        <thead>
+        <tr>
+            <td style="text-align: center">Data</td>
+            <td style="text-align: center">Nº Shipper</td>
+            <td style="text-align: center">QT Cx</td>
+            <td style="text-align: center">Inicio Prep.</td>
+            <td style="text-align: center">Fim Prep.</td>
+            <td style="text-align: center">Confirmação</td>
+            <td style="text-align: center">Comentários</td>
+            <td></td>
+            <td style="display: none" ></td>
+        </tr>
+        </thead>
+        <tbody>
+        {% for tracking in items %}
+        <tr>
+
+            {% if tracking.confirmacao != None %}
+            <td style="width: 10%;text-align: center; background-color: lightgreen;" title="{{ tracking.data|default:'Empty' }}"  id="data_"  >
+                {{ tracking.data|default:""}}
+                {% else %}
+
+            <td style="width: 10%;text-align: center" title="{{ tracking.data|default:'Empty' }}"  id="data_"  >
+                {% if tracking.data != None %}
+                    {{ tracking.data|default:""}}
+                {% else %}
+                {% if not user in users_in_group %}
+                <button title="Data" disabled="true" type="submit" style="background: #FBA51A;text-align: center" class="btn btn-primary" id="botaoUpdateData" onclick="getButtonDate(this, 'data_')">Prep Data</button>
+                {% else %}
+                    <button title="Data"  type="submit" style="background: #FBA51A;text-align: center" class="btn btn-primary" id="botaoUpdateData" onclick="getButtonDate(this, 'data_')">Prep Data</button>
+                    {% endif %}
+                {% endif %}
+                {% endif %}
+                </td>
+
+            <td style="width: 20%;text-align: center" title="{{ tracking.nShipper|default:'Empty' }}" contenteditable id="nShipper" class="editable">{{ tracking.nShipper|default:""}}</td>
+            <td style="width: 10%;text-align: center" title="{{ tracking.qtyCaixas|default:'Empty' }}" contenteditable id="qtyCaixas" class="editable">{{ tracking.qtyCaixas|default:""}}</td>
+          
+            <td style="width: 10%;text-align: center;" title="{{ tracking.inicioPrep|default:'Empty'}}" id="inicioPreps">
+                {% if tracking.inicioPrep != None  %}
+                    {{ tracking.inicioPrep|default:""}}
+                {% else %}
+                    {% if tracking.data == None or not user in users_in_group  %}
+                    
+                        <button title="Editar" disabled="true" type="submit" style="background: #FBA51A;" class="btn btn-primary" id="botaoUpdateInicioPrep" onclick="getButtonDate(this, 'inicioPrep')">Inicio Prep</button>
+                    {% else %}
+                      <button title="Editar"  type="submit" style="background: #FBA51A;" class="btn btn-primary" id="botaoUpdateInicioPrep" onclick="getButtonDate(this, 'inicioPrep')">Inicio Prep</button>
+                    {% endif %}
+                {% endif %}
+                </td>
+            
+            <td style="width: 10%" class="text-center" id="fimPrep">
+                {% if tracking.fimPrep != None %}
+                    {{ tracking.fimPrep|default:""}}
+                {% else %}
+                {% if tracking.inicioPrep == None or not user in users_in_group  %}
+
+                <button title="Editar" disabled="true"  type="submit" style="background: #FBA51A;" class="btn btn-primary" id="botaoFimPrep" onclick="getButtonDate(this, 'fimPrep')">Fim Prep</button>
+                {% else %}
+                    <button title="Editar"  type="submit" style="background: #FBA51A;" class="btn btn-primary" id="botaoFimPrep" onclick="getButtonDate(this, 'fimPrep')">Fim Prep</button>
+                    {% endif %}
+                    {% endif %}
+                </td>
+            <td style="width: 5%;text-align: center" id="confirmacao">
+                {% if tracking.confirmacao != None  %}
+                    {{ tracking.confirmacao|default:""}}
+                {% else %}
+                {% if tracking.fimPrep == None  or not user in users_in_group  %}
+                <button title="Editar"  disabled="true" type="submit" style="background: #FBA51A;" class="btn btn-primary" id="botaoConfirmacao" onclick="getButtonDate(this, 'confirmacao')">Confirmação</button>
+                {% else %}
+                    <button title="Editar"  type="submit" style="background: #FBA51A;" class="btn btn-primary" id="botaoConfirmacao" onclick="getButtonDate(this, 'confirmacao')">Confirmação</button>
+                {% endif %}
+                {% endif %}
+            </td>
+            
+            <td style="width: 20%;text-align: center;"  title="{{ tracking.comentarios|default:'Empty' }}" contenteditable id="comentario" class="editable"
+            >{{ tracking.comentarios|default:""}}</td>
+            <td style="width: 7%">
+                <div class="form-inline">
+                   
+                    <a type="button" id="botaoDelete" title="Delete" class="fas fa-trash-alt"
+                       style="margin-left: 10px; height: 18px"
+                       data-toggle="modal" data-target="#deleteLinha">
+                    </a>
+                </div>
+            </td>
+            <td style="display: none" id="idSave" value="{{ tracking.id }}">{{ tracking.id }}</td>
+        </tr>
+   
+    {% endfor %}
+        </tbody>
+        <tfoot>
+        <tr>
+            <th style="text-align: center" >Data</th>
+            <th style="text-align: center">Nº Shipper</th>
+            <th style="text-align: center">QT Cx</th>
+            <th style="text-align: center">Inicio Prep</th>
+            <th style="text-align: center"> Fim Prep </th>
+            <th style="text-align: center">Confirmação</th> <!-- Stock -->
+            <th style="text-align: center">Comentários<th>
+            <th style="display: none" ></th>
+        </tr>
+        </tfoot>
+    </table>
+    
+    <p id="datepicker" style="display: none" />
+
+
+    <h6><b><i style="font-size: 20px"></i><a type="button"
+        class="fas fa-plus-circle fa-3x button5"
+        id="newRow"
+        onclick="addNewRow()"
+        style="color: orange; background-color: black; border-radius: 50%; margin-top: 10%;margin-left: 50%;"></a></b>
+        {% csrf_token %}
+    </h6>
+
+    
+    
+    <form method="POST" class="form" action="{% url 'shippers:deleteRowTracking' %}"
+          enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal fade" id="deleteLinha" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title" id="myModalLabel"><b>Delete this row?</b></h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="infoDelete"></p></br>
+                        <input type="hidden" id="rowIdDelete" name="rowIdDelete" value="{{rowIdDelete}}">
+                       
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Delete</button>
+                    </div>
+                </div>
+                </div>
+            </div>
+    </form>
+    
+    {% endblock %} {% block javascript %}
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="/resources/demos/style.css">
+    <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/confetti.css">
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="../../static/js/tabledit.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <style>
+.bg-golden {
+    background-color: #ffd89a;
+    animation-name: colorAnim;
+    animation-duration: .2s;
+}
+
+@keyframes colorAnim {
+    from {background-color: unset;}
+    to {background-color: #ffd89a;}
+}
+
+.flatpickr-wrapper {
+    position: fixed;
+    top: 70%;
+    left: 80%;
+}
+</style>
+
+<script>
+        $("#datepicker").flatpickr({
+            inline: true,
+            dateFormat: "Y-m-d",
+            altInput: true,
+            altFormat: "F j, Y at H:i",
+            showMonths: 1,
+            clickOpens: false,
+            altInputClass: "display: none;",
+            altInput: true,
+            static: true,
+            mode: "multiple",
+
+            onChange: function(selectedDates, dateStr, instance) {
+                const re = dateStr.replace(/\s/g, "").split(",").join('|')
+                const trs = document.querySelectorAll('#example tr:not(.header)')
+
+                const regex = new RegExp(re)
+                const isFoundInTds = td => regex.test(td.innerHTML)
+                const setTrStyleDisplay = ({ style, children }) => {
+                    style.display = isFoundInTds(
+                    children[0]
+                    ) ? '' : 'none' 
+                }
+                
+                trs.forEach(setTrStyleDisplay)
+            },
+        });
+
+   var table = $("#example").DataTable({
+          paging: false,
+          orderCellsTop: true,
+          fixedHeader: true,
+          height: 1,
+          overflowY : "scroll",
+          scrollX: true,
+          scrollY: 460,
+          scrollCollapse: true,
+          info: false,
+          order: [[0,'desc'],[3,'desc']],
+          dom: 'frtipB',
+          select: {
+            style: "os",
+            selector: "th:first-child",
+            blurable: true,
+          },
+          buttons: [
+                    'excel'
+                ],
+            });
+
+        function addOrEditTrackingRow(data, onSucess = () => {}) {
+            $.ajax({
+                type: 'POST',
+                url: "{% url 'shippers:addNewRowTracking' %}",
+                data: data,
+                success: function () {
+                    console.log("[API] Callback to the endpoint sucess")
+                    onSucess()
+                }
+            }) 
+        }
+
+        $(document).ready(function () {
+            $(".editable").click(function () {
+                console.log("Chaning td")
+                $(this).addClass("bg-golden ").css("padding", "5px");
+                $(this).focus();
+            })
+
+           
+        $(document).on("focusout", ".editable", function () {
+            const DefaultMixinCss = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-primary',
+                },
+                buttonsStyling: false
+            })
+            $(this).removeClass("bg-golden")
+
+            var tableRaw = document.getElementById('example');
+            var data = $(this).parents('tr').find("td")
+            const text = $(this).text()
+
+            for (let item of tableRaw.rows) {
+                if (item.cells[8] == data[8]) continue
+                console.log("Cell raw", item.cells[1].innerText, text)
+                if (item.cells[1].innerText == text && item.cells[1].innerText != "") {
+                    item.cells[1].innerText = ""
+                    return DefaultMixinCss.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Valor introduzido já existente',
+                        confirmButtonText: 'Bruh',
+                    })
+                }
+            }
+
+            addOrEditTrackingRow({
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                id: data[8].innerText,
+                data: data[0].innerText,
+                nShipper: data[1].innerText,
+                qtyCaixas: data[2].innerText,
+                inicioPrep: data[3].innerText,
+                fimPrep: data[4].innerText,
+                confirmacao: data[5].innerText,
+                comentarios: data[6].innerText,}
+            )
+            console.log("Mudar dados para -> ", data)
+        })
+
+        var path = $("#pathDefault").val();
+        $("#textPath").val(path);
+    });
+
+
+    $('#example tbody').on('click', '#botaoDelete', function () {
+        console.log("ENtrou")
+    var data = table.row($(this).parents('tr')).data();
+    //Estão a vir os btns
+
+    console.log("DATA",data)
+    var dataTime = data[0]
+    var nShipper = data[1]
+    var qtyCaixas = data[2]
+    var inicioPrep = data[3]
+    var fimPrep = data[4]
+    var confirmacao= data[5]
+    var comentario = data[6]
+
+    var modalInfo = "<p>" + "<b>Data:</b>&emsp;&emsp;" + dataTime + "</b>" +
+        "<p>" + "<b>Nº Shipper:</b>&emsp;&emsp;&emsp;" + nShipper + "</p>" +
+        "<p>" + "<b>QT Cx:</b>&emsp;&emsp;&emsp;" + qtyCaixas + "</p>" +
+        "<p>" + "<b>Inicio Prep:</b>&emsp;&emsp;&emsp;" + inicioPrep + "</p>" +
+        "<p>" + "<b>Fim Prep:</b>&emsp;&emsp;" + fimPrep + "</p>" +
+        "<p>" + "<b>Confirmação:</b>&emsp;&emsp;" + confirmacao + "</p>" +
+        "<p>" + "<b>Comentario:</b>&emsp;&emsp;" + comentario + "</p>"
+
+    //inventarioDelete
+    $("#rowIdDelete").val(data[8])
+    $('#infoDelete').html(modalInfo);
+    });
+
+    function addNewRow() {
+        var table = document.getElementById('example');
+        const DefaultMixinCss = Swal.mixin({
+            customClass: {
+                confirmButton: 'btn btn-primary',
+            },
+            buttonsStyling: false
+        })
+                
+        for (let item of [...table.rows].slice(1, table.rows.length-1)) {
+            if ($(item.cells[0].innerHTML).prop("tagName") == "BUTTON"
+                && $(item.cells[3].innerHTML).prop("tagName") == "BUTTON"
+                && $(item.cells[4].innerHTML).prop("tagName") == "BUTTON"
+                && $(item.cells[5].innerHTML).prop("tagName") == "BUTTON"
+                && item.cells[1].innerText == ""
+                && item.cells[2].innerText == ""
+                && item.cells[6].innerText == "") 
+                return DefaultMixinCss.fire({
+                    icon: 'error',
+                    title: 'Ops...',
+                    text: 'Já existe uma nova entrada',
+                    confirmButtonText: 'OK',
+                })
+        }
+
+         console.log("ADDING new row")
+         $.ajax({
+         type: "POST",
+         url: "{% url 'shippers:addLine' %}",
+         data: {
+             csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+             },
+             complete: function () {
+             console.log("[API] Callback to the endpoint sucess");
+             window.location.reload()
+         }
+         });
+     }
+
+    function getButtonDate(scope, key) {
+        var data = table.row($(scope).parents('tr')).data();
+        addOrEditTrackingRow({
+            csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+            id: data[8],
+            [key]: new Date().getTime() / 1000,
+        }, () => {let now = new Date(); $(scope).parent().html(`${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()} ${now.getHours()}:${now.getMinutes()}`)})
+        window.location.reload()
+    }
+
+</script>
+{% endblock %}

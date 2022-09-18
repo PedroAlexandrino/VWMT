@@ -41,7 +41,7 @@ def beginSchedule():
         enviarEmailSchedule, "cron", hour="22", max_instances=1, misfire_grace_time=None
     )
     # LOOP de 5 em 5 segundos da func "enviarEmailSchedule"
-    # scheduler.add_job(enviarEmailSchedule, 'interval', seconds = 10, max_instances=1, misfire_grace_time=None)
+    #scheduler.add_job(enviarEmailSchedule, 'interval', seconds = 5, max_instances=1, misfire_grace_time=None)
 
     # PARECE OK
     scheduler.add_job(

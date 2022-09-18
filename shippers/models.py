@@ -469,7 +469,19 @@ class GatewayTipoViatura(models.Model):
     def __str__(self):
         return f"{self.nome}"
 
+class TrackingPage(models.Model):
+    data = models.DateTimeField(null=True, blank=True)
+    nShipper = models.CharField(max_length=10, null=True, blank=True)
+    qtyCaixas = models.CharField(null=True, blank=True, max_length=15)
+    inicioPrep = models.DateTimeField(null=True, blank=True)
+    fimPrep= models.DateTimeField(null=True, blank=True)
+    confirmacao = models.DateTimeField(null=True, blank=True)
+    comentarios = models.CharField(max_length=100, null=True, blank=True)
 
+    def __str__(self):
+        return f"{self.data}"
+
+    
 class SecurityShipper(models.Model):
     nome = models.CharField(max_length=100, null=True)
 

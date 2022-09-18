@@ -1,20 +1,15 @@
-from email import contentmanager
-import json
 import os
-from datetime import datetime
-
 import time
-import tablib
 import math
+import openpyxl
+
+from datetime import datetime
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
-from django.core import serializers
 from django.core.mail import EmailMultiAlternatives
-from django.core.serializers import serialize
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
-import openpyxl
 from django.db.models import Q
 from django.core.paginator import Paginator
 
@@ -217,7 +212,6 @@ def tracking(request):
 @login_required()
 @user_passes_test(lambda u: u.groups.filter(name="admin").exists())
 def tracking2(request):
-    print("Tracking2")
     with timer():
         actualDay = datetime.today().strftime("%Y-%m-%d")
         dadosQAD = []
@@ -345,178 +339,7 @@ def tracking2(request):
                 mergedRow = rowAbs | rowAd | rowAbsc
                 dadosQAD.append(mergedRow)
 
-        # for abs in dadosQADabs.all():
-        #     rowAbs2 = {}
-        #     if dadosQADabsALTERADOS.filter(abs_par_id=abs['abs_id']).exists():
-        #         for abs2 in dadosQADabsALTERADOS.filter(abs_par_id=abs['abs_id']):
-        #             rowAbs2 = {
-        #                 'itemNumber': abs2['abs_item'],
-        #                 'qtyToShip': str(abs2['abs_qty']),
-        #                 'qtyShipped': str(abs2['abs_ship_qty'])
-        #             }
-        #
-        #             rowPt = {}
-        #
-        #             if dadosQADpt.filter(pt_part= abs['abs_item']).exists():
-        #                 pt = dadosQADpt.get(pt_part= abs['abs_item'])
-        #                 rowPt = {
-        #                     'description': pt['pt_desc1'] + pt['pt_desc2'],
-        #                 }
-        #             mergedRow = rowPt | rowAbs2
-        #             dadosQAD.append(mergedRow)
-
-        # for abs in dadosQADabs.all():
-        #     if dadosQADabsALTERADOS.filter(abs_par_id=abs['abs_id']).exists() and dadosQADad.filter(
-        #             ad_addr=abs['abs_shipto']).exists() and dadosQADabsc.filter(absc_abs_id=abs['abs_id']).exists():
-        #         row = {
-        #             'id': abs['abs_id'],
-        #             'shipDate': str(abs['abs_shp_date'])[0:10],
-        #             'shipTime': abs['abs_shp_time'],
-        #             'city': '',
-        #             'country': '',
-        #             'carrier': '',
-        #             'fob': abs['abs_qad01'][20:40],
-        #             'modeOfTransport': abs['abs_qad01'][60:80],
-        #             'vehicleID': abs['abs_qad01'][80:100],
-        #             'totalMasterPacks': str(abs['oid_abs_mstr']),
-        #             'confirmed': abs['abs_status'],
-        #             'itemNumber': '',
-        #             'description': '',
-        #             'qtyToShip': '',
-        #             'qtyShipped': ''
-        #         }
-        #         dadosQAD.append(row)
-        #
-        #     for pt in dadosQADpt.all():
-        #         if abs['abs_item'] == pt['pt_part']:
-        #             row = {
-        #                 'id': abs['abs_id'],
-        #                 'shipDate': str(abs['abs_shp_date'])[0:10],
-        #                 'shipTime': abs['abs_shp_time'],
-        #                 'city': '',
-        #                 'country': '',
-        #                 'carrier': '',
-        #                 'fob': abs['abs_qad01'][20:40],
-        #                 'modeOfTransport': abs['abs_qad01shipping.html'][60:80],
-        #                 'vehicleID': abs['abs_qad01'][80:100],
-        #                 'totalMasterPacks': str(abs['oid_abs_mstr']),
-        #                 'confirmed': abs['abs_status'],
-        #                 'itemNumber': '',
-        #                 'description': '',
-        #                 'qtyToShip': '',
-        #                 'qtyShipped': ''
-        #             }
-        #             dadosQAD.append(row)
-
         return render(request, "shippers/shipping.html", {"dadosQAD": dadosQAD})
-
-    # for abs in dadosQADabs.all():
-    #
-    #     abs['abs_shp_time'] = str(convert(abs['abs_shp_time']))
-    #     if abs['abs_status'][1:2] == 'y':
-    #         abs['abs_status'] = 'Yes'
-    #     else:
-    #         abs['abs_status'] = 'No'
-    #     description = ''
-    #     abs_item = AbsMstr.objects.values_list('abs_item', flat=True).filter(abs_par_id=abs['abs_id']).last()
-    #     abs_qty = AbsMstr.objects.values_list('abs_qty', flat=True).filter(abs_par_id=abs['abs_id']).last()
-    #     abs_ship_qty = AbsMstr.objects.values_list('abs_ship_qty', flat=True).filter(abs_par_id=abs['abs_id']).last()
-    #     pt_desc1 = PtMstr.objects.values_list('pt_desc1', flat=True).filter(pt_part=abs_item).last()
-    #     pt_desc2 = PtMstr.objects.values_list('pt_desc2', flat=True).filter(pt_part=abs_item).last()
-    #     ad_city = AdMstr.objects.values_list('ad_city', flat=True).filter(ad_domain=abs['abs_domain'],
-    #                                                                       ad_addr=abs['abs_shipto']).last()
-    #     ad_country = AdMstr.objects.values_list('ad_country', flat=True).filter(ad_domain=abs['abs_domain'],
-    #                                                                             ad_addr=abs['abs_shipto']).last()
-    #     absc_carrier = AbscDet.objects.values_list('absc_carrier', flat=True).filter(absc_abs_id=abs['abs_id']).last()
-    #     if pt_desc1 is None:
-    #         pt_desc1 = ''
-    #     if pt_desc2 is None:
-    #         pt_desc2 = ''
-    #     if abs_item is None:
-    #         abs_item = ''
-    #     if abs_qty is None:
-    #         abs_qty = ''
-    #     if abs_ship_qty is None:
-    #         abs_ship_qty = ''
-    #     description += pt_desc1
-    #     if pt_desc1 is None:
-    #         pt_desc1 = ''
-    #     if len(pt_desc1) == 24:
-    #         aux = ' '
-    #     else:
-    #         aux = ''
-    #     description += aux + pt_desc2
-    #     row = {
-    #         'id': abs['abs_id'],
-    #         'shipDate': str(abs['abs_shp_date'])[0:10],
-    #         'shipTime': abs['abs_shp_time'],
-    #         'city': ad_city,
-    #         'country': ad_country,
-    #         'carrier': absc_carrier,
-    #         'fob': abs['abs_qad01'][20:40],
-    #         'modeOfTransport': abs['abs_qad01'][60:80],
-    #         'vehicleID': abs['abs_qad01'][80:100],
-    #         'totalMasterPacks': str(abs['oid_abs_mstr']),
-    #         'confirmed': abs['abs_status'],
-    #         'itemNumber': abs_item,
-    #         'description': aux,
-    #         'qtyToShip': abs_qty,
-    #         'qtyShipped': abs_ship_qty
-    #     }
-    #     dadosQAD.append(row)
-
-    # for abs in dadosQADabs.all():
-    #     control = 0
-    #     for absc in dadosQADabsc.all():
-    #         if abs['abs_id'] == absc['absc_abs_id']:
-    #             for ad in dadosQADad.all():
-    #                 if abs['abs_shipto'] == ad['ad_addr']:
-    #                     for absALT in dadosQADabsALTERADOS.all():
-    #                         if absALT['abs_par_id'] == abs['abs_id']:
-    #                             for pt in dadosQADpt.all():
-    #                                 if pt['pt_part'] == absALT['abs_item']:
-    #                                     abs['abs_shp_time'] = str(convert(abs['abs_shp_time']))
-    #                                     if abs['abs_status'][1:2] == 'y':
-    #                                         abs['abs_status'] = 'Yes'
-    #                                     else:
-    #                                         abs['abs_status'] = 'No'
-    #                                     if len(pt['pt_desc1']) == 24:
-    #                                          aux = ' '
-    #                                     else: aux = ''
-    #                                     row = {
-    #                                         'id': abs['abs_id'],
-    #                                         'shipDate': str(abs['abs_shp_date'])[0:10],
-    #                                         'shipTime': abs['abs_shp_time'],
-    #                                         'city': ad['ad_city'],
-    #                                         'country': ad['ad_country'],
-    #                                         'carrier': absc['absc_carrier'],
-    #                                         'fob': abs['abs_qad01'][20:40],
-    #                                         'modeOfTransport': abs['abs_qad01'][60:80],
-    #                                         'vehicleID': abs['abs_qad01'][80:100],
-    #                                         'totalMasterPacks': str(abs['oid_abs_mstr']),
-    #                                         'confirmed': abs['abs_status'],
-    #                                         'itemNumber': absALT['abs_item'],
-    #                                         'description': pt['pt_desc1']+aux+pt['pt_desc2'],
-    #                                         'qtyToShip': str(absALT['abs_qty']),
-    #                                         'qtyShipped': str(absALT['abs_ship_qty'])
-    #                                     }
-    #                                     dadosQAD.append(row)
-    #                                     control = 1
-    #                                 if control == 1:
-    #                                     break
-    #                         if control == 1:
-    #                             break
-    #                 if control == 1:
-    #                     break
-    #         if control == 1:
-    #             break
-
-
-# def getInfoConfirmationData(request):
-#    if request.is_ajax():
-#       ficheiro_Shippers = finalFicheiroShippers.objects.all()
-#       file_serializer = serializers.serialize('json', ficheiro_Shippers)
-#       return JsonResponse(file_serializer, safe=False)
 
 # utilizado em shippersTracking
 def uploadFiles(request):
@@ -1701,3 +1524,129 @@ def reportConfirmation(request):
         msg.attach_alternative(message, "text/html")
         msg.send()
         return redirect("shippers:shippersConfirmation")
+
+
+def trackingPage (request):
+    #falta chamada à bd, tens de receber os campos todos e percorrer lá na view.
+    #tens de pegar os users/grupos
+    # pegar os useres que estão num determinado grupo
+    tracking = TrackingPage.objects.all()
+    user = User.objects.all()
+    
+    
+    
+    users_in_group = Group.objects.get(name="TrackingAdmin").user_set.all()
+    #if user.groups.filter(name__in=['TrackingAdmin']).exists()  :
+    print("GROUPS", user,users_in_group)
+
+    return render(
+        request,
+        "shippers/tracking.html",
+        {
+            "items": tracking,
+            "users": user,
+            "users_in_group": users_in_group
+        },
+    )
+
+
+def get_time(value):
+    print(value)
+    return value and isinstance(value, float) and datetime.fromtimestamp(float(value))
+
+
+def addNewRowTracking(request):
+    if request.method == "POST":
+        print("REQ->",request.POST)
+        id = request.POST.get("id")
+        if id:
+            query = TrackingPage.objects.get(id=id)
+        else:
+            query = TrackingPage(id=id)
+            
+        if (data := get_time(request.POST.get("data_"))):
+            query.data = data
+        if (nShipper := request.POST.get("nShipper")):
+            query.nShipper = nShipper
+        if (qtyCaixas := request.POST.get("qtyCaixas")):
+            query.qtyCaixas = qtyCaixas
+        if (inicioPrep := get_time(request.POST.get("inicioPrep"))):
+            query.inicioPrep = inicioPrep
+        if (fimPrep := get_time(request.POST.get("fimPrep"))):
+            query.fimPrep = fimPrep
+        if (confirmacao := get_time(request.POST.get("confirmacao"))):
+            query.confirmacao = confirmacao
+        if (comentarios := request.POST.get("comentarios")):
+            query.comentarios = comentarios
+        query.save()
+
+    return JsonResponse({"message": "OK"})
+
+
+def addLine(request):
+    """    user = User.objects.get(username="andre")  # get Some User
+    print("USER",user)
+    if user.groups.filter(name="TrackingAdmin"):
+        print("PERTENCE AO GRUPO")
+    """
+    dataEmpty = TrackingPage()
+    dataEmpty.save()
+    return redirect("shippers:trackingPage")
+
+def addData(request):
+    from datetime import date
+     
+    ids = request.POST["ids"]
+    print("ID",ids)
+    #dataEmpty = TrackingPage()
+    dataEmpty = TrackingPage.objects.filter(id=ids)
+    print("data",TrackingPage.objects.filter(id=ids))
+    today = date.today()
+    #dataEmpty.data= today
+    print("HJ", today)
+    dataEmpty.save()
+
+def addInicioPrep(request):
+    from datetime import date 
+    ids = request.POST["ids"]
+    dataEmpty = TrackingPage()
+    dataEmpty = TrackingPage.objects.filter(id=ids)
+    
+    today = date.today()
+    dataEmpty.incioPrep= today
+    dataEmpty.save()
+
+def addFimPrep(request):
+    from datetime import date 
+    ids = request.POST["ids"]
+    dataEmpty = TrackingPage.objects.filter(id=ids)
+    today = date.today()
+    dataEmpty.fimPrep= today
+    dataEmpty.save()
+
+def addConfirmacao(request):
+    ids = request.POST["ids"]
+    dataEmpty = TrackingPage.objects.filter(id=ids)
+    from datetime import date 
+    today = date.today()
+    dataEmpty.confirmacao= today
+    dataEmpty.save()
+
+
+
+
+
+def deleteRowTracking(request):
+    # Acho que falta fazer as verificações de campos vazios
+    stockPackagePack = TrackingPage.objects
+    if request.method == "POST":
+        print("REQ",request.POST)
+        row_id = request.POST["rowIdDelete"]
+        # Aqui ele vai buscar o partNumber id e nesse id vai eliminar a cell
+        print(stockPackagePack.all().get(id=row_id))
+        stockPackagePack.all().get(id=row_id).delete()
+    return redirect("shippers:trackingPage")
+
+
+def editRowTracking(request):
+    ...

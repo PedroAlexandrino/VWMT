@@ -1299,7 +1299,7 @@ def deleteKardex(request):
         subject, from_email, to = (
             "Alteração em Receiving - MNFG Supply - Configurations",
             "noreply@visteon.com",
-            ["aroque1@visteon.com"],
+            ["pmarti30@visteon.com"],
         )
         msg = EmailMultiAlternatives(subject, message, from_email, to)
         msg.attach_alternative(message, "text/html")

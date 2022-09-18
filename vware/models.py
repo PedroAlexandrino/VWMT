@@ -56,7 +56,7 @@ class SupplyPackage(models.Model):
     supply_time = models.IntegerField(default=60, blank="true", null=True)
     stock = models.IntegerField(default=0, blank="true", null=True)
     inventario = models.IntegerField(default=0, blank="true", null=True)
-    link = models.FileField(upload_to="supplyPackageLink/", blank="true", null="true")
+    link = models.FileField(upload_to="SupplyPackage/", blank="true", null="true")
     #cliente_produto = models.ForeignKey("vware.ClienteProduto", on_delete=models.CASCADE, default=None,blank="true", null="true")
 
 
@@ -81,7 +81,7 @@ class StockPackage(models.Model):
     # produto = models.ForeignKey(Produtos, on_delete=models.CASCADE, default=None,blank="true", null="true")
     suplyPackage = models.ManyToManyField(SupplyPackage)
     descricao = models.CharField(max_length=150, null=True)
-    link = models.FileField(null=True, upload_to="Users\PMARTI30\Downloads")
+    link = models.FileField(null=True, upload_to="StockPackage/")
     quantidade = models.CharField(max_length=50, null=True)
     inventario = models.CharField(max_length=50, null=True)
     comentario = models.CharField(max_length=255, null=True)
@@ -161,7 +161,7 @@ class ClientesOEM(models.Model):
 
 
 class Produtos(models.Model):
-    #cliente = models.ForeignKey(ClienteProduto, null=True, on_delete=models.SET_NULL)
+    cliente = models.ForeignKey(ClientesOEM, null=True, on_delete=models.SET_NULL)#ITS IN SERVER AND ITS NEEDED
     tipo = models.ForeignKey(
         "vware.TipoEmbalagem", on_delete=models.CASCADE, default=None, null=True
     )

@@ -10,6 +10,7 @@ app_name = "pManagement"
 urlpatterns = [
     # Packing
     # Request
+
     path("requests/", views.requests, name="requests"),
     path("takeQuantity/", views.takeQuantity, name="takeQuantity"),
     path("supplyPackage/", views.supplyPackage, name="supplyPackage"),

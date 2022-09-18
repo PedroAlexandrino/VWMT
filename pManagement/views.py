@@ -1,12 +1,7 @@
-from pickle import NONE
-from sys import getsizeof
-from time import CLOCK_UPTIME
 import tablib
 import io
 import math
 import typing as t
-import aspose.slides as slides
-import win32com.client
 
 from datetime import datetime
 from openpyxl import Workbook
@@ -28,11 +23,12 @@ from django.http import (
     Http404,
 )
 from django.http import HttpResponseRedirect
-from django.core.files.storage import FileSystemStorage
 from django.core.files.storage import default_storage
-from contextlib import contextmanager
 
 from pManagement.models import *
+from shippers.models import(
+    TrackingPage,)
+
 from vware.models import (
     Produtos,
     StockPackage,
@@ -40,6 +36,7 @@ from vware.models import (
     TipoEmbalagem,
     ClientesOEM,
     ClienteProduto,
+    
 )
 
 from .models import PackageType
@@ -159,10 +156,11 @@ def createStockPackage(request):
         print("QTY",quantidade,type(quantidade))
         inventario = request.POST.get("quantidadeInventarioNovo", 0)
         tipo = PackageType(request.POST["tipo"])
-
-        if not len(quantidade):
+        caminho ='StockPackage/'
+        if not quantidade:
             quantidade=0
-        if not len(inventario):
+
+        if not inventario:
             inventario=0
 
         if not StockPackage.objects.filter(pn=partNumber).exists():
@@ -171,11 +169,7 @@ def createStockPackage(request):
             newPartNumber.descricao = descricao
 
             if link:
-                # mudar para pasta do StockPAckage
-                #C:\Users\PMARTI30\Desktop\visteon\media\StockPackage
-                
-                newPartNumber.link = default_storage.save(link.name, link)
-
+                newPartNumber.link = default_storage.save(caminho+link.name, link)
             newPartNumber.comentario = comentario
             newPartNumber.quantidade = quantidade
             newPartNumber.inventario = inventario
@@ -198,16 +192,14 @@ def updateStockPackage(request):
         edit_description = request.POST.get("descricaoEdit")
 
         edit_link = request.FILES.get("linkEdit")
-        edit_Links = request.POST.get("linkEdits")
-
+       
         edit_comentario = request.POST.get("commentEdit")
         edit_quantidade = request.POST.get("stockEdit")
         edit_inv = request.POST.get("invEdit")
         #edit_tipo = request.POST.get("tipoEdit")
         edit_tipo = request.POST["tipoEdit"]
 
-        print("MAMBOS->",request.POST)
-        print("MAMBOS2->",type(edit_tipo))
+        
         if rowId == "":
             return HttpResponseBadRequest(
             "Não recebe o ID "
@@ -223,27 +215,28 @@ def updateStockPackage(request):
             inventario = edit_inv,
            
         )
-
-        
+        caminho ='StockPackage/'
+        #BUG
+        #The joined path (C:/StockPackage) is located outside of the base path component (C:\Users\PMARTI30\Desktop\visteon\media)
         if not edit_tipo =="undefined" :
             print("CHEGOU AO IF DO TIPO NOT NULOL")
             ref.tipo = edit_tipo
         else:
             print("CHEGOU AO IF DO TIPO")
             ref.tipo =StockPackage.objects.get(id=rowId).tipo
-            #ref.save()
+            ref.save()
 
         if edit_link is not None:
             # Savar o link localmente na maquina
-            ref.link = default_storage.save(edit_link.name, edit_link)
+            ref.link = default_storage.save(caminho+edit_link.name, edit_link)
+              #wbProduction.save("C:\\visteon\\media\\receiving\\icdr\\workbookICDR.xls")
         else:
             ref.link = StockPackage.objects.get(id=rowId).link
-            #ref.save()
+            ref.save()
         
-        print("GUARDOU")
         ref.save()
 
-        return HttpResponseRedirect("pManagement:stockPackage")
+        return JsonResponse({"message": "OK"})
 
 # Delete de uma linha da table(html) e faz edição na db
 @login_required()
@@ -252,6 +245,7 @@ def updateStockPackage(request):
 )
 def deleteLinhaStockPackage(request):
     # Acho que falta fazer as verificações de campos vazios
+    print("REQ DO FILTRO",request.POST)
     stockPackagePack = StockPackage.objects
     if request.method == "POST":
         row_id = request.POST["rowIdDelete"]
@@ -299,71 +293,6 @@ def updateAllStock(request):
 
     return redirect("pManagement:stockPackage")
 
-
-""" def uploadStockPackage(request):
-    if request.method == 'POST':
-        if request.FILES.get('myfile'):
-            dataset = tablib.Databook()
-            new_table = request.FILES['myfile']
-
-            if not new_table.name.endswith('xlsx'):
-                clientes = ClientesOEM.objects
-                produtos = Produtos.objects
-                stockPackage = StockPackage.objects
-                return render(request, 'pManagement/stockPackage.html',
-                              {'clientes': clientes, 'produtos': produtos, 'tipoEmbalagem': tipoEmbalagem,
-                               "erro2": "WRONG FORMAT! Only xlsx files"})
-
-            # elimina todos os elementos que estavam na base de dados
-            ClientesOEM.objects.all().delete()
-            Produtos.objects.all().delete()
-            TipoEmbalagem.objects.all().delete()
-
-            imported_data = dataset.load(new_table.read(), format='xlsx')
-
-            for data in imported_data.sheets():
-                if (data.title == 'Sheet3'):
-                    for element in data:
-                        if (element.__contains__('Cliente')):
-                            continue
-
-                        # caso nao sejam inseridas quantidades no ficheiro = 0
-                        if (element[4] == None):
-                            y = list(element)
-                            y[4] = 0
-                            element = tuple(y)
-
-                        # caso o cliente no ficheiro nao exista, é criado Not needed
-                        if (not ClientesOEM.objects.filter(oem=element[0]).exists()):
-                            cliente = ClientesOEM(
-                                None,
-                                element[0]
-                            )
-                            cliente.save()
-
-                        # caso nao exista um produto para aquele cliente e tipo embalagem, é criado not needed, i need something difrent
-                        if not Produtos.objects.filter(nome=element[1], cliente__oem=element[
-                            0]).exists() or TipoEmbalagem.objects.filter(produto__nome=element[1],
-                                                                         produto__cliente__oem=element[0]).exists():
-                            produto = Produtos(
-                                None,
-                                ClientesOEM.objects.get(oem=element[0]).id,
-                                element[1]
-                            )
-                            produto.save()
-
-                        tipoEmbalagem = TipoEmbalagem(
-                            None,
-                            Produtos.objects.get(nome=element[1], cliente__oem=element[0], tipoembalagem__nome=None).id,
-                            element[2],
-                            element[4],
-                            element[5],
-                            element[3]
-                        )
-                        tipoEmbalagem.save()
-        return redirect('pManagement:stockPackage')
- """
-
 # ver se é para por aqui decorarors
 def downloadExcelStockPackage(request):
     if request.method == "GET":
@@ -408,49 +337,6 @@ def downloadExcelStockPackage(request):
         )
         return fresp
 
-
-# def uploadDataExcel(request):
-#    print("CHEGOU AO EXCEL")
-#    if request.method == 'POST':
-#        excel_file = ['//PAVPD002/E_Proj/sharedir/MP&L/Warehouse/PWMS/Shipping/Shippers Tracking.xlsx']
-#        workbook = openpyxl.load_workbook(excel_file[0])
-#        for sheet in workbook:
-#            if sheet.title == 'Pre-Shipper Browse':
-#                # if PreShipperBrowse.objects.get(shipDate=sheet[1][6].value):
-#                # return
-#                # caso seja igual, ver as diferenças linha a linha e acrescentar
-#                # else:
-#                StockPackage.objects.all().delete()
-#                for element in sheet:
-#                    value2 = StockPackage(
-#                        None,
-#                        element[0].value,
-#                        element[1].value,
-#                        element[2].value,
-#                        element[3].value,
-#                        element[4].value,
-#                        element[5].value,
-#
-#                    )
-#                    value2.save()
-#
-#            if sheet.title == 'Pre-Shipper Detail Browse':
-#                StockPackage.objects.all().delete()
-#                for element in sheet:
-#                    value2 = StockPackage(
-#                        None,
-#                        element[0].value,
-#                        element[1].value,
-#                        element[2].value,
-#                        element[3].value,
-#                        element[4].value,
-#                        element[5].value,
-#                      )
-#                    value2.save()
-#    return redirect('shippers:shippersTracking')
-#
-
-# Ver que decorator por aqui
 @login_required()
 @user_passes_test(
     lambda u: u.groups.filter(Q(name="pManagement") | Q(name="SupplyPackage")).exists()
@@ -458,7 +344,7 @@ def downloadExcelStockPackage(request):
 def uploadStockFileStock(request):
     if request.method == "POST":
         if not (file := request.FILES.get("myfile")):
-            return HttpResponseBadRequest("Não recebi nenhum ficheiro :(")
+            return HttpResponseBadRequest("No fille was found")
 
         if not file.name.endswith("xlsx"):
             return HttpResponseBadRequest(
@@ -467,14 +353,14 @@ def uploadStockFileStock(request):
 
         # elimina todos os elementos que estavam na base de dados
 
-        workbook = load_workbook(file.open("rb"))
+        workbook = load_workbook(file.open("rb"), data_only = True)
         sheet = workbook.get_sheet_by_name(workbook.sheetnames[0])
         db = StockPackage.objects
         db.all().delete()
 
         if not sheet:
             return HttpResponseBadRequest(
-                "Não foi encontrado nenhuma sheet no excel..."
+                "Não foi encontrado nenhum sheet no excel..."
             )
 
         if len(list(sheet.columns)) != 7:
@@ -518,7 +404,7 @@ def uploadStockFile(request):
 
         # elimina todos os elementos que estavam na base de dados
        
-        workbook = load_workbook(file.open("rb"))
+        workbook = load_workbook(file.open("rb"),data_only = True)
         sheet = workbook.get_sheet_by_name(workbook.sheetnames[0])
 
         SupplyPackage.objects.all().delete()
@@ -1638,7 +1524,7 @@ def downloadExcelSupplyPackage(request):
 
         data_fmt = datetime.now().strftime("%d-%m-%Y %H:%M")
         fresp = FileResponse(
-            file, filename=f"SupplyPackage{data_fmt}.xlsx", as_attachment=True
+            file, filendefault_storagename=f"SupplyPackage{data_fmt}.xlsx", as_attachment=True
         )
         return fresp
 
@@ -1678,25 +1564,32 @@ def addRowSupplyPackage(request):
             supply_time=kit_supplyTime,
             stock=kitStock,
         )
+        
+        
         ref.save()
         print("GUARDOU!")
         # se vierem valores em branco para as listas, tem de dar para adicionar na mesma
+        caminho ='SupplyPackage/'
+        if kitlink is not None:
+            print("LINK", kitlink)
+            # alterar o defaultStorage para a pasta desiganada (supplyPackage)
+            ref.link = default_storage.save(caminho+kitlink.name, kitlink)
         for stock in stockPackages[0].split(","):
-            print("S StockP",stock)
+            if not stock:
+                break
+
             s = StockPackage.objects.get(id=stock)
          
             s.suplyPackage.add(ref)
             s.save()
         for client in clients[0].split(","):
+            if not stock:
+                break
+
             s = ClienteProduto.objects.get(id=client)
             print("S ClienteP",s)
             s.supply_pkg.add(ref)
             s.save()
-            
-       
-
-       
-
     return redirect("pManagement:supplyPackage")
 
 def display_pdf(fobj: io.FileIO, fname: str):
@@ -1707,7 +1600,6 @@ def display_pdf(fobj: io.FileIO, fname: str):
 
 def pdf_view(request):
     import aspose.slides as slides
-    print("CHEGASTE AO PDF")
 
     link = request.GET.get("link")
     filename = link.split("/")[-1]
@@ -1776,11 +1668,12 @@ def updateSupplyPackage(request):
             id=rowId,
         )
         ref.save()
+        caminho ='SupplyPackage/'
       
         if edit_link is not None:
             print("LINK", edit_link)
             # alterar o defaultStorage para a pasta desiganada (supplyPackage)
-            ref.link = default_storage.save(edit_link.name, edit_link)
+            ref.link = default_storage.save(caminho+edit_link.name, edit_link)
 
         StockPackage.suplyPackage.through.objects.filter(supplypackage_id=rowId).delete()
         ClienteProduto.supply_pkg.through.objects.filter(supplypackage_id=rowId).delete()
@@ -1863,7 +1756,7 @@ def uploadSupplyPackageFile(request):
 
             # elimina todos os elementos que estavam na base de dados
             # FALTA ADICIONAR CAMPOS CERTOS; NO FOR JÀ ESTÂO ALGUNS MAS FALTA DEFINIR COMO GUARDAR AS LISTAS
-            workbook = load_workbook(file.open("rb"))
+            workbook = load_workbook(file.open("rb"),data_only = True)
             sheet = workbook.get_sheet_by_name(
                 "Sheet1"
             )  # existe maneira dele procurar pelo sheet1 e pelo sheet
@@ -2174,7 +2067,7 @@ def downloadExcelClienteProduto(request):
         cliente_prod = ClienteProduto.objects
         wbProduction = Workbook()
         file = io.BytesIO()
-        # Não criar um sheet novo e ter um existente ;)
+
         sheetProduction = wbProduction.get_sheet_by_name("Sheet")
        
         #Verificar se ele está a ir buscar os campos à view ou aos models
@@ -2185,7 +2078,7 @@ def downloadExcelClienteProduto(request):
                 "Comentario",
             ]
         )
-        #CONFIRAR COM O BOSS COMO ELE QUER AS TABLES pois é aqui que vai ser construido o excel
+        #aqui que vai ser construido o excel
         for elem in cliente_prod.all():
                 sheetProduction.append(
                     [
@@ -2228,6 +2121,7 @@ def createClienteProduto(request):
         comment = request.POST["newComment"]
         print("CLIENTE->", cliente)
         print("PRODUTOS->", prods)
+        print("Comentario->", comment)
         
         if not ClientesOEM.objects.filter(oem=cliente).exists():
             ref = ClientesOEM()
@@ -2242,7 +2136,8 @@ def createClienteProduto(request):
             prod.save()
 
         prod = Produtos.objects.get(nome=prods)
-
+        if comment == None:
+            comment=""
         rel = ClienteProduto(
             cliente=ref,
             comment=comment,
@@ -2250,7 +2145,7 @@ def createClienteProduto(request):
         )
         rel.save()
 
-      
+        return JsonResponse({"id": rel.id})
 
     return redirect("pManagement:clienteProduto")
 
@@ -2265,26 +2160,33 @@ def createClienteProduto(request):
 )
 def updateClienteProduto(request):
     print("REQUEST", request.POST)
-    print("Update CLIENTE PRODUTO --------->")
     if request.method == "POST":
 
         rowId = request.POST["rowIdUpdate"]
         edit_client = request.POST.get("getCliente")
         edit_prod = request.POST.get("getProds", "")
-        edit_comentario = request.POST.get("editComment")
+        edit_comentario = request.POST.get("editComment","")
 
         print("MAMBOS->",edit_comentario)
         client_ref = ClientesOEM.objects
         if not ClientesOEM.objects.filter(oem=edit_client).exists():
-            client_ref.oem = edit_client
+            ref = ClientesOEM()
+            ref.oem = edit_client
+            ref.save()
+            #client_ref.oem = edit_client
 
         prod_ref = Produtos.objects
         if not Produtos.objects.filter(nome=edit_prod).exists():
-            prod_ref.nome = edit_prod
+            ref = Produtos()
+            ref.nome = edit_prod
+            ref.save()
+            #prod_ref.nome = edit_prod
         
 
         ref_client = ClientesOEM.objects.get(oem=edit_client)
         ref_prod = Produtos.objects.get(nome=edit_prod)
+        if edit_comentario == None or edit_comentario == "":
+            edit_comentario=""  
         ref = ClienteProduto(
             id = rowId,
             comment=edit_comentario,
