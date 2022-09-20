@@ -1,4 +1,6 @@
+from dataclasses import field
 from django.db import models
+from qad_ee.models import SctDet
 
 # Create your models here.
 
@@ -477,9 +479,17 @@ class TrackingPage(models.Model):
     fimPrep= models.DateTimeField(null=True, blank=True)
     confirmacao = models.DateTimeField(null=True, blank=True)
     comentarios = models.CharField(max_length=100, null=True, blank=True)
-
+    #add view fields
     def __str__(self):
         return f"{self.data}"
+
+class Sct_Det_View(models.Model):
+    prrowid = models.CharField(db_column="prrowid", max_length=36)
+    sct_sim = models.CharField(db_column="sct_sim", max_length=36)
+    class Meta:
+        managed = False  # Created from a view. Don't remove.
+        
+        db_table = "sct_det"
 
     
 class SecurityShipper(models.Model):

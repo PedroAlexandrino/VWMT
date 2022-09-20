@@ -127,7 +127,7 @@
     <h6><b><i style="font-size: 20px"></i><a type="button"
         class="fas fa-plus-circle fa-3x button5"
         id="newRow"
-       onclick="addNewRow()"
+        onclick="addNewRow()"
         style="color: orange; background-color: black; border-radius: 50%; margin-top: 10%;margin-left: 50%;"></a></b>
         {% csrf_token %}
     </h6>
@@ -167,6 +167,17 @@
     <script src="../../static/js/tabledit.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <style>
+.bg-golden {
+    background-color: #ffb640;
+    animation-name: colorAnim;
+    animation-duration: .2s;
+}
+
+@keyframes colorAnim {
+    from {background-color: unset;}
+    to {background-color: #ffd89a;}
+}
+
 .flatpickr-wrapper {
     position: fixed;
     top: 70%;
@@ -226,8 +237,6 @@
             });
 
         function addOrEditTrackingRow(data, onSucess = () => {}) {
-          
-
             $.ajax({
                 type: 'POST',
                 url: "{% url 'shippers:addNewRowTracking' %}",
@@ -242,69 +251,55 @@
         $(document).ready(function () {
             $(".editable").click(function () {
                 console.log("Chaning td")
-                $(this).addClass("bg-warning").css("padding", "5px");
+                $(this).addClass("bg-golden ").css("padding", "5px");
                 $(this).focus();
             })
 
            
-            $(document).on("focusout", ".editable", function () {
-                var tableRaw = document.getElementById('example');
-                const DefaultMixinCss = Swal.mixin({
-                    customClass: {
-                        confirmButton: 'btn btn-primary',
-                    },
-                    buttonsStyling: false
-                    })
-                $(this).removeClass("bg-warning")
-
-                var row = $(this).closest("tr");
-                var row_tds = row.find("td");
-                var row_id = row.attr("row_id");
-
-                var data = table.row($(this).parents('tr')).data();
-                console.log(data)
-                var dados =""
-                let counter = 0
-                let canProgress = true
-
-
-                row_tds.each((i) => {
-                    const text = $(row_tds[i]).text()
-                    if (!tableRaw.rows[i]) return
-                    if(tableRaw.rows[i].cells[1].innerHTML == text && tableRaw.rows[i].cells[1].innerHTML != "" ){
-                        counter++
-                        if (counter > 1)
-                        {
-                            tableRaw.rows[i].cells[1].innerHTML = ""
-                            canProgress = false
-                            return DefaultMixinCss.fire({
-                                title: 'Valor que foi introduzido já existe',
-                                
-                                confirmButtonText: 'OK',
-                            }
-                        )}
-                    }
-                });
-
-                if (!canProgress) return
-
-                addOrEditTrackingRow({
-                    csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
-                    id: data[8],
-                    data: $(data[0]).text(),
-                    nShipper: data[1],
-                    qtyCaixas: data[2],
-                    inicioPrep: $(data[3]).text(),
-                    fimPrep: $(data[4]).text(),
-                    confirmacao: $(data[5]).text(),
-                    comentarios: data[6],}
-                )
-                console.log("Mudar dados para -> ", data)
+        $(document).on("focusout", ".editable", function () {
+            const DefaultMixinCss = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-primary',
+                },
+                buttonsStyling: false
             })
+            $(this).removeClass("bg-golden")
 
-            var path = $("#pathDefault").val();
-            $("#textPath").val(path);
-        });
+            var tableRaw = document.getElementById('example');
+            var data = $(this).parents('tr').find("td")
+            const text = $(this).text()
+
+            for (let item of tableRaw.rows) {
+                if (item.cells[8] == data[8]) continue
+                console.log("Cell raw", item.cells[1].innerText, text)
+                if (item.cells[1].innerText == text && item.cells[1].innerText != "") {
+                    item.cells[1].innerText = ""
+                    return DefaultMixinCss.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Valor introduzido já existente',
+                        confirmButtonText: 'OK',
+                    })
+                }
+            }
+
+            addOrEditTrackingRow({
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                id: data[8].innerText,
+                data: data[0].innerText,
+                nShipper: data[1].innerText,
+                qtyCaixas: data[2].innerText,
+                inicioPrep: data[3].innerText,
+                fimPrep: data[4].innerText,
+                confirmacao: data[5].innerText,
+                comentarios: data[6].innerText,}
+            )
+            console.log("Mudar dados para -> ", data)
+        })
+
+        var path = $("#pathDefault").val();
+        $("#textPath").val(path);
+    });
 
 
     $('#example tbody').on('click', '#botaoDelete', function () {
@@ -335,44 +330,30 @@
     });
 
     function addNewRow() {
-             
-             var datas = []
-             var nShipper = []
-             var qtyCaixas = []
-             var inicioPrep = []
-             var fimPrep = []
-             var confirmacao = []
-             var comentario = []
- 
-             var table = document.getElementById('example');
-             const DefaultMixinCss = Swal.mixin({
-                     customClass: {
-                         confirmButton: 'btn btn-primary',
-                     },
-                     buttonsStyling: false
-                 })
-             for (var i = 1, n = table.rows.length ; i < n; i++){
-                 var row = $(table.rows[i].cells[8].innerHTML)
-                 datas.push(table.rows[i].cells[0].innerHTML)
-                 nShipper.push(table.rows[i].cells[1].innerHTML)
-                 qtyCaixas.push(table.rows[i].cells[2].innerHTML)
-                 inicioPrep.push(table.rows[i].cells[3].innerHTML)
-                 fimPrep.push(table.rows[i].cells[4].innerHTML)
-                 confirmacao.push(table.rows[i].cells[5].innerHTML)
-                 comentario.push(table.rows[i].cells[6].innerHTML)
-                 
-                     console.log(datas.includes("button"))
-                 if(table.rows[i].cells[0].innerHTML.includes("button")&& nShipper == "" && qtyCaixas == "" && table.rows[i].cells[3].innerHTML.includes("button")
-                  && table.rows[i].cells[4].innerHTML.includes("button") && table.rows[i].cells[5].innerHTML.includes("button") && comentario == ""){
-                     
-                     
+        var table = document.getElementById('example');
+        const DefaultMixinCss = Swal.mixin({
+            customClass: {
+                confirmButton: 'btn btn-primary',
+            },
+            buttonsStyling: false
+        })
+                
+        for (let item of [...table.rows].slice(1, table.rows.length-1)) {
+            if ($(item.cells[0].innerHTML).prop("tagName") == "BUTTON"
+                && $(item.cells[3].innerHTML).prop("tagName") == "BUTTON"
+                && $(item.cells[4].innerHTML).prop("tagName") == "BUTTON"
+                && $(item.cells[5].innerHTML).prop("tagName") == "BUTTON"
+                && item.cells[1].innerText == ""
+                && item.cells[2].innerText == ""
+                && item.cells[6].innerText == "") 
                 return DefaultMixinCss.fire({
-                     title: 'Já existe uma nova entrada',
-                     
-                     confirmButtonText: 'OK',
-                     })
-         }
-             }
+                    icon: 'error',
+                    title: 'Ops...',
+                    text: 'Já existe uma nova entrada',
+                    confirmButtonText: 'OK',
+                })
+        }
+
          console.log("ADDING new row")
          $.ajax({
          type: "POST",
@@ -395,58 +376,6 @@
             [key]: new Date().getTime() / 1000,
         }, () => {let now = new Date(); $(scope).parent().html(`${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()} ${now.getHours()}:${now.getMinutes()}`)})
         window.location.reload()
-    }
-    
-
-    function save(){
-        var ids = []
-        var datas = []
-        var nShipper = []
-        var qtyCaixas = []
-        var inicioPrep = []
-        var fimPrep = []
-        var confirmacao = []
-        var comentario = []
-
-        var table = document.getElementById('example');
-        for (var i = 1, n = table.rows.length ; i < n; i++){
-            //está a ir buscar os valores na vertical
-        var row = $(table.rows[i].cells[8].innerHTML)
-
-        datas.push(table.rows[i].cells[0].innerHTML)
-        nShipper.push(table.rows[i].cells[1].innerHTML)
-        qtyCaixas.push(table.rows[i].cells[2].innerHTML)
-        inicioPrep.push(table.rows[i].cells[3].innerHTML)
-        fimPrep.push(table.rows[i].cells[4].innerHTML)
-        confirmacao.push(table.rows[i].cells[5].innerHTML)
-        comentario.push(table.rows[i].cells[6].innerHTML)
-        ids.push(row.attr("id")) 
-
-        }
-        console.log("LOG",nShipper,qtyCaixas,comentario)
-        $.ajax({
-                type: 'POST',
-                url: "{% url 'shippers:addNewRowTracking' %}",
-                data: {
-                    csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
-                    id: ids,
-                    data: datas,
-                    nShipper: nShipper,
-                    qtyCaixas: qtyCaixas,
-                    inicioPrep: inicioPrep,
-                    fimPrep: fimPrep,
-                    confirmacao: confirmacao,
-                    comentarios: comentario,
-                },
-                success: function () {
-
-                    console.log("[API] Callback to the endpoint sucess")
-                },
-                complete: function () {
-                        //window.location.replace("{% url 'shippers:trackingPage' %}")
-                }
-                
-            }) 
     }
 
 </script>

@@ -456,10 +456,11 @@
               </button>
               <button
                 type="submit"
-                class="btn btn-primary"          
+                class="btn btn-primary"    
+                id="EditButton"      
                   
               >
-                Create
+                Edit
               </button>
             </div>
           </div>
@@ -669,8 +670,9 @@ function CreateNewRowButton() {
       newComment: newComment,
     },
     success: function () {
-      elem.disabled = false
       window.location.replace("{% url 'pManagement:clienteProduto' %}");
+      elem.disabled = false
+      
     },
   });
 }
@@ -682,7 +684,7 @@ function CreateNewRowButton() {
           var novoCommentEdit = $("#editComment").val();
 
           console.log("REQUEST A CAMINHO COM.... --> ", novoCommentEdit)
-
+          var elem = document.getElementById("EditButton")
           var dataForm = new FormData();
          // var stockPackages = document.getElementById('getProds').value;
           dataForm.append("rowIdUpdate", rowIdUpdate);
@@ -693,7 +695,7 @@ function CreateNewRowButton() {
             "csrfmiddlewaretoken",
             $("input[name=csrfmiddlewaretoken]").val()
           );
-
+          elem.disabled = true
           $.ajax({
             type: "POST",
             url: "{% url 'pManagement:updateClienteProduto' %}",
@@ -703,8 +705,8 @@ function CreateNewRowButton() {
             data: dataForm,
           
             success: function () {
-              elem.disabled = true
               window.location.reload()
+              elem.disabled = false
             },
           });
         }

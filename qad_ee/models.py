@@ -2463,7 +2463,7 @@ class LdDet(models.Model):
     )
     ld_time_frz = models.IntegerField(blank=True, null=True)
     pro2srcpdb = models.CharField(
-        db_column="Pro2SrcPDB", max_length=12, blank=True, null=True
+        db_column="L", max_length=12, blank=True, null=True
     )  # Field name made lowercase.
     pro2created = models.DateTimeField(blank=True, null=True)
     pro2modified = models.DateTimeField(blank=True, null=True)

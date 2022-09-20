@@ -121,11 +121,11 @@
         </tfoot>
     </table>
     
-    <p id="datepicker" style="display: none" />
+    <!-- <p id="datepicker" style="display: none" /> -->
 
 
     <h6><b><i style="font-size: 20px"></i><a type="button"
-        class="fas fa-plus-circle fa-3x button5"
+        class="fas fa-plus-circle fa-4x button5"
         id="newRow"
         onclick="addNewRow()"
         style="color: orange; background-color: black; border-radius: 50%; margin-top: 10%;margin-left: 50%;"></a></b>
@@ -168,7 +168,7 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <style>
 .bg-golden {
-    background-color: #ffd89a;
+    background-color: #ffb640;
     animation-name: colorAnim;
     animation-duration: .2s;
 }
@@ -271,14 +271,13 @@
 
             for (let item of tableRaw.rows) {
                 if (item.cells[8] == data[8]) continue
-                console.log("Cell raw", item.cells[1].innerText, text)
                 if (item.cells[1].innerText == text && item.cells[1].innerText != "") {
                     item.cells[1].innerText = ""
                     return DefaultMixinCss.fire({
                         icon: 'error',
                         title: 'Oops...',
                         text: 'Valor introduzido já existente',
-                        confirmButtonText: 'Bruh',
+                        confirmButtonText: 'OK',
                     })
                 }
             }
@@ -286,15 +285,14 @@
             addOrEditTrackingRow({
                 csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
                 id: data[8].innerText,
-                data: data[0].innerText,
+                ...(data[0].tagName == "BUTTON" && {data: data[0].innerText}),
+                ...(data[3].tagName == "BUTTON" && {data: data[3].innerText}),
+                ...(data[4].tagName == "BUTTON" && {data: data[4].innerText}),
+                ...(data[5].tagName == "BUTTON" && {data: data[5].innerText}),
                 nShipper: data[1].innerText,
                 qtyCaixas: data[2].innerText,
-                inicioPrep: data[3].innerText,
-                fimPrep: data[4].innerText,
-                confirmacao: data[5].innerText,
                 comentarios: data[6].innerText,}
             )
-            console.log("Mudar dados para -> ", data)
         })
 
         var path = $("#pathDefault").val();
@@ -308,19 +306,38 @@
     //Estão a vir os btns
 
     console.log("DATA",data)
-    var dataTime = data[0]
+    var dataTime = data[0] || ""
     var nShipper = data[1]
     var qtyCaixas = data[2]
-    var inicioPrep = data[3]
-    var fimPrep = data[4]
+    var inicioPrep = data[3] || ""
+    var fimPrep = data[4] || ""
     var confirmacao= data[5]
     var comentario = data[6]
+    
+    if(dataTime.startsWith("<button")){
+        dataTime=""
+    }
+    if(inicioPrep.startsWith("<button")){
+        inicioPrep=""
+    }
+    if(fimPrep.startsWith("<button")){
+        fimPrep=""
+    }
+    if(confirmacao.startsWith("<button")){
+        confirmacao=""
+    }
+    
 
-    var modalInfo = "<p>" + "<b>Data:</b>&emsp;&emsp;" + dataTime + "</b>" +
+    console.log("data",dataTime)
+
+    var modalInfo = "<p>" + "<b>Data:</b>&emsp;&emsp;" + dataTime+ "</b>" +
+
         "<p>" + "<b>Nº Shipper:</b>&emsp;&emsp;&emsp;" + nShipper + "</p>" +
         "<p>" + "<b>QT Cx:</b>&emsp;&emsp;&emsp;" + qtyCaixas + "</p>" +
+      
         "<p>" + "<b>Inicio Prep:</b>&emsp;&emsp;&emsp;" + inicioPrep + "</p>" +
         "<p>" + "<b>Fim Prep:</b>&emsp;&emsp;" + fimPrep + "</p>" +
+
         "<p>" + "<b>Confirmação:</b>&emsp;&emsp;" + confirmacao + "</p>" +
         "<p>" + "<b>Comentario:</b>&emsp;&emsp;" + comentario + "</p>"
 
@@ -374,8 +391,9 @@
             csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
             id: data[8],
             [key]: new Date().getTime() / 1000,
-        }, () => {let now = new Date(); $(scope).parent().html(`${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()} ${now.getHours()}:${now.getMinutes()}`)})
-        window.location.reload()
+        }, () => {let now = new Date(); Number($(scope).parent().html(`${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()} ${now.getHours()}:${now.getMinutes()}`))
+    console.log("now",now)})
+        //window.location.reload()
     }
 
 </script>

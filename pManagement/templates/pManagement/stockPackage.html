@@ -505,7 +505,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Save changes</button>
+                        <button type="submit" class="btn btn-primary" id ="EditButton">Save changes</button>
                     </div>
                 </div>
             </div>
@@ -551,7 +551,7 @@
             var tipo = $("input[name=tipo]:checked").val()
             var csrfmiddlewaretoken = $('input[name=csrfmiddlewaretoken]').val()
             // não está a adicionar o stock pk não está aqui definido  
-            console.log("DADOS--->",typeof tipo)
+            console.log("DADOS--->",pn, link)
 
             var dataForm = new FormData();
             dataForm.append(
@@ -592,6 +592,7 @@
                     console.log("[API] Callback to the endpoint sucess")
                     window.location.reload();  
                     elem.disabled = false
+
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     alert(jqXHR.responseText);
@@ -602,7 +603,7 @@
           /* $("#example tbody").on("click", "#EditRowButton", function () { */
             //Printar todos os campos para ver se ele envia bem para a view
             //aqui são recebidos os dados do modal e são enviados para a view
-
+        var elem = document.getElementById("EditButton")
           var rowIdUpdate = $("#rowIdUpdate").val();
           var pn = $("#novoPartNumberEdit").val();
           var descricao= $("#novoDescriptionEdit").val();
@@ -617,7 +618,6 @@
       
            
           console.log("REQUEST A CAMINHO COM.... --> ",pn,descricao,novoCommentEdit,stock,inv,link,tipo)
-        
           var dataForm = new FormData();
           dataForm.append("rowIdUpdate", rowIdUpdate);
           dataForm.append("partNumberEdit", pn);
@@ -634,7 +634,7 @@
             "csrfmiddlewaretoken",
             $("input[name=csrfmiddlewaretoken]").val()
           );
-
+          elem.disabled = true
           $.ajax({
             type: "POST",
             url: "{% url 'pManagement:updateStockPackage' %}",
@@ -644,6 +644,7 @@
             success: function () {
               console.log("[API] Callback to the endpoint sucess");
               window.location.reload()
+              elem.disabled = false
             },
           });
         };
@@ -825,7 +826,7 @@ $('#example').on('change', 'input', function () {
             $(document).on("click", "#BotaoMistery", function () {
                 console.log("Triggered")
                 Swal.fire({
-                title: 'Encontras-te o esteregg. [BRUH]',
+                title: 'Encontras-te o esteregg. [NICE]',
                 width: 600,
                 padding: '3em',
                 color: '#716add',
@@ -944,7 +945,6 @@ function botaoDownloadPdf(){
                 var inv = data[5];
                 var tipo = data[7]
                 var rowIdUpdate = data[8]
-                
                
                 document.getElementById("novoPartNumberEdit").value = partNumber
                 document.getElementById("novoDescriptionEdit").value = descricao
@@ -954,13 +954,6 @@ function botaoDownloadPdf(){
                 document.getElementById("quantidadeInventarioNovoEdit").value = inv
                 document.getElementById("tipo").value = tipo
                 document.getElementById("rowIdUpdate").value = rowIdUpdate
-                // preset code
-                //document.getElementsByName("RetPackage")[0].checked = false
-                //document.getElementsByName("ExpPackage")[0].checked = false
-                //if (tipo == "ReturnablePackage")
-                //    document.getElementsByName("RetPackage")[0].checked = true
-                //else
-                //    document.getElementsByName("ExpPackage")[0].checked = true
 
                 $('#rowIdUpdate').val($(data[8]));
                 $.ajax({
@@ -983,43 +976,13 @@ function botaoDownloadPdf(){
                 complete: function () {
                     //É aqui onde é feita a ligação com a view
 
-                   // window.location.replace("{% url 'pManagement:pdf_view' %}")
                     window.location.reload()
                 }
             })
             });
 
        
-/* 
-        function firstClick() {
-            window.location.replace("{% url 'pManagement:stockPackage' %}?page=1")
-        }
 
-        function prevClick() {
-            var page = parseInt("{{ current_page }}")
-            
-            if ( page == 1)
-                alert("Min page reached (" + 1 + ")")
-            else
-                window.location.replace("{% url 'pManagement:stockPackage' %}?page=" + (page-1))
-        }
-
-            
-      
-
-        function nextClick() {
-            var page = parseInt("{{ current_page }}")
-            var page_max = parseInt("{{ page_max }}")
-            if (page == page_max)
-                alert("Max page reached (" + page_max + ")")
-            else
-                window.location.replace("{% url 'pManagement:stockPackage' %}?page=" + (page+1))
-        }
-
-        function lastClick() {
-            var page_max = parseInt("{{ page_max }}")
-            window.location.replace("{% url 'pManagement:stockPackage' %}?page=" + (page_max))
-        } */
        
         function botaoUpdateStock() {
             const DefaultMixinCss = Swal.mixin({
@@ -1061,8 +1024,7 @@ function botaoDownloadPdf(){
                     console.log("[API] Callback to the endpoint sucess")
                 },
                 complete: function () {
-                    //window.location.replace("{% url 'pManagement:stockPackage' %}")
-                   // window.location.reload()
+                    //dá para por aqui um refrfesh quando clicas no gravar
                 }
             })
         }
@@ -1124,7 +1086,7 @@ function botaoDownloadPdf(){
                     console.log("[API] Callback to the endpoint sucess")
                 },
                 complete: function () {
-                        window.location.replace("{% url 'pManagement:stockPackage' %}")
+                    window.location.reload()
                 }
                 
             }) 

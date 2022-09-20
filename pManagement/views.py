@@ -1432,32 +1432,14 @@ def configurations(request):
 
 
 def supplyPackage(request):
-    # pagina do supplyPackage
-    # clientes = ClientesOEM.produto.through.objects.all()
-    # produtos =  Produtos.objects.all()
+
     tipoEmbalagem = TipoEmbalagem.objects.all()
     stockPackage_items = StockPackage.objects.all()
     kits = SupplyPackage.objects.all()
-    cliente_produto = ClienteProduto.objects.all()
 
     listaFinal = []
 
-    """  for cliente in clientes:
-        for produto in produtos:
-            if cliente.id == produto.cliente:
-                lista_objecto = {
-                    "cliente": cliente.oem,
-                
-                    
-                    
-                }
-                lista.append(lista_objecto)
-    for element in lista:
-        if element in listaFinal:
-            continue
-        else:
-            listaFinal.append(element)
-    """
+
     return render(
         request,
         "pManagement/supplyPackage.html",
@@ -1535,8 +1517,6 @@ def downloadExcelSupplyPackage(request):
     lambda u: u.groups.filter(Q(name="pManagement") | Q(name="SupplyPackage")).exists()
 )
 def addRowSupplyPackage(request):
-    
-    print("REQUEST ADD->", request.POST)
     if request.method == "POST":
         pn = request.POST.get("pnAdd")
         kitDescription = request.POST.get("prodDescriptionAdd")
@@ -1547,15 +1527,13 @@ def addRowSupplyPackage(request):
         
         stockPackages = request.POST.getlist("stockPackages")
         clients = request.POST.getlist("clients")
+        print("REQUEST ADD->", request.POST)
         
 
-        """ if not stockPackages:
-            stockPackages = None
-        if not clients:
-            clients= None """
+         
         print("NO ADD!")
         print("LINK-> ", str( request.FILES.get("novoLinkEdit")))
-        print(f"PART-NUM{pn}, Desc{kitDescription}, Comm {kitComment}, Link{kitlink} StP{stockPackages} , ClienteProd{clients}" )
+        print(f"PART-NUM{pn}, Link{kitlink} StP{stockPackages} , ClienteProd{clients}")
         print("CLDASD->", clients[0].split(","))
         ref = SupplyPackage(
             part_number=pn,
@@ -1564,16 +1542,13 @@ def addRowSupplyPackage(request):
             supply_time=kit_supplyTime,
             stock=kitStock,
         )
-        
-        
         ref.save()
         print("GUARDOU!")
-        # se vierem valores em branco para as listas, tem de dar para adicionar na mesma
         caminho ='SupplyPackage/'
-        if kitlink is not None:
+        if not kitlink:
             print("LINK", kitlink)
-            # alterar o defaultStorage para a pasta desiganada (supplyPackage)
             ref.link = default_storage.save(caminho+kitlink.name, kitlink)
+            print("GUARDOU!")
         for stock in stockPackages[0].split(","):
             if not stock:
                 break
@@ -1656,7 +1631,7 @@ def updateSupplyPackage(request):
         edit_stockPackages = request.POST.getlist("stockPackages")
         edit_clients = request.POST.getlist("clients")
         rowId = request.POST["rowIdUpdate"]
-        print("edit_stockPackages->", edit_stockPackages)
+        print("ID->", request.POST["rowIdUpdate"])
         print("edit_clients->", edit_clients)
 
         ref = SupplyPackage(
@@ -1667,29 +1642,43 @@ def updateSupplyPackage(request):
             stock=edit_stock,
             id=rowId,
         )
-        ref.save()
         caminho ='SupplyPackage/'
-      
+        # se o id do stock e do clientePRod
+        # tens de ir buscar os que já existem lá
+        
         if edit_link is not None:
             print("LINK", edit_link)
-            # alterar o defaultStorage para a pasta desiganada (supplyPackage)
             ref.link = default_storage.save(caminho+edit_link.name, edit_link)
-
+            print("GUARDOu")
         StockPackage.suplyPackage.through.objects.filter(supplypackage_id=rowId).delete()
         ClienteProduto.supply_pkg.through.objects.filter(supplypackage_id=rowId).delete()
-        print("Stock", edit_stockPackages)
-
-        for stock in edit_stockPackages[0].split(","):
-            s = StockPackage.objects.get(id=stock)
-            s.suplyPackage.add(ref)
-            s.save()
-       
-
-        for client in edit_clients[0].split(","):
-            s = ClienteProduto.objects.get(id=client)
-            s.supply_pkg.add(ref)
-            s.save()
+        print("Stock", edit_stockPackages[0])
         ref.save()
+        if edit_stockPackages[0] != "":
+            print("STOCKP N VAZIO-->")
+            for stock in edit_stockPackages[0].split(","):
+                s = StockPackage.objects.get(id=stock)
+                s.suplyPackage.add(ref)
+                s.save()
+        else:  
+            print("STOCKP VAZIO-->")
+            #s= StockPackage.objects.get(suplyPackage=rowId)
+            #s.suplyPackage.add(ref)
+            #s.save()
+       
+        if  edit_clients[0]  != "":
+            print("Clientes N vazio-->",)
+            for client in edit_clients[0].split(","):
+                s = ClienteProduto.objects.get(id=client)
+                s.supply_pkg.add(ref)
+                s.save()
+        else:
+            print("Clientes  VAZIO-->")
+            # s= ClienteProduto.objects.get(supply_pkg_id=rowId)
+            # s.supply_pkg.add(ref)
+            #s.save()
+
+       
     return redirect("pManagement:supplyPackage")
 
 

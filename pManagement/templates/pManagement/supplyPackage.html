@@ -334,7 +334,7 @@
                             </button>
                     </div>
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Create</button>
+                        <button type="submit" class="btn btn-primary" id ="CreateButtonNew">Create</button>
                     </div>
                 </div>
               
@@ -475,7 +475,7 @@
                             NOVO CLIENTE
                         </button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Save changes</button>
+                    <button type="submit" class="btn btn-primary" id ="EditButton">Save changes</button>
                 </div>
                 
             </div>
@@ -863,7 +863,6 @@ aria-labelledby="myModalLabel">
     console.log("VALUES", pnAdd,supplyDescriptionAdd,supplyCommentAdd,supplyStockAdd)
     console.log("StockPackage/ Clientes", stockPackages,clients)
     var elem = document.getElementById("CreateButtonNew")
-            elem.disabled = true
     var dataForm = new FormData();
     dataForm.append(
         "pnAdd", pnAdd
@@ -901,13 +900,11 @@ aria-labelledby="myModalLabel">
             data: dataForm,
             success: function () {
                 console.log("[API] Callback to the endpoint sucess")
-                elem.disabled = false
                 return true;
             },
             complete: function () {
-                return true;
-                elem.disabled = false
                 window.location.reload()
+                elem.disabled = true
             }
         }) 
 };
@@ -926,47 +923,22 @@ function EditRowButton(scope) {
     var stockPackages = []
     var tableReturnable = $('#pnReturnable').DataTable()
     var tableExpendable = $('#pnExpendableTable').DataTable()
-
- /*    if(novoPartNumberEdit=="" || novoPartNumberEdit == undefined){
-        return alert("Deve introduzir um Part-Number");
-    }
-    if(novoStockProdutoEdit <0){
-        return alert("O stock deve ser um valor positivo")
-    }
-    if(novolinkEdit == undefined || novolinkEdit == ""){
-                alert("Link vazio")
-            }
-            else{
-                if(!novolinkEdit.name.endsWith("pptx")){
-                return alert("Not a valid file");
-            }
-        } */
-
+    var elem = document.getElementById("EditButton")//Ver o id do btn(save)
+    elem.disabled = true
     console.log("DADOS->", rowIdUpdate,novoPartNumberEdit,novoDescriptionEdit,novoStockProdutoEdit,novoSupplyTimeEdit,novoLinkEdit)
     $.each(tableReturnable.rows('.selected').nodes(), function (i, item) {
         var data = tableReturnable.row(this).data();
-        console.log("tableReturnableasd", data);
         stockPackages.push(data[3])
     });
 
     $.each(tableExpendable.rows('.selected').nodes(), function (i, item) {
         var data = tableExpendable.row(this).data();
-        console.log("tableExpendablesade", data);
         clients.push(data[5])
     });
 
-    console.log("CLIENTES",clients)
-    console.log("STOCKPACK",stockPackages)
-
-    if(!novoPartNumberEdit.length){
-        return alert("Part-number is not valid")
-    }
-    if(novoStockProdutoEdit < 0){
-        return alert("You must set a valid Stock")
-    }
-    if(novoSupplyTimeEdit < 0){
-        return alert("You must set a valid Supply-Time")
-    }
+    if(!clients)clients == null
+    if(!stockPackages)stockPackages == null
+    
 
     var dataForm = new FormData();
     dataForm.append(
@@ -1010,6 +982,7 @@ function EditRowButton(scope) {
             success: function () {
                 console.log("[API] Callback to the endpoint sucess")
                 window.location.reload()
+                elem.disabled = false
             },
             complete: function () {
             }
@@ -1020,7 +993,7 @@ function EditRowButton(scope) {
     var newComment = $("#newComment").val();
     var clienteAdd = $("#getCliente").val();
     var produtos =  $("#getProds").val();
-    var tableExpendable = $('#tableExpendable').DataTable();
+    var tableExpendable = $('#pnExpendableTable').DataTable();
 
     $.ajax({
         type: 'POST',
@@ -1036,7 +1009,8 @@ function EditRowButton(scope) {
             console.log("Chegou ao  DRAW")
             tableExpendable.row.add(
                 ["", clienteAdd, produtos, newComment, "", resp["id"]]
-            ).draw()//BUG tabela não esta visivél aqui
+            )
+            tableExpendable.draw()
             console.log("PASSOU O DRAW")
             $("#addClientPackage").modal('hide');
             console.log("[API] Callback to the endpoint sucess")
@@ -1065,24 +1039,6 @@ $(document).ready(function () {
         CreateClienteSubmiteButton($(this))
     })
 
-   /*  $('#example tbody').on('click', '#linka', function () {
-        var data = table.row($(this).parents('tr')).data();
-        var link = data[8]
-        
-         if(link==""){
-            return alert("Este campo não tem link")
-        }
-        var popup = confirm("Deseja abrir o ficheiro?")
-        console.log(popup)
-        if (popup == true) {
-            console.log("true")
-            window.open("{% url 'pManagement:pdf_view' %}?link=" + link, '_blank').focus();
-        } else {
-            console.log("false")
-            window.open("{% url 'pManagement:pdf_view1' %}?link=" + link, '_blank').focus();
-        }
-    
-}); */
 
 $('#example tbody').on('click', '#link', function () {
     var data = table.row($(this).parents('tr')).data();
@@ -1345,7 +1301,7 @@ $(document).on("click", "#StockPackageButton", function (e) {
             listaPnReturnable.draw()
 },
         error: function (jqXHR, textStatus, errorThrown) {
-            alert("Error ao carregar os clientes...");
+            alert("Error ao carregar os produtos...");
         }
     ,})
 })
@@ -1451,60 +1407,7 @@ $(document).on('click', '#clientPackage', function () {
 
 
     /* Aqui trata do clicavél do (novo Item) o StockPackage */
-$(document).on('click', '#openBomb', function () {
-                tableExpendable.rows().deselect();
-                var myModal = new bootstrap.Modal(document.getElementById('partNumbersReturnable'))
-                var va = document.getElementById("clientPackage.pn");
-                console.log("VALUE --> ",va);
-                myModal.show()
-            });
 
-            $('#partNumbersReturnable').on('shown.bs.modal', function (e) {
-                $.fn.dataTable.tables({visible: true, api: true}).columns.adjust();
-            });
-
-
-    /* Clicavél da cell Bomb */
-        $(document).on('click', '#bomb', function () {
-            console.log("bomb")
-            var data = table.row($(this).parents('tr')).data();
-            
-            //arranjar maneira de passar o id sem ter de o ir buscar a tabela
-            var idPacote = data[10]
-            console.log("DATA--> ",data)
-            $.ajax({
-                type: 'GET',
-                url: '/packing/getPNReturnable',
-                data: {
-                    idPacote: idPacote,
-                },
-
-
-                success: function (response) {
-                    console.log(response)
-                    var myModal = new bootstrap.Modal(document.getElementById('showPartNumbersReturnable'))
-                    myModal.show()
-                    if (response["listaReturnable"] != null) {
-                        console.log("entrou no if")
-                        var myArray = response["listaReturnable"]
-                        var myFinalString = ""
-                        console.log("ARRAY-> ", myArray)
-                        for (var key in myArray) {
-                              for (var k in myArray[key]) {
-                                myFinalString += "<strong>" + k + "</strong>" + ": " + myArray[key][k]
-                                myFinalString += "</br>"
-                             }
-                            myFinalString += "\n<br></br>"
-                            console.log("STRING -->", myFinalString)
-                        }
-                        
-                        $('#listPartNumbersReturnable').html(myFinalString);
-                    } else {
-                        $('#listPartNumbersReturnable').html(null);
-                    }
-                }
-            })
-    });
 
 
 $('#example').on('change', 'input', function () {
@@ -1741,37 +1644,6 @@ $('#example').on('change', 'input', function () {
             });
         });
 
-      /*   function firstClick() {
-            window.location.replace("{% url 'pManagement:stockPackage' %}?page=1")
-        }
-
-        function prevClick() {
-            var page = parseInt("{{ current_page }}")
-            
-            if ( page == 1)
-                alert("Min page reached (" + 1 + ")")
-            else
-                window.location.replace("{% url 'pManagement:stockPackage' %}?page=" + (page-1))
-        }
-
-            
-      
-
-        function nextClick() {
-            var page = parseInt("{{ current_page }}")
-            var page_max = parseInt("{{ page_max }}")
-            if (page == page_max)
-                alert("Max page reached (" + page_max + ")")
-            else
-                window.location.replace("{% url 'pManagement:stockPackage' %}?page=" + (page+1))
-        }
-
-        function lastClick() {
-            var page_max = parseInt("{{ page_max }}")
-            window.location.replace("{% url 'pManagement:stockPackage' %}?page=" + (page_max))
-        }
-        */
-
         function botaoUpdateStock() {
             const DefaultMixinCss = Swal.mixin({
                 customClass: {
@@ -1818,9 +1690,6 @@ $('#example').on('change', 'input', function () {
                 }
             })
         }
-
-
-
 
         function botaoUpdateInventario() {
             // FAZEr verificação antes do ouytro popup, caso haja negativos ele nem mostra o outro..

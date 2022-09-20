@@ -1040,9 +1040,9 @@ def changeUserGroups(request):
             )
             my_group.user_set.remove(user)
         if User.objects.filter(
-            username=request.POST["username"], groups__name="shippingTracking"
+            username=request.POST["username"], groups__name="TrackingAdmin"
         ):
-            my_group = Group.objects.using("default").get(name="shippingTracking")
+            my_group = Group.objects.using("default").get(name="TrackingAdmin")
             my_group.user_set.remove(user)
         if User.objects.filter(
             username=request.POST["username"], groups__name="shippingSecurity"
@@ -1071,7 +1071,7 @@ def changeUserGroups(request):
             )
             my_group.user_set.add(user)
         if grupo == "tracking":
-            my_group = Group.objects.using("default").get(name="shippingTracking")
+            my_group = Group.objects.using("default").get(name="TrackingAdmin")
             my_group.user_set.add(user)
         if grupo == "security":
             my_group = Group.objects.using("default").get(name="shippingSecurity")
@@ -1083,7 +1083,7 @@ def changeUserGroups(request):
         if grupo == "portaria/tracking":
             my_group = Group.objects.using("default").get(name="shippingPortaria")
             my_group.user_set.add(user)
-            my_group = Group.objects.using("default").get(name="shippingTracking")
+            my_group = Group.objects.using("default").get(name="TrackingAdmin")
             my_group.user_set.add(user)
         if grupo == "portaria/security":
             my_group = Group.objects.using("default").get(name="shippingPortaria")
@@ -1100,7 +1100,7 @@ def changeUserGroups(request):
                 name="shippingPortariaReadOnly"
             )
             my_group.user_set.add(user)
-            my_group = Group.objects.using("default").get(name="shippingTracking")
+            my_group = Group.objects.using("default").get(name="TrackingAdmin")
             my_group.user_set.add(user)
         if grupo == "portariaReadOnly/security":
             my_group = Group.objects.using("default").get(
@@ -1117,12 +1117,12 @@ def changeUserGroups(request):
             my_group = Group.objects.using("default").get(name="shippingConfirmation")
             my_group.user_set.add(user)
         if grupo == "tracking/security":
-            my_group = Group.objects.using("default").get(name="shippingTracking")
+            my_group = Group.objects.using("default").get(name="TrackingAdmin")
             my_group.user_set.add(user)
             my_group = Group.objects.using("default").get(name="shippingSecurity")
             my_group.user_set.add(user)
         if grupo == "tracking/confirmation":
-            my_group = Group.objects.using("default").get(name="shippingTracking")
+            my_group = Group.objects.using("default").get(name="TrackingAdmin")
             my_group.user_set.add(user)
             my_group = Group.objects.using("default").get(name="shippingConfirmation")
             my_group.user_set.add(user)
@@ -1135,14 +1135,14 @@ def changeUserGroups(request):
         if grupo == "portaria/tracking/security":
             my_group = Group.objects.using("default").get(name="shippingPortaria")
             my_group.user_set.add(user)
-            my_group = Group.objects.using("default").get(name="shippingTracking")
+            my_group = Group.objects.using("default").get(name="TrackingAdmin")
             my_group.user_set.add(user)
             my_group = Group.objects.using("default").get(name="shippingSecurity")
             my_group.user_set.add(user)
         if grupo == "portaria/tracking/confirmation":
             my_group = Group.objects.using("default").get(name="shippingPortaria")
             my_group.user_set.add(user)
-            my_group = Group.objects.using("default").get(name="shippingTracking")
+            my_group = Group.objects.using("default").get(name="TrackingAdmin")
             my_group.user_set.add(user)
             my_group = Group.objects.using("default").get(name="shippingConfirmation")
             my_group.user_set.add(user)
@@ -1158,7 +1158,7 @@ def changeUserGroups(request):
                 name="shippingPortariaReadOnly"
             )
             my_group.user_set.add(user)
-            my_group = Group.objects.using("default").get(name="shippingTracking")
+            my_group = Group.objects.using("default").get(name="TrackingAdmin")
             my_group.user_set.add(user)
             my_group = Group.objects.using("default").get(name="shippingSecurity")
             my_group.user_set.add(user)
@@ -1167,7 +1167,7 @@ def changeUserGroups(request):
                 name="shippingPortariaReadOnly"
             )
             my_group.user_set.add(user)
-            my_group = Group.objects.using("default").get(name="shippingTracking")
+            my_group = Group.objects.using("default").get(name="TrackingAdmin")
             my_group.user_set.add(user)
             my_group = Group.objects.using("default").get(name="shippingConfirmation")
             my_group.user_set.add(user)
@@ -1181,7 +1181,7 @@ def changeUserGroups(request):
             my_group = Group.objects.using("default").get(name="shippingConfirmation")
             my_group.user_set.add(user)
         if grupo == "tracking/security/confirmation":
-            my_group = Group.objects.using("default").get(name="shippingTracking")
+            my_group = Group.objects.using("default").get(name="TrackingAdmin")
             my_group.user_set.add(user)
             my_group = Group.objects.using("default").get(name="shippingSecurity")
             my_group.user_set.add(user)
@@ -1191,7 +1191,7 @@ def changeUserGroups(request):
         if grupo == "portaria/tracking/security/confirmation":
             my_group = Group.objects.using("default").get(name="shippingPortaria")
             my_group.user_set.add(user)
-            my_group = Group.objects.using("default").get(name="shippingTracking")
+            my_group = Group.objects.using("default").get(name="TrackingAdmin")
             my_group.user_set.add(user)
             my_group = Group.objects.using("default").get(name="shippingSecurity")
             my_group.user_set.add(user)
@@ -1202,7 +1202,7 @@ def changeUserGroups(request):
                 name="shippingPortariaReadOnly"
             )
             my_group.user_set.add(user)
-            my_group = Group.objects.using("default").get(name="shippingTracking")
+            my_group = Group.objects.using("default").get(name="TrackingAdmin")
             my_group.user_set.add(user)
             my_group = Group.objects.using("default").get(name="shippingSecurity")
             my_group.user_set.add(user)
@@ -1527,17 +1527,12 @@ def reportConfirmation(request):
 
 
 def trackingPage (request):
-    #falta chamada à bd, tens de receber os campos todos e percorrer lá na view.
-    #tens de pegar os users/grupos
-    # pegar os useres que estão num determinado grupo
-    tracking = TrackingPage.objects.all()
     user = User.objects.all()
-    
-    
-    
     users_in_group = Group.objects.get(name="TrackingAdmin").user_set.all()
-    #if user.groups.filter(name__in=['TrackingAdmin']).exists()  :
-    print("GROUPS", user,users_in_group)
+    #teste = Sct_Det_View.objects.all()
+    tracking = TrackingPage.objects.all()
+   # print("TESTE Qad",teste)
+    print("TESTE QAD ",Sct_Det_View.objects.all())
 
     return render(
         request,
@@ -1551,19 +1546,25 @@ def trackingPage (request):
 
 
 def get_time(value):
-    print(value)
-    return value and isinstance(value, float) and datetime.fromtimestamp(float(value))
-
+    if not value:
+        return None
+    try:
+        float(value)
+    except ValueError:
+        return datetime.strptime(value, "%Y-%m-%d %H:%S")
+    else:
+        return datetime.fromtimestamp(float(value))
 
 def addNewRowTracking(request):
     if request.method == "POST":
-        print("REQ->",request.POST)
         id = request.POST.get("id")
         if id:
             query = TrackingPage.objects.get(id=id)
         else:
-            query = TrackingPage(id=id)
+            query = TrackingPage()
             
+        print("TESTE DATE" ,  get_time(request.POST.get("inicioPrep")))
+
         if (data := get_time(request.POST.get("data_"))):
             query.data = data
         if (nShipper := request.POST.get("nShipper")):
@@ -1584,18 +1585,19 @@ def addNewRowTracking(request):
 
 
 def addLine(request):
-    """    user = User.objects.get(username="andre")  # get Some User
-    print("USER",user)
-    if user.groups.filter(name="TrackingAdmin"):
-        print("PERTENCE AO GRUPO")
-    """
-    dataEmpty = TrackingPage()
-    dataEmpty.save()
-    return redirect("shippers:trackingPage")
+        """    user = User.objects.get(username="andre")  # get Some User
+        print("USER",user)
+        if user.groups.filter(name="TrackingAdmin"):
+            print("PERTENCE AO GRUPO")
+        """
+
+        dataEmpty = TrackingPage()
+
+        dataEmpty.save()
+        return redirect("shippers:trackingPage")
 
 def addData(request):
-    from datetime import date
-     
+    from datetime import date 
     ids = request.POST["ids"]
     print("ID",ids)
     #dataEmpty = TrackingPage()
@@ -1604,7 +1606,7 @@ def addData(request):
     today = date.today()
     #dataEmpty.data= today
     print("HJ", today)
-    dataEmpty.save()
+    #dataEmpty.save()
 
 def addInicioPrep(request):
     from datetime import date 
@@ -1646,7 +1648,3 @@ def deleteRowTracking(request):
         print(stockPackagePack.all().get(id=row_id))
         stockPackagePack.all().get(id=row_id).delete()
     return redirect("shippers:trackingPage")
-
-
-def editRowTracking(request):
-    ...
