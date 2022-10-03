@@ -56,7 +56,7 @@ class SupplyPackage(models.Model):
     supply_time = models.IntegerField(default=60, blank="true", null=True)
     stock = models.IntegerField(default=0, blank="true", null=True)
     inventario = models.IntegerField(default=0, blank="true", null=True)
-    link = models.FileField(upload_to="SupplyPackage/", blank="true", null="true")
+    link = models.FileField(upload_to="SupplyPackage/",max_length=200, blank="true", null="true")
     #cliente_produto = models.ForeignKey("vware.ClienteProduto", on_delete=models.CASCADE, default=None,blank="true", null="true")
 
 
@@ -76,7 +76,7 @@ class PackageType(Enum):
     RET = "Returnable"
 
 
-class StockPackage(models.Model):
+class   StockPackage(models.Model):
     pn = models.CharField(max_length=50, null=False, db_index=True, blank=False)
     # produto = models.ForeignKey(Produtos, on_delete=models.CASCADE, default=None,blank="true", null="true")
     suplyPackage = models.ManyToManyField(SupplyPackage)

@@ -417,16 +417,18 @@ def uploadStockFile(request):
             return HttpResponseBadRequest(
                 "Não foi encontrado nenhum sheet no excel..."
             )
-
+       
         if len(list(sheet.columns)) != 9:
             return HttpResponseBadRequest("Ficheiro com formatação errada.")
-
         for i in list(sheet)[1:]:
             pn, desc, com, cpkg, spkg, stime, stock, inv, link = (
                 i[x].value if len(i) - 1 >= x else None for x in range(9)
             )
+            print("LINK->",link)  
 
-            cpkg = re.findall(r"(\S+)?-(\S+)?", cpkg) if cpkg else []
+            
+            #cpkg = re.findall(r"(\S+)?-(\S+)?", cpkg) if cpkg else []
+            cpkg = cpkg.split("_") if cpkg else []
             spkg = spkg.split(";") if spkg else []
 
             ref = SupplyPackage.objects.create(
@@ -436,25 +438,29 @@ def uploadStockFile(request):
                 supply_time=stime,
                 stock=stock,
                 inventario=inv,
-                link=link,
+                link = link,
             )
+             
 
             for pkg in cpkg:
-                c, _ = ClientesOEM.objects.get_or_create(oem=pkg[0])
-                p = Produtos(nome=pkg[1])
+                print("PKG",cpkg[1])
+                c, _ = ClientesOEM.objects.get_or_create(oem=cpkg[0])
+                print("->", _)
+                p = Produtos(nome=cpkg[1])
                 p.save()
 
-                c.suplyPackage.add(ref)
+                c.suplyPackage.add(ref)     
 
                 cp = ClienteProduto(
                     cliente=c,
                     produto=p
-                )
+                )               
                 cp.save()
                 cp.supply_pkg.add(ref)
 
             for pkg in spkg:
-                c = StockPackage(pn=pkg, tipo="Returnable")
+                #fazer verificação caso o stockPackage não exista
+                c = StockPackage(pn=pkg, tipo="")
                 c.save()
                 c.suplyPackage.add(ref)
 
@@ -1432,7 +1438,6 @@ def configurations(request):
 
 
 def supplyPackage(request):
-
     tipoEmbalagem = TipoEmbalagem.objects.all()
     stockPackage_items = StockPackage.objects.all()
     kits = SupplyPackage.objects.all()
@@ -1516,55 +1521,71 @@ def downloadExcelSupplyPackage(request):
 @user_passes_test(
     lambda u: u.groups.filter(Q(name="pManagement") | Q(name="SupplyPackage")).exists()
 )
-def addRowSupplyPackage(request):
-    if request.method == "POST":
-        pn = request.POST.get("pnAdd")
-        kitDescription = request.POST.get("prodDescriptionAdd")
-        kitComment = request.POST.get("prodCommentAdd")
-        kitStock = request.POST.get("prodStockAdd")
-        kitlink = request.FILES.get("novoLinkEdit")
-        kit_supplyTime = request.POST.get("supplyTimeAdd", 60) or 60
-        
-        stockPackages = request.POST.getlist("stockPackages")
-        clients = request.POST.getlist("clients")
-        print("REQUEST ADD->", request.POST)
-        
+def addRowSupplyPackage(request):  
+    pn = request.POST.get("pnAdd")
+    kitDescription = request.POST.get("prodDescriptionAdd")
+    kitComment = request.POST.get("prodCommentAdd")
+    kitStock = request.POST.get("prodStockAdd")
+    kitlink = request.FILES.get("novoLinkEdit")
+    kit_supplyTime = request.POST.get("supplyTimeAdd", 60) or 60
+    
+    stockPackages = request.POST.getlist("stockPackages")
+    clients = request.POST.getlist("clients")
+    print("REQUEST ADD->", request.POST)
+    
 
-         
-        print("NO ADD!")
-        print("LINK-> ", str( request.FILES.get("novoLinkEdit")))
-        print(f"PART-NUM{pn}, Link{kitlink} StP{stockPackages} , ClienteProd{clients}")
-        print("CLDASD->", clients[0].split(","))
-        ref = SupplyPackage(
-            part_number=pn,
-            description=kitDescription,
-            comment=kitComment,
-            supply_time=kit_supplyTime,
-            stock=kitStock,
-        )
-        ref.save()
+        
+    print("NO ADD!")
+    #print("LINK-> ", str( request.FILES.get("novoLinkEdit")))
+    print(f"PART-NUM{pn},DESC {kitDescription}, kitStock {kitStock}, kitSupTime {kit_supplyTime},    StP{stockPackages} , ClienteProd{clients}")
+    print("CLDASD->", clients[0].split(","))
+    """   ref = SupplyPackage(
+        part_number=pn,
+        description=kitDescription,
+        comment=kitComment,
+        supply_time=kit_supplyTime,
+        stock=kitStock,
+    ) """
+    ref = SupplyPackage()
+    ref.part_number = pn
+    ref.description = kitDescription
+    ref.comment = kitComment
+    ref.supply_time = kit_supplyTime
+    ref.stock = kitStock
+   
+    
+     
+    caminho ='SupplyPackage/'
+    print("link",kitlink, type(kitlink))
+    if kitlink != None:
+        print("tas no link")
+        print("LINK", kitlink)
+        ref.link = default_storage.save(caminho+kitlink.name, kitlink)
+        
         print("GUARDOU!")
-        caminho ='SupplyPackage/'
-        if not kitlink:
-            print("LINK", kitlink)
-            ref.link = default_storage.save(caminho+kitlink.name, kitlink)
-            print("GUARDOU!")
-        for stock in stockPackages[0].split(","):
-            if not stock:
-                break
+    ref.save()
+        #tens de printar a ref
+    print("ref",ref.part_number)
+    for stock in stockPackages[0].split(","):
+        if not stock:
+            break
 
-            s = StockPackage.objects.get(id=stock)
-         
-            s.suplyPackage.add(ref)
-            s.save()
-        for client in clients[0].split(","):
-            if not stock:
-                break
-
-            s = ClienteProduto.objects.get(id=client)
-            print("S ClienteP",s)
-            s.supply_pkg.add(ref)
-            s.save()
+        
+        print("Erro está nas linhas seguintes",StockPackage.objects.get(id=stock).pn, stock,ref.id)
+        s = StockPackage.objects.get(id= stock)
+        s.suplyPackage.add(ref)
+        s.save()
+        print("Guardou StPckg")
+    for client in clients[0].split(","):
+        if not stock:
+            break
+        s = ClienteProduto.objects.get(id=client)
+        print("S ClienteP",s)
+        s.supply_pkg.add(ref)
+        print("ref do clienteProd", s.supply_pkg)
+        s.save()
+        print("GUARDROU clientes")
+    ref.save()
     return redirect("pManagement:supplyPackage")
 
 def display_pdf(fobj: io.FileIO, fname: str):
@@ -1574,6 +1595,7 @@ def display_pdf(fobj: io.FileIO, fname: str):
     return response
 
 def pdf_view(request):
+    #esta func server para converter PPTs para PDFs e abrir no browser
     import aspose.slides as slides
 
     link = request.GET.get("link")
@@ -1597,29 +1619,35 @@ def pdf_view(request):
         response = FileResponse(f, filename=link, as_attachment=True)
     return response
 
-    
-def pdf_view1(request):
-    print("CHEGASTE AO PDF1")
-    link = request.GET.get("link")
-    filename = link.split("/")[-1]
-    # é aqui que vais por o sistema de pastas, ele está a ir ao defaultStorage buscar
-    try:
-        f = default_storage.open(filename)
-    except FileNotFoundError:
-        raise Http404("Ficheiro não existe.")
-
+def factory_response_file(link: str, f):
     if link.split(".")[-1] == "pdf":
         response = HttpResponse(f.read(), content_type="application/pdf")
-        # aqui talvez dê para ir buscar o nome do file ao titulo
         response["Content-Disposition"] = f'filename={link.split("/")[-1]}'
     else:
         response = FileResponse(f, filename=link, as_attachment=True)
     return response
+    
+def pdf_view1(request):
+    link = request.GET.get("link")
+    print("Link recebido", link)
+    
+    if link.startswith("\\\\"):
+        with open(link, "r") as f:
+            return factory_response_file(link, f, encoding='utf-8' ) 
+            
+            
+
+    # é aqui que vais por o sistema de pastas, ele está a ir ao defaultStorage buscar
+    #está a atrofiar com o sybol & do MP&L
+    try:
+        f = default_storage.open(link)
+    except FileNotFoundError:
+        raise Http404("Ficheiro não existe.")
+
+    return factory_response_file(link, f)
 
 
 def updateSupplyPackage(request):
-    print("REquest do update SUPPLY PACKAGE--> ", request.POST)
-
     if request.method == "POST":
         edit_partNumber = request.POST.get("novoPartNumberEdit")
         edit_description = request.POST.get("novoDescriptionEdit")
@@ -1627,7 +1655,7 @@ def updateSupplyPackage(request):
         edit_stock = request.POST.get("novoStockProdutoEdit")
 
         edit_supplyTime = request.POST.get("novoSupplyTimeEdit", 60) or 60
-        edit_link = request.FILES.get("novolinkEdit")
+        edit_link = request.FILES.get("novolinkEdit") 
         edit_stockPackages = request.POST.getlist("stockPackages")
         edit_clients = request.POST.getlist("clients")
         rowId = request.POST["rowIdUpdate"]
@@ -1649,13 +1677,14 @@ def updateSupplyPackage(request):
         if edit_link is not None:
             print("LINK", edit_link)
             ref.link = default_storage.save(caminho+edit_link.name, edit_link)
-            print("GUARDOu")
+        else:
+            print("Empty Link")
+            s = SupplyPackage.objects.get(id=rowId)
+            ref.link = s.link
         StockPackage.suplyPackage.through.objects.filter(supplypackage_id=rowId).delete()
         ClienteProduto.supply_pkg.through.objects.filter(supplypackage_id=rowId).delete()
-        print("Stock", edit_stockPackages[0])
         ref.save()
         if edit_stockPackages[0] != "":
-            print("STOCKP N VAZIO-->")
             for stock in edit_stockPackages[0].split(","):
                 s = StockPackage.objects.get(id=stock)
                 s.suplyPackage.add(ref)
@@ -2118,7 +2147,7 @@ def createClienteProduto(request):
             ref.save()
 
         ref= ClientesOEM.objects.get(oem=cliente)
-        
+        #BUG
         if not Produtos.objects.filter(nome=prods):
             prod = Produtos()
             prod.nome = prods
@@ -2150,37 +2179,57 @@ def createClienteProduto(request):
 def updateClienteProduto(request):
     print("REQUEST", request.POST)
     if request.method == "POST":
+        rowId = request.POST["rowIdUpdate"] #id do item da TrackingPage
+        edit_client = request.POST.get("getCliente") #nome do cliente
+        edit_prod = request.POST.get("getProds", "") #nome do prod
+        edit_comentario = request.POST.get("editComment","") #comentario
 
-        rowId = request.POST["rowIdUpdate"]
-        edit_client = request.POST.get("getCliente")
-        edit_prod = request.POST.get("getProds", "")
-        edit_comentario = request.POST.get("editComment","")
+        print("MAMBOS->",ClienteProduto.objects.filter(id=rowId))
+        print("CLientes->", ClientesOEM.objects.filter(oem=edit_client))
+        
+        #clients = ClientesOEM.objects.get(oem=edit_client).id	
+        #prods = Produtos.objects.get(id=ClienteProduto.objects.get(id=rowId).produto_id)
+        #já está a vir o id do cliente que estás a editar
+        #print("PRODUTOS-> ", Produtos.objects.get(nome=edit_prod).id)
+        #tens de printar os valores filtrados do clientesOEM e do PRODUTO,  
+        #client_ref = ClientesOEM.objects
 
-        print("MAMBOS->",edit_comentario)
-        client_ref = ClientesOEM.objects
-        if not ClientesOEM.objects.filter(oem=edit_client).exists():
+        if not ClientesOEM.objects.filter(oem=edit_client):
+            print("ENTROUClientes")
             ref = ClientesOEM()
             ref.oem = edit_client
             ref.save()
+            id_clienteNovo = ref.id
+            print("ID NOVO", id_clienteNovo)
+            
+
+            #preciso de mandar este id para a qery mais em baixo
             #client_ref.oem = edit_client
 
-        prod_ref = Produtos.objects
-        if not Produtos.objects.filter(nome=edit_prod).exists():
+        #prod_ref = Produtos.objects
+        #prod_obj = Produtos.objects.get(nome=edit_prod)
+        # print("PRODBJ", prod_obj,edit_prod)
+        if not Produtos.objects.filter(nome=edit_prod):
+            print("ENTROUPRODS")
             ref = Produtos()
             ref.nome = edit_prod
             ref.save()
+            id_produtoNovo = ref.id
+            print("ID NOVOPROD", id_produtoNovo)
             #prod_ref.nome = edit_prod
         
+     
 
-        ref_client = ClientesOEM.objects.get(oem=edit_client)
-        ref_prod = Produtos.objects.get(nome=edit_prod)
+        #ref_client = ClientesOEM.objects.get(id=ClientesOEM.objects.get(oem=edit_client).id)
+        #ref_prod = Produtos.objects.get(id=ClienteProduto.objects.get(id=rowId).produto_id) 
+        #estas 2 linhas ele está a dar erro
         if edit_comentario == None or edit_comentario == "":
             edit_comentario=""  
         ref = ClienteProduto(
             id = rowId,
             comment=edit_comentario,
-            produto = ref_prod,
-            cliente=ref_client,
+            produto = Produtos.objects.get(id=id_produtoNovo), 
+            cliente= ClientesOEM.objects.get(id=id_clienteNovo),
         )
         
         #Produtos.objects.filter(cliente_id=rowId).update(cliente_id=None)

@@ -9,6 +9,8 @@ from django.urls import path
 app_name = "shippers"
 
 urlpatterns = [
+        path('sentry-debug/', views.trigger_error), #test PATH sentry dash
+
     path("shippersTracking/", views.shippersTracking, name="shippersTracking"),
     path("deleteRowTracking/", views.deleteRowTracking, name="deleteRowTracking"),
     path(
@@ -22,6 +24,7 @@ urlpatterns = [
     path("addFimPrep/", views.addFimPrep, name="addFimPrep"),
     path("addConfirmacao/", views.addConfirmacao, name="addConfirmacao"),
     path("addNewRowTracking/", views.addNewRowTracking, name="addNewRowTracking"),
+     path("botaoDadosQAD/", views.botaoDadosQAD, name="botaoDadosQAD"),
     #Fim do TrackingPage
     path("tracking/", views.tracking, name="tracking"),
     path("tracking2/", views.tracking2, name="tracking2"),

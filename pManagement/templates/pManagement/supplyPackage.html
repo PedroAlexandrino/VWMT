@@ -1043,7 +1043,13 @@ $(document).ready(function () {
 $('#example tbody').on('click', '#link', function () {
     var data = table.row($(this).parents('tr')).data();
     var link = $(data[8]).html()
+    var linkObj = new URLSearchParams()
+    linkObj.append("link", link.replace("&amp;", "&"))
+    console.log("Link encoded", linkObj.toString())
+    console.log("Link non-encoded", link)
+
     if(link == "" || link == undefined){return}
+        console.log("LINK",link)
 
     const DefaultMixinCss = Swal.mixin({
         customClass: {
@@ -1058,7 +1064,7 @@ $('#example tbody').on('click', '#link', function () {
         cancelButtonText: `No`,
         }).then((result) => {
         if (result.isConfirmed) {
-            window.open("{% url 'pManagement:pdf_view1' %}?link=" + link, '_blank').focus();
+            window.open("{% url 'pManagement:pdf_view1' %}?" + linkObj.toString(), '_blank').focus();
         }
     })
 });
@@ -1795,7 +1801,7 @@ $('#example').on('change', 'input', function () {
                 },
                
                 complete: function () {
-                    window.location.reload()
+                   // window.location.reload()
                 }
             })
         }

@@ -18,52 +18,58 @@
     <table id="example" class="stripe hover cell-border " style="width:100%;" >
         <thead>
         <tr>
-            <td style="text-align: center">Data</td>
             <td style="text-align: center">Nº Shipper</td>
+            <td style="text-align: center"></td>
             <td style="text-align: center">QT Cx</td>
             <td style="text-align: center">Inicio Prep.</td>
             <td style="text-align: center">Fim Prep.</td>
             <td style="text-align: center">Confirmação</td>
+           
+            <td style="text-align: center">Ship Date</td>
+            <td style="text-align: center">Ship Time</td>
+            <td style="text-align: center">Carrier</td>
             <td style="text-align: center">Comentários</td>
+            
             <td></td>
             <td style="display: none" ></td>
         </tr>
         </thead>
         <tbody>
         {% for tracking in items %}
+            
+     
         <tr>
 
-            {% if tracking.confirmacao != None %}
-            <td style="width: 10%;text-align: center; background-color: lightgreen;" title="{{ tracking.data|default:'Empty' }}"  id="data_"  >
-                {{ tracking.data|default:""}}
-                {% else %}
+           
+            {% if tracking.confirmacao != None  %}
+                <td style="width: 5%;text-align: center; background-color: lightgreen;" title="{{ tracking.nShipper|default:'Empty' }}">{{ tracking.nShipper|default:""}}</td>
+            {% else %}
+            {% if tracking.inicioPrep != None or tracking.ship_carrier != None %}
+                <td style="width: 5%;text-align: center" title="{{ tracking.nShipper|default:'Empty' }}">{{ tracking.nShipper|default:""}}</td>
+            {% else %}
+                <td style="width: 5%;text-align: center" title="{{ tracking.nShipper|default:'Empty' }}" contenteditable id="nShipper" class="editable">{{ tracking.nShipper|default:""}}</td>
+            {% endif %}
+            {% endif %}
+            <td style="width: 5%;text-align: center">
+           
+            <a type="button" id="botaoQad"  title="Dados do QAD" class="fas fa-cloud-download-alt"
+            data-toggle="modal">
+            </a>
+           
+            
+        </td>
 
-            <td style="width: 10%;text-align: center" title="{{ tracking.data|default:'Empty' }}"  id="data_"  >
-                {% if tracking.data != None %}
-                    {{ tracking.data|default:""}}
-                {% else %}
-                {% if not user in users_in_group %}
-                <button title="Data" disabled="true" type="submit" style="background: #FBA51A;text-align: center" class="btn btn-primary" id="botaoUpdateData" onclick="getButtonDate(this, 'data_')">Prep Data</button>
-                {% else %}
-                    <button title="Data"  type="submit" style="background: #FBA51A;text-align: center" class="btn btn-primary" id="botaoUpdateData" onclick="getButtonDate(this, 'data_')">Prep Data</button>
-                    {% endif %}
-                {% endif %}
-                {% endif %}
-                </td>
-
-            <td style="width: 20%;text-align: center" title="{{ tracking.nShipper|default:'Empty' }}" contenteditable id="nShipper" class="editable">{{ tracking.nShipper|default:""}}</td>
             <td style="width: 10%;text-align: center" title="{{ tracking.qtyCaixas|default:'Empty' }}" contenteditable id="qtyCaixas" class="editable">{{ tracking.qtyCaixas|default:""}}</td>
           
             <td style="width: 10%;text-align: center;" title="{{ tracking.inicioPrep|default:'Empty'}}" id="inicioPreps">
                 {% if tracking.inicioPrep != None  %}
                     {{ tracking.inicioPrep|default:""}}
                 {% else %}
-                    {% if tracking.data == None or not user in users_in_group  %}
-                    
-                        <button title="Editar" disabled="true" type="submit" style="background: #FBA51A;" class="btn btn-primary" id="botaoUpdateInicioPrep" onclick="getButtonDate(this, 'inicioPrep')">Inicio Prep</button>
-                    {% else %}
+                    {% if tracking.nShipper != None%}
                       <button title="Editar"  type="submit" style="background: #FBA51A;" class="btn btn-primary" id="botaoUpdateInicioPrep" onclick="getButtonDate(this, 'inicioPrep')">Inicio Prep</button>
-                    {% endif %}
+                    {%else%}
+                    <button title="Editar"  type="submit" disabled="true" style="background: #FBA51A;" class="btn btn-primary" id="botaoUpdateInicioPrep" onclick="getButtonDate(this, 'inicioPrep')">Inicio Prep</button>
+                {% endif %}
                 {% endif %}
                 </td>
             
@@ -71,7 +77,7 @@
                 {% if tracking.fimPrep != None %}
                     {{ tracking.fimPrep|default:""}}
                 {% else %}
-                {% if tracking.inicioPrep == None or not user in users_in_group  %}
+                {% if tracking.inicioPrep == None %}
 
                 <button title="Editar" disabled="true"  type="submit" style="background: #FBA51A;" class="btn btn-primary" id="botaoFimPrep" onclick="getButtonDate(this, 'fimPrep')">Fim Prep</button>
                 {% else %}
@@ -83,7 +89,7 @@
                 {% if tracking.confirmacao != None  %}
                     {{ tracking.confirmacao|default:""}}
                 {% else %}
-                {% if tracking.fimPrep == None  or not user in users_in_group  %}
+                {% if tracking.fimPrep == None  %}
                 <button title="Editar"  disabled="true" type="submit" style="background: #FBA51A;" class="btn btn-primary" id="botaoConfirmacao" onclick="getButtonDate(this, 'confirmacao')">Confirmação</button>
                 {% else %}
                     <button title="Editar"  type="submit" style="background: #FBA51A;" class="btn btn-primary" id="botaoConfirmacao" onclick="getButtonDate(this, 'confirmacao')">Confirmação</button>
@@ -91,32 +97,43 @@
                 {% endif %}
             </td>
             
-            <td style="width: 20%;text-align: center;"  title="{{ tracking.comentarios|default:'Empty' }}" contenteditable id="comentario" class="editable"
+            
+
+
+            <td style="width: 10%;text-align: center" title="{{ tracking.ship_date|default:'Empty' }}">{{ tracking.ship_date|default:""}}</td>
+            <td style="width: 10%;text-align: center" title="{{ tracking.ship_time|default:'Empty' }}">{{ tracking.ship_time|default:""}}</td>
+            <td style="width: 10%;text-align: center" title="{{ tracking.ship_carrier|default:'Empty' }}">{{ tracking.ship_carrier|default:""}}</td>
+            <td style="width: 10%;text-align: center;"  title="{{ tracking.comentarios|default:'Empty' }}" contenteditable id="comentario" class="editable"
             >{{ tracking.comentarios|default:""}}</td>
-            <td style="width: 7%">
-                <div class="form-inline">
-                   
+            <td style="width: 5%;text-align: center">
                     <a type="button" id="botaoDelete" title="Delete" class="fas fa-trash-alt"
-                       style="margin-left: 10px; height: 18px"
-                       data-toggle="modal" data-target="#deleteLinha">
+                       data-toggle="modal" data-target="#deleteLinha"> 
                     </a>
-                </div>
+                    <!-- <button title="Mostra dados QAD"  type="submit" style="background: #FBA51A;" class="btn btn-primary" id="botaoDadosQAD">QAD</button> -->
             </td>
             <td style="display: none" id="idSave" value="{{ tracking.id }}">{{ tracking.id }}</td>
         </tr>
-   
+ 
     {% endfor %}
         </tbody>
         <tfoot>
         <tr>
-            <th style="text-align: center" >Data</th>
+             
             <th style="text-align: center">Nº Shipper</th>
+            <th style="text-align: center"></th>
+            
             <th style="text-align: center">QT Cx</th>
             <th style="text-align: center">Inicio Prep</th>
             <th style="text-align: center"> Fim Prep </th>
             <th style="text-align: center">Confirmação</th> <!-- Stock -->
-            <th style="text-align: center">Comentários<th>
-            <th style="display: none" ></th>
+            
+            <th style="text-align: center">Ship Date</th>
+            <th style="text-align: center">Ship Time</th>
+            <th style="text-align: center">Carrier</th>
+            <th style="text-align: center">Comentários</th>
+            <th></th>
+                
+                <th style="display: none" ></th>
         </tr>
         </tfoot>
     </table>
@@ -131,6 +148,8 @@
         style="color: orange; background-color: black; border-radius: 50%; margin-top: 10%;margin-left: 50%;"></a></b>
         {% csrf_token %}
     </h6>
+
+   
 
     
     
@@ -224,13 +243,24 @@
           scrollY: 460,
           scrollCollapse: true,
           info: false,
-          order: [[0,'desc'],[3,'desc']],
+          order:[[3,'desc'],[11,'desc']],
           dom: 'frtipB',
           select: {
             style: "os",
             selector: "th:first-child",
             blurable: true,
           },
+          columnDefs: [{
+                    targets: "_all",
+                    render: function (data, type, row) {
+                        if (data.startsWith('<')) {
+                            return data
+                        }
+                        return data.length > 19 ?
+                            data.substr(0, 19) + '…' :
+                            data;
+                    }
+                }],
           buttons: [
                     'excel'
                 ],
@@ -268,30 +298,30 @@
             var tableRaw = document.getElementById('example');
             var data = $(this).parents('tr').find("td")
             const text = $(this).text()
-
+            console.log(this.id )
             for (let item of tableRaw.rows) {
-                if (item.cells[8] == data[8]) continue
-                if (item.cells[1].innerText == text && item.cells[1].innerText != "") {
-                    item.cells[1].innerText = ""
+                if (item.cells[11] == data[11]) continue
+                
+                if (item.cells[0].innerText == text && item.cells[0].innerText != "" && this.id == "nShipper"  ) { //tá a verificar a igualdade do camponShiper com o texto que eu lhe introduzo
                     return DefaultMixinCss.fire({
                         icon: 'error',
                         title: 'Oops...',
-                        text: 'Valor introduzido já existente',
+                        text: 'Valor introduzido já existente ('+ item.cells[0].innerText+")",
                         confirmButtonText: 'OK',
                     })
                 }
             }
-
+            window.location.reload()
             addOrEditTrackingRow({
                 csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
-                id: data[8].innerText,
-                ...(data[0].tagName == "BUTTON" && {data: data[0].innerText}),
+                id: data[11].innerText,
+            
                 ...(data[3].tagName == "BUTTON" && {data: data[3].innerText}),
                 ...(data[4].tagName == "BUTTON" && {data: data[4].innerText}),
                 ...(data[5].tagName == "BUTTON" && {data: data[5].innerText}),
-                nShipper: data[1].innerText,
+                nShipper: data[0].innerText,
                 qtyCaixas: data[2].innerText,
-                comentarios: data[6].innerText,}
+                comentarios: data[9].innerText,}
             )
         })
 
@@ -306,17 +336,18 @@
     //Estão a vir os btns
 
     console.log("DATA",data)
-    var dataTime = data[0] || ""
-    var nShipper = data[1]
+    var nShipper = data[0]
     var qtyCaixas = data[2]
     var inicioPrep = data[3] || ""
     var fimPrep = data[4] || ""
     var confirmacao= data[5]
-    var comentario = data[6]
+    var comentario = data[9]
+    //falta adicionar as outras 3
+    var ship_date = data[6]
+    var ship_time = data[7]
+    var ship_carrier = data[8]
     
-    if(dataTime.startsWith("<button")){
-        dataTime=""
-    }
+
     if(inicioPrep.startsWith("<button")){
         inicioPrep=""
     }
@@ -328,10 +359,10 @@
     }
     
 
-    console.log("data",dataTime)
+     
+    //Falta fazer para os campos novos
 
-    var modalInfo = "<p>" + "<b>Data:</b>&emsp;&emsp;" + dataTime+ "</b>" +
-
+    var modalInfo = 
         "<p>" + "<b>Nº Shipper:</b>&emsp;&emsp;&emsp;" + nShipper + "</p>" +
         "<p>" + "<b>QT Cx:</b>&emsp;&emsp;&emsp;" + qtyCaixas + "</p>" +
       
@@ -339,15 +370,92 @@
         "<p>" + "<b>Fim Prep:</b>&emsp;&emsp;" + fimPrep + "</p>" +
 
         "<p>" + "<b>Confirmação:</b>&emsp;&emsp;" + confirmacao + "</p>" +
-        "<p>" + "<b>Comentario:</b>&emsp;&emsp;" + comentario + "</p>"
+        "<p>" + "<b>Comentario:</b>&emsp;&emsp;" + comentario + "</p>" +
+         "<p>" + "<b>Shiping Date:</b>&emsp;&emsp;" + ship_date + "</p>"+
+         "<p>" + "<b>Shiping Time:</b>&emsp;&emsp;" + ship_time + "</p>"+
+         "<p>" + "<b>Transportadora:</b>&emsp;&emsp;" + ship_carrier + "</p>"
+         
 
     //inventarioDelete
-    $("#rowIdDelete").val(data[8])
+    $("#rowIdDelete").val(data[11])
     $('#infoDelete').html(modalInfo);
     });
 
+    
+        $('#example tbody').on('click', '#botaoQad', function () {
+        console.log("ENtrou")
+        var data = table.row($(this).parents('tr')).data();
+
+        console.log("ENtraste no js do btn")
+        const DefaultMixinCss = Swal.mixin({
+            customClass: {
+                confirmButton: 'btn btn-primary',
+                backdrop: 'static',
+                keyboard: false,
+                allowOutsideClick: false
+            },
+            buttonsStyling: false //VAI SER NEEDED caso não exista nenhum resultado da view
+        })  
+
+        const DefaultMixinCss1 = Swal.mixin({
+            customClass: {
+               
+
+            },
+            buttonsStyling: false //VAI SER NEEDED caso não exista nenhum resultado da view
+        })  
+       
+        //nao tas no scope da tabela
+        console.log("DATA",data[11])
+        var nShipper = data[0]
+        var carrier = data[8]
+        var id = data[11]
+        console.log("CARRIER", carrier)
+         Swal.fire({
+            icon: 'success',
+            title: 'A consultar o QAD...',
+            showConfirmButton: false,
+            allowOutsideClick: false,
+            allowEscapeKey : true
+        }).then((result) =>{
+            if (result.isDismissed = true) {console.log("sai"); window.location.reload()}
+        })
+        console.log(event.key)
+        switch (event.key) {
+        case 27:
+            window.location.reload()
+        }
+        console.log("ADDING new row")
+         $.ajax({
+         type: "POST",
+         url: "{% url 'shippers:botaoDadosQAD' %}",
+         data: {
+             csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+             nShipper : nShipper,
+             id : id
+             },
+             success: function () {
+                console.log("[API] Callback to the endpoint sucess");
+                window.location.reload()
+         },
+         error: function (){
+            setTimeout(function(){
+            Swal.fire({
+            icon: 'error',
+            title: 'A pesquisa falhou.',
+            showConfirmButton: false
+        },90000, window.location.reload());
+        })
+         }
+         });
+        }
+    );
+
+
     function addNewRow() {
         var table = document.getElementById('example');
+        var btn = document.getElementById('newRow')
+       
         const DefaultMixinCss = Swal.mixin({
             customClass: {
                 confirmButton: 'btn btn-primary',
@@ -356,13 +464,15 @@
         })
                 
         for (let item of [...table.rows].slice(1, table.rows.length-1)) {
-            if ($(item.cells[0].innerHTML).prop("tagName") == "BUTTON"
-                && $(item.cells[3].innerHTML).prop("tagName") == "BUTTON"
+            if ($(item.cells[3].innerHTML).prop("tagName") == "BUTTON"
                 && $(item.cells[4].innerHTML).prop("tagName") == "BUTTON"
                 && $(item.cells[5].innerHTML).prop("tagName") == "BUTTON"
-                && item.cells[1].innerText == ""
+                && item.cells[0].innerText == ""
                 && item.cells[2].innerText == ""
-                && item.cells[6].innerText == "") 
+                && item.cells[6].innerText == ""
+                && item.cells[7].innerText == ""
+                && item.cells[8].innerText == ""
+                && item.cells[9].innerText == "") 
                 return DefaultMixinCss.fire({
                     icon: 'error',
                     title: 'Ops...',
@@ -370,7 +480,7 @@
                     confirmButtonText: 'OK',
                 })
         }
-
+        btn.disabled=true
          console.log("ADDING new row")
          $.ajax({
          type: "POST",
@@ -381,6 +491,7 @@
              complete: function () {
              console.log("[API] Callback to the endpoint sucess");
              window.location.reload()
+             btn.disabled=false
          }
          });
      }
@@ -389,11 +500,11 @@
         var data = table.row($(scope).parents('tr')).data();
         addOrEditTrackingRow({
             csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
-            id: data[8],
+            id: data[11],
             [key]: new Date().getTime() / 1000,
         }, () => {let now = new Date(); Number($(scope).parent().html(`${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()} ${now.getHours()}:${now.getMinutes()}`))
     console.log("now",now)})
-        //window.location.reload()
+        window.location.reload()
     }
 
 </script>

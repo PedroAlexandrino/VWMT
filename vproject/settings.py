@@ -11,6 +11,9 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+import sentry_sdk
+
+from sentry_sdk.integrations.django import DjangoIntegration
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -188,3 +191,37 @@ DEFAULT_FROM_EMAIL = "noreply@visteon.com"
 SERVER_EMAIL = "noreply@visteon.com"
 
 CELERY_TIMEZONE = "Europe/London"
+
+def init_sentry():
+    from sentry_sdk.transport import HttpTransport
+    import urllib3
+    urllib3.disable_warnings()
+
+    def _get_pool_options(self, ca_certs):
+        return {
+            "num_pools": 2,
+            "cert_reqs": "CERT_NONE",
+        }
+
+    HttpTransport._get_pool_options = _get_pool_options
+
+    print(f"Started sentry with debug={DEBUG}")
+    sentry_sdk.init(
+        dsn="https://e0d7423d2dd74e44b7c07bc25f31002b@o4503901221224448.ingest.sentry.io/4503901457088512",
+        integrations=[
+            DjangoIntegration(),
+        ],
+        environment="dev" if DEBUG else "prod",
+        debug=False,
+
+        # Set traces_sample_rate to 1.0 to capture 100%
+        # of transactions for performance monitoring.
+        # We recommend adjusting this value in production.
+        traces_sample_rate=1.0,
+
+        # If you wish to associate users to errors (assuming you are using
+        # django.contrib.auth) you may enable sending PII data.
+        send_default_pii=True
+    )
+
+init_sentry()

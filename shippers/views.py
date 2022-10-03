@@ -1,6 +1,9 @@
+from http.client import HTTPResponse
 import os
 import time
 import math
+from tkinter import NS
+from urllib.error import HTTPError
 import openpyxl
 
 from datetime import datetime
@@ -13,6 +16,7 @@ from django.shortcuts import render, redirect
 from django.db.models import Q
 from django.core.paginator import Paginator
 from qad_ee.models import *
+from django.urls import path
 
 
 # Create your views here.
@@ -31,7 +35,7 @@ def timer():
         yield
     finally:
         # __exit__
-        print(f"A função  demorou {time.perf_counter() -t}ms")
+        print(f"A função  demorou {time.perf_counter() -t}s")
 
 
 @login_required()
@@ -1527,25 +1531,44 @@ def reportConfirmation(request):
         return redirect("shippers:shippersConfirmation")
 
 
+# Edita uma linha da table table(html) e faz edição na db
+@login_required()
+@user_passes_test(
+    lambda u: u.groups.filter(Q(name="TrackingAdmin")).exists())
 def trackingPage (request):
+    import datetime
     user = User.objects.all()
     users_in_group = Group.objects.get(name="TrackingAdmin").user_set.all()
-    #teste = Sct_Det_View.objects.all()
     tracking = TrackingPage.objects.all()
-    teste = AbsMstr.objects.all()
-    actualDay = datetime.today().strftime("%Y-%m-%d")
-   # print("TESTE Qad",teste)
-    print("TESTE QAD ",   AbsMstr.objects.filter(abs_shp_date= "2021-10-28 00:00:00.000").values)
 
+    results_tracking_updated = TrackingPage.objects.raw("SELECT * FROM shippers_trackingpage WHERE inicioPrep > GETDATE()-2 ")
+    results_tracking_historico = TrackingPage.objects.raw("SELECT * FROM shippers_trackingpage WHERE inicioPrep < GETDATE()-2 ")
+    actualDay_menos2 = datetime.datetime.now() - datetime.timedelta(days=2)
+    print(actualDay_menos2, type(actualDay_menos2))
+    tracking_historic = TrackingPage()
+
+    #actualDay_menos2 = actualDay_menos2.strftime("%Y-%m-%d %H:%S")
+    for i in results_tracking_historico:
+        #if i.inicioPrep < actualDay_menos2:
+            print("dados da query-> ", i) 
+
+        #print("DATA->" ,i.inicioPrep, type(i.inicioPrep)," + ", actualDay_menos2, type(actualDay_menos2) )
     return render(
         request,
         "shippers/tracking.html",
         {
             "items": tracking,
             "users": user,
-            "users_in_group": users_in_group
+            "users_in_group": users_in_group,
+            "historico" : results_tracking_historico,
+            "updated_data": results_tracking_updated,
+            "actualDay_menos2": actualDay_menos2,
         },
     )
+
+    
+def trigger_error(request):
+    division_by_zero = 1 / 0
 
 
 def get_time(value):
@@ -1565,11 +1588,7 @@ def addNewRowTracking(request):
             query = TrackingPage.objects.get(id=id)
         else:
             query = TrackingPage()
-            
         print("TESTE DATE" ,  get_time(request.POST.get("inicioPrep")))
-
-        if (data := get_time(request.POST.get("data_"))):
-            query.data = data
         if (nShipper := request.POST.get("nShipper")):
             query.nShipper = nShipper
         if (qtyCaixas := request.POST.get("qtyCaixas")):
@@ -1600,6 +1619,7 @@ def addLine(request):
         return redirect("shippers:trackingPage")
 
 def addData(request):
+    """ PARA ELIMINAR """
     from datetime import date 
     ids = request.POST["ids"]
     print("ID",ids)
@@ -1630,6 +1650,7 @@ def addFimPrep(request):
     dataEmpty.save()
 
 def addConfirmacao(request):
+    #ir na bd-> QAD_EE,    buscar os 3 campos, em principio vao ser relacionar pelo prrowid
     ids = request.POST["ids"]
     dataEmpty = TrackingPage.objects.filter(id=ids)
     from datetime import date 
@@ -1637,6 +1658,44 @@ def addConfirmacao(request):
     dataEmpty.confirmacao= today
     dataEmpty.save()
 
+def botaoDadosQAD(request):
+    from qad_ee.models import AbsMstr, AbscDet
+    from datetime import timedelta
+    from django.http import HttpResponseNotFound
+    nShipper = request.POST["nShipper"]
+    if not nShipper:
+        return HttpResponseNotFound(
+            "nShipper não pode estar vazio"
+            )
+    results_mstr = AbsMstr.objects.raw(f"SELECT * FROM abs_mstr WHERE abs_domain = 3511010 AND abs_id LIKE '_%%{nShipper}' AND abs_id LIKE 's%%' OR abs_id LIKE 'd%%' OR abs_id LIKE 'p%%' ")
+    results_det = AbscDet.objects.raw(f"SELECT * FROM absc_det WHERE absc_domain = 3511010 AND absc_abs_id LIKE '_%%{nShipper}' AND absc_abs_id LIKE 's%%' OR absc_abs_id LIKE 'd%%' OR absc_abs_id LIKE 'p%%' ")
+    abs_mstr = list(results_mstr)
+    absc_det = list(results_det)
+    print("RESULTS -->", abs_mstr, absc_det)
+    id_tracking = request.POST["id"]
+    
+    if not abs_mstr or not absc_det:
+        return HttpResponseNotFound(
+            "Não foi encontrado nenhum value "
+            )
+    else:
+        ref = TrackingPage.objects.get(id=id_tracking)
+        for i in abs_mstr:
+            abs_shp_date = i.abs_shp_date
+            abs_shp_time = i.abs_shp_time
+            convert = str(timedelta(seconds=abs_shp_time))
+            convertData= str(abs_shp_date).split(" ")
+            ref.ship_date =  convertData[0]
+            ref.ship_time = convert
+
+            print("DATA->",  convertData[0])
+        for i in absc_det:
+            absc_carrier= i.absc_carrier
+            ref.ship_carrier = absc_carrier
+           
+        ref.save()
+        print("GUARDOU!")
+    return redirect("shippers:trackingPage")
 
 
 

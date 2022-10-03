@@ -471,23 +471,21 @@ class GatewayTipoViatura(models.Model):
         return f"{self.nome}"
 
 class TrackingPage(models.Model):
-    data = models.DateTimeField(null=True, blank=True)
     nShipper = models.CharField(max_length=10, null=True, blank=True)
     qtyCaixas = models.CharField(null=True, blank=True, max_length=15)
-    inicioPrep = models.DateTimeField(null=True, blank=True)
+    inicioPrep = models.DateField(null=True, blank=True)
     fimPrep= models.DateTimeField(null=True, blank=True)
     confirmacao = models.DateTimeField(null=True, blank=True)
     comentarios = models.CharField(max_length=100, null=True, blank=True)
-    #add view fields
-    def __str__(self):
-        return f"{self.data}"
+    #dados do QAD(Estao ja a ser importados na pasta Qad)
+    ship_date = models.CharField(max_length=20, null=True, blank=True)
+    ship_time = models.CharField(max_length=20, null=True, blank=True)
+    ship_carrier = models.CharField(max_length=20, null=True, blank=True)
 
-""" class Sct_Det_View(models.Model):
-    prrowid = models.ForeignKey("AbsMtr", db_column="prrowid", max_length=36, on_delete=models.CASCADE)
-    sct_sim = models.CharField(db_column="sct_sim", max_length=36)
-    class Meta:
-        managed = False  # Created from a view. Don't remove.
-         """
+    def __str__(self):
+        return f"{self.nShipper}"
+
+
        
 
     

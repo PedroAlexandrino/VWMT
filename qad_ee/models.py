@@ -17,8 +17,8 @@ class AbsMstr(models.Model):
     abs_type = models.CharField(max_length=30, blank=True, null=True)
     abs_status = models.CharField(max_length=80, blank=True, null=True)
     abs_timezone = models.CharField(max_length=30, blank=True, null=True)
-    abs_shp_date = models.DateTimeField(blank=True, null=True)
-    abs_shp_time = models.IntegerField(blank=True, null=True)
+    abs_shp_date = models.DateTimeField(blank=True, null=True)#A Usar
+    abs_shp_time = models.IntegerField(blank=True, null=True)#needd
     abs_arr_date = models.DateTimeField(blank=True, null=True)
     abs_arr_time = models.IntegerField(blank=True, null=True)
     abs_crt_date = models.DateTimeField(blank=True, null=True)
@@ -406,7 +406,7 @@ class AbscDet(models.Model):
     prrowid = models.CharField(primary_key=True, max_length=36)
     absc_abs_id = models.CharField(max_length=30, blank=True, null=True)
     absc_seq = models.IntegerField(blank=True, null=True)
-    absc_carrier = models.CharField(max_length=80, blank=True, null=True)
+    absc_carrier = models.CharField(max_length=80, blank=True, null=True)#paraUsar
     absc_user1 = models.CharField(max_length=80, blank=True, null=True)
     absc_user2 = models.CharField(max_length=80, blank=True, null=True)
     absc_qadc01 = models.CharField(
