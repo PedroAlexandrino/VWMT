@@ -12,6 +12,7 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.db.models import Q
 from django.core.paginator import Paginator
+from qad_ee.models import *
 
 
 # Create your views here.
@@ -1531,8 +1532,10 @@ def trackingPage (request):
     users_in_group = Group.objects.get(name="TrackingAdmin").user_set.all()
     #teste = Sct_Det_View.objects.all()
     tracking = TrackingPage.objects.all()
+    teste = AbsMstr.objects.all()
+    actualDay = datetime.today().strftime("%Y-%m-%d")
    # print("TESTE Qad",teste)
-    print("TESTE QAD ",Sct_Det_View.objects.all())
+    print("TESTE QAD ",   AbsMstr.objects.filter(abs_shp_date= "2021-10-28 00:00:00.000").values)
 
     return render(
         request,

@@ -1,9 +1,8 @@
 from dataclasses import field
 from django.db import models
-from qad_ee.models import SctDet
 
 # Create your models here.
-
+ 
 
 class Teste_browse(models.Model):
     shipFrom = models.CharField(max_length=50, null=True)
@@ -483,13 +482,13 @@ class TrackingPage(models.Model):
     def __str__(self):
         return f"{self.data}"
 
-class Sct_Det_View(models.Model):
-    prrowid = models.CharField(db_column="prrowid", max_length=36)
+""" class Sct_Det_View(models.Model):
+    prrowid = models.ForeignKey("AbsMtr", db_column="prrowid", max_length=36, on_delete=models.CASCADE)
     sct_sim = models.CharField(db_column="sct_sim", max_length=36)
     class Meta:
         managed = False  # Created from a view. Don't remove.
-        
-        db_table = "sct_det"
+         """
+       
 
     
 class SecurityShipper(models.Model):
