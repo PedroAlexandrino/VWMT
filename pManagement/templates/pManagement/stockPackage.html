@@ -280,19 +280,10 @@
                     <a href="#" class="btn btn-outline-primary" value="ClearFilters" onclick="ClearFilters()">Clear filters</a>
                     <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#addLinha" style="margin-left: 55%">Add Item
                         style="background-color: #00117243"
-
                          <button type="button" class="btn btn-primary buttons" style="background-color: #21127251"  id="prints">Print</button>
-                    
-
                     </button>-->
-                  
                         <button type="button"  title="Download Excel" class="btn btn-primary buttons" style="background-color: #21127251" id="downloadExcel">Excel</button>
-                 
-                   
-                       
-                      
-                                
-
+                        
                                 <form method="POST" class="form" action="{% url 'pManagement:updateAllStock' %}"
                                 enctype="multipart/form-data">
                               {% csrf_token %}

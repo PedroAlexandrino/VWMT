@@ -1697,7 +1697,55 @@ def botaoDadosQAD(request):
         print("GUARDOU!")
     return redirect("shippers:trackingPage")
 
+def downloadExcelHistoricoTracking(request):
+    #aqui ele tem de sair pelo menos os dados do ultimo mês, até dois dias antes do dia atual
+    #caso apanhes btns ou campos vazios/Empty, no ficheiro tem de aparecer vazio ou mete o texto dos btns
+    """ 
+     if request.method == "GET":
+        elementos = TrackingPage.objects.raw("SELECT * FROM trackingPage WHERE inicioPrep < GETDATE()-2) #fazer a verificação pelo mês
+        wbProduction = Workbook()
+        file = io.BytesIO()
+        # Não criar um sheet novo e ter um existente ;)
+        sheetProduction = wbProduction.get_sheet_by_name("Sheet")
 
+        sheetProduction.append(
+            [
+                "Nº Shipper",
+                "QT Cx",
+                "Inicio Prep",
+                "Fim Prep",
+                "Confirmação",
+                "Ship Date",
+                "Ship Time",
+                "Carrier",
+                "Comentários"
+            ]
+        )
+
+        for elem in elementos.all(): # em principio não precisa do all()
+            sheetProduction.append(
+                [
+                    str(elem.pn),
+                    str(elem.descricao),
+                    str(elem.comentario),
+                    str(elem.quantidade),
+                    str(elem.inventario),
+                    str(elem.link),
+                    str(elem.tipo),
+                ]
+            )
+
+        wbProduction.save(file)
+        # Voltar a pocição inicial do IO file object
+        file.seek(0)
+
+        data_fmt = datetime.now().strftime("%d-%m-%Y %H:%M")
+        fresp = FileResponse(
+            file, filename=f"StockPackage_{data_fmt}.xlsx", as_attachment=True
+        )
+        return fresp
+     """
+    ...
 
 
 def deleteRowTracking(request):

@@ -137,6 +137,8 @@
         </tr>
         </tfoot>
     </table>
+
+    <button type="button"  title="Download Histórico" class="btn btn-primary buttons" style="background-color: #21127251" id="downloadHistorico">Histórico</button>
     
     <!-- <p id="datepicker" style="display: none" /> -->
 
@@ -506,6 +508,10 @@
     console.log("now",now)})
         window.location.reload()
     }
+    
+    $(document).on('click', '#downloadHistorico', function () {
+            window.location.replace("{% url 'shippers:downloadExcelHistoricoTracking' %}")
+        });
 
 </script>
 {% endblock %}

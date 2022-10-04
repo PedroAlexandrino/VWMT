@@ -24,7 +24,8 @@ urlpatterns = [
     path("addFimPrep/", views.addFimPrep, name="addFimPrep"),
     path("addConfirmacao/", views.addConfirmacao, name="addConfirmacao"),
     path("addNewRowTracking/", views.addNewRowTracking, name="addNewRowTracking"),
-     path("botaoDadosQAD/", views.botaoDadosQAD, name="botaoDadosQAD"),
+    path("botaoDadosQAD/", views.botaoDadosQAD, name="botaoDadosQAD"),
+    path("historico/", views.historico, name="historico"),
     #Fim do TrackingPage
     path("tracking/", views.tracking, name="tracking"),
     path("tracking2/", views.tracking2, name="tracking2"),
