@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     "crispy_forms",
     "widget_tweaks",
     "pedro_test",
+     
 ]
 
 SCHEDULER_DEFAULT = True

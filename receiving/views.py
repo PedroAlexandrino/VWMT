@@ -686,7 +686,7 @@ def errorLog(request):
 
 
 @login_required()
-@user_passes_test(lambda u: u.groups.filter(name="admin").exists())
+@user_passes_test(lambda u: u.groups.filter(name="receivingMNFG").exists())
 def pending(request):
     dia = date.today() - timedelta(days=10)
 
@@ -2931,12 +2931,14 @@ def changeUserGroups(request):
             my_group.user_set.add(user)
             my_group = Group.objects.using("default").get(name="receivingTPM")
             my_group.user_set.add(user)
-        if grupo == "lineRequest/mnfgSupply/tpm":
+        if grupo == "lineRequest/mnfgSupply/tpm/pending":
             my_group = Group.objects.using("default").get(name="receivingMNFG")
             my_group.user_set.add(user)
             my_group = Group.objects.using("default").get(name="receivingLINES")
             my_group.user_set.add(user)
             my_group = Group.objects.using("default").get(name="receivingTPM")
+            my_group.user_set.add(user)
+            my_group = Group.objects.using("default").get(name="pending")
             my_group.user_set.add(user)
         message = (
             "User "
@@ -4295,6 +4297,7 @@ def atualizarAgeing():
 
 
 def enviarEmailsICDR():
+    print("entrou")
     elementosICDR = ICDR.objects
 
     for elem in elementosICDR.all():

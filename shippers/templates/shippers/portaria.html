@@ -1,7 +1,8 @@
-{% extends "vware/baseArmazem.html" %}
+{% extends "vware/baseArmazem1.html" %}
 {% load static %}
 
 {% block body_title %}
+
     <div class="text-primary">
         <h6><b><i class="fa fa-home text-secondary"></i><a href={% url 'main:main' %}><span
                 class="text-secondary"> Home | </span></a> Portaria</b></h6>
@@ -57,149 +58,18 @@
         tfoot input {
             width: 100%;
         }
-        
-    
-    .buttonsPaginator{
-        position: relative;
-        padding: 5px 10px;
-        background: #FBA51A;
-        text-align: center;
-        
-    }
-    .buttonFirst{
-        position: relative;
-        right:    0;
-        background: #FBA51A;
-        text-align: center;
-        margin: 0;
-        height: auto;
-
-        padding: 2px 5px;
-        font-size: 15px;
-        width: 4%;
-        margin-left: 80%;
-        bottom:   188px;
 
 
-    }
-    .buttonPrevious{
-        position: relative;
-        right:    0;
-        background: #FBA51A;
-        text-align: center;
-        margin: 0;
-        height: auto;
-
-        padding: 2px 5px;
-        font-size: 15px;
-        width: 4%;
-        margin-left: 84%;
-        bottom:   212px;
-    }
-    .buttonActual{
-        position: relative;
-        right:    0;
-        background: #FBA51A;
-        text-align: center;
-        margin: 0;
-        height: auto;
-
-        padding: 2px 5px;
-        font-size: 15px;
-        width: 2%;
-        margin-left: 88%;
-        bottom:   235px;
-    }
-    .buttonNext{
-        position: relative;
-        right:    0;
-        background: #FBA51A;
-        text-align: center;
-        margin: 0;
-        height: auto;
-
-        padding: 2px 5px;
-        font-size: 15px;
-        width: 3%;
-        margin-left: 90%;
-        bottom:   259px;
-    }
-    .buttonLast{
-        position: relative;
-        right:    0;
-        background: #FBA51A;
-        text-align: center;
-        margin: 0;
-        height: auto;
-
-        padding: 2px 5px;
-        font-size: 15px;
-        width: 3%;
-        margin-left: 93%;
-        bottom:   283px;
-    }
-
-
-        @media screen and (max-width: 1700px) {
-            .button {
-                width: 35%;
-                height: 70px;
-                display: inline-block;
-                font-family: Arial, "Helvetica", sans-serif;
-                font-size: 45px;
-                color: #fff;
-                text-decoration: none;
-                text-align: center;
-                text-shadow: 1px 1px 0 #7D9EAD, 2px 2px 0 #7D9EAD, 1px 1px 0 #7D9EAD;
-                padding-top: 6px;
-                margin-left: auto;
-                margin-right: auto;
-                left: 30px;
-                position: relative;
-                cursor: pointer;
-                border: none;
-                background: #FBA51A;
-                background-image: linear-gradient(bottom, #E57200 0%, #FBA51A 100%);
-                border-radius: 5px;
-                box-shadow: inset 0px 1px 0px #FBA51A, 0px 5px 0px 0px #cb7b25, 0px 10px 5px #999;
-            }
-
-            .button:active {
-                top: 3px;
-                box-shadow: inset 0px 1px 0px #FBA51A, 0px 2px 0px 0px #E57200, 0px 5px 3px #999;
-            }
-
-            .button:hover, button:focus {
-                outline: none;
-                transform: translateY(0.5px);
-            }
-
-            .containerPrincipal {
-                height: 790px;
-                width: 100%;
-                top: 11px;
-                left: 0px;
-                position: relative;
-                border: 1px solid transparent;
-            }
-
-            .column_left {
-                border-left: 2px solid black;
-            }
-
-            tfoot input {
-                width: 100%;
-            }
-        }
+         
     </style>
 {% endblock %}
 
 {% block body_content %}
+    <!-- PRIMEIRA TABELA -->
     <div class="containerPrincipal">
         {% if readOnly %}
-        <p style="text-align: center; font-size: 60px; margin-bottom: -25px"><b>PORTARIA</b></p>
-        <p style="text-align: center; font-size: 20px; margin-bottom: -25px"><b>ReadOnly</b></p>
-        <table id="gatewayHistory" class="stripe hover row-border" style="width:100%">
+            <p style="text-align: center; font-size: 60px; margin-bottom: -25px"><b>PORTARIA</b></p>
+            <table id="gatewayHistory" class="stripe hover row-border" style="width:100%">
                 <thead>
                 <tr>
                     <th style="font-size: 13px">Data/hora chegada</th>
@@ -221,7 +91,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                {% for elem in elementosGateway %}
+                {% for elem in elementosGateway.all %}
                     <tr>
                         <td title="{{ elem.dataHoraChegada }}">{{ elem.dataHoraChegada }}</td>
                         <td title="{{ elem.condutor }}">{{ elem.condutor }}</td>
@@ -294,9 +164,13 @@
                 </tr>
                 </tfoot>
             </table>
+
+    <!-- BTN EXCEL -->
             <div style="position: absolute;">
-                <button type="button" class="form-control" style="background-color: lightgrey" id="-">Excel</button>
+                <button type="button" class="form-control" style="background-color: lightgrey" id="excel">Excel</button>
             </div>
+
+            <!-- BTN para veres as viaturas -->
             <div style="bottom: 0px; margin-left: 85%; position: absolute">
                 <h6><b><i style="font-size: 20px">Legenda de viaturas </i><a type="button"
                                                                              class="fas fa-plus-circle fa-2x button5"
@@ -306,9 +180,10 @@
             </div>
 
         {% else %}
+        <!-- Outro caso para uma segunda versão da tabela -->
             <p style="text-align: center; font-size: 60px; margin-bottom: -25px"><b>PORTARIA</b></p>
             {% if erro %}
-                <div class="container p-1">
+                <div class="container p-1 infinite-item">
                     <div class="row no-gutters">
                         <div class="col-lg-4 col-md-1 m-auto">
                             <div class="alert alert-danger shadow my-3" role="alert" style="border-radius: 3px">
@@ -355,7 +230,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                {% for elem in items %}
+                {% for elem in elementosGateway.all %}
                     <tr>
                         {% if elem.estado == 'verde' %}
                             <td style="background-color: limegreen">{{ elem.dataHoraChegada }}</td>
@@ -372,7 +247,7 @@
                             {% if elem.dataHoraEntrada %}
                                 {% if elem.abandono == 'true' %}
                                     <td style="max-width: 70px; text-align: center; background-color: rgba(255,0,0,0.50)"
-                                        class="column_left">{{ elem.dataHoraEntrada }}</td>
+                                        class="column_left ">{{ elem.dataHoraEntrada }}</td>
                                 {% else %}
                                     <td style="max-width: 70px; text-align: center; background-color: limegreen"
                                         class="column_left">{{ elem.dataHoraEntrada }}</td>
@@ -473,6 +348,8 @@
                         <td style="display: none">{{ elem.id }}</td>
                     </tr>
                 {% endfor %}
+                <a class="infinite-more-link" href="/next/page">More</a>
+
                 </tbody>
                 <tfoot>
                 <tr>
@@ -515,7 +392,9 @@
                     <td colspan="3"></td>
                 </tr>
                 </tfoot>
+                
             </table>
+
             <button type="button" class="btn btn-secondary mb-3" id="excel">Excel</button>
 
             <div style="bottom: 0px; margin-left: 82%; position: absolute">
@@ -525,31 +404,21 @@
                                                                              style="color: orange; background-color: black; border-radius: 50%; margin-left: 10px; margin-top: 2px"></a></b>
                 </h6>
             </div>
-            <!-- Div onde são criados os btns que vão fazer a ligação entre as paginas-->
-            
-            
+
+            <!-- BTN add nova entrada -->
             <div style="width: 85%; margin-left: 6%; bottom: 0%; position: absolute; border: 3px solid transparent; text-align: center">
                 <button type="submit" class="button" id="clickCriarNovo" data-toggle="modal"
                         data-target="#criarNovo">
                     NOVA ENTRADA
                 </button>
             </div>
-            <div style="position: absolute; right: 25px; bottom: 0">
+
+            <div style="position: absolute; right: 25px; bottom: -5%">
                 <a href="#reportIssue" data-toggle="modal" data-target="#reportIssue" class="fas fa-info-circle"
                    style="font-size: 15px; height: 22px"> Help</a>
             </div>
             </div>
         {% endif %}
-        <br>
-        <div class="dataTables_paginate paging_full_numbers" id="example_paginate">
-            <button class="button buttonFirst" aria-controls="example" data-dt-idx="0" tabindex="0" id="example_first" onclick="firstClick()">First</a>
-            <button class="button buttonPrevious" aria-controls="example" data-dt-idx="1" tabindex="0" id="example_previous" onclick="prevClick()">Previous</a>
-            <span>
-                <button class="button buttonActual" aria-controls="example" data-dt-idx="2" tabindex="0">{{ current_page }}</a>
-            </span>
-            <button class="button buttonNext" aria-controls="example" data-dt-idx="4" tabindex="-1" id="example_next" onclick="nextClick()">Next</a>
-            <button class="button buttonLast" aria-controls="example" data-dt-idx="5" tabindex="-1" id="example_last" onclick="lastClick()">Last</a>
-        </div>
     <form method="POST" enctype="multipart/form-data" action="{% url 'shippers:reportPortaria' %}">
         {% csrf_token %}
         <div class="modal fade" id="reportIssue" tabindex="-1" role="dialog"
@@ -704,18 +573,18 @@
 
     <form method="POST" enctype="multipart/form-data" action="{% url 'shippers:submitGateway' %}">
         {% csrf_token %}
-        <div class="modal fade" id="criarNovo"name="criarNovo"  tabindex="-1" role="dialog" "
+        <div class="modal fade" id="criarNovo" name="criarNovo" tabindex="-1" role="dialog"
              aria-labelledby="myModalLabel">
-            <div class="modal-dialog modal-xl modal-dialog-scrollable " role="document">
-                <div class="modal-content ">
-                    <div class="modal-header" style="background-color: rgba(236,144,0,0.86) ">
+            <div class="modal-dialog modal-xl" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: rgba(236,144,0,0.86)">
                         <h4 class="modal-title" id="myModalLabel" style="margin-left: 40%; font-size: 40px"><i>Inserir
                             dados</i></h4>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                                 aria-hidden="true">&times;</span></button>
                     </div>
-                    <div class="modal-body "  
-                    style="background: linear-gradient(to bottom, rgba(236,144,0,0.86) 0%, ghostwhite 100%); ">
+                    <div class="modal-body"
+                         style="background: linear-gradient(to bottom, rgba(236,144,0,0.86) 0%, ghostwhite 100%); ">
                         <div class="form-inline" style="margin-top: 10px">
                             <div style="text-align: center">
                                 <p style="font-size: 20px"><strong>CONDUTOR</strong></p>
@@ -830,11 +699,10 @@
                                     {% endfor %}
                                 </datalist>
                             </div>
-                            
-                            <div style="margin-left: 40px; text-align: center">
+                            <div style="margin-left: 50px; text-align: center">
                                 <p style="margin-top: 20px; font-size: 20px; margin-left: 200px;" id="selectVeiculo">
                                     <strong>TIPO VEICULO</strong></p>
-                                <p style="margin-left: 200px; font-size: 20px" id="valorNovo"></p>   <!--BUGBTN-->
+                                <p style="margin-left: 200px; font-size: 20px" id="valorNovo"></p>
                             </div>
                         </div>
                     </div>
@@ -853,12 +721,20 @@
 {% endblock %}
 
 {% block javascript %}
+
+<!-- <script src="/static/js/jquery.waypoints.min.js"></script>
+<script src="/static/js/infinite.min.js"></script>   -->
+<script src="https://unpkg.com/@webcreate/infinite-ajax-scroll/dist/infinite-ajax-scroll.min.js"></script>
+
+
+
     <script>
         $(document).ready(function () {
             setInterval(function () {
                 if (!$('#criarNovo').hasClass('show')) {
                     window.location.reload();
                 }
+
             }, 300000)
 
             $('input#empresa').change(function () {
@@ -947,12 +823,6 @@
                 })
             });
 
-       
-
-
-
-
-
             $('input#contacto').change(function () {
                 var contacto = $(this).val()
 
@@ -1001,11 +871,14 @@
 
             if ($(window).width() < 1700) {
                 var table = $('#gatewayHistory').DataTable({
-                   // pageLength: 10,
-                   // pagingType: "full_numbers",
-                    paging: false,
+                    //pageLength: 20,
+                    //pagingType: "full_numbers",
+                    paging: true, 
                     info: false,
                     scrollY: 433,
+                    scroller: {
+                        loadingIndicator: true
+                    },
                     scrollX: true,
                     scrollCollapse: true,
                     order: [[0, 'desc']],
@@ -1048,13 +921,15 @@
                     ],
                 });
             } else {
-                //Table do READONLY
                 var table = $('#gatewayHistory').DataTable({
-                    paging: false,
+                    paging: true,
                     info: false,
-                    scrollY: 433,
+                    scrollY: 485,
                     scrollX: true,
                     scrollCollapse: true,
+                    scroller: {
+                        loadingIndicator: true
+                    },
                     order: [[0, 'desc']],
                     columnDefs: [{
                         "targets": 0,
@@ -1123,7 +998,6 @@
             if (checkedSaidaRead && !checkedRead) {
                 table.columns(11).search('^\s*$', true, false).draw()
             }
-            //PODE SER AQIZ
             $(table.table().container()).on('keyup', 'tfoot input', function () {
                 table
                     .column($(this).data('index'))
@@ -1136,7 +1010,7 @@
                 var data = tableViaturas.cell(row).data();
                 var posicao = ''
                 var posicaoPag = ''
-
+                /* Dá para substituir com switch Case */
                 if (data.includes('camioes1')) {
                     posicao = '1'
                     posicaoPag = '1'
@@ -1227,7 +1101,18 @@
                 })
             });
 
+            
             $('#gatewayHistory tbody').on('click', '#update', function () {
+                //tens de por o btn update a ficar disabled
+                console.log("Tas ai")
+              
+                this.disabled= true
+                //var elem =  this.getElementById("update")
+                //elem.disabled = true    
+                //buttonObject.disabled = true
+                //text.disabled = true
+                //$("update").attr('disabled', true);
+
                 var data = table.row($(this).parents('tr')).data();
                 var abandonado = $(this).closest("tr").find('td:eq(12) input[name=abandonado]:checkbox').is(":checked")
                 var comentariosEntrada = $(this).closest("tr").find('td:eq(13) input').val()
@@ -1241,7 +1126,43 @@
                 if (data[14].startsWith("<input")) {
                     dataHoraSaida = $(this).closest("tr").find('td:eq(14) input').val()
                 }
+                console.log("ID->", data[17])
+                $.ajax({
+                    type: 'POST',
+                    url: '/shippers/submitGatewayRowUpdate/',
+                    data: {
+                        csrfmiddlewaretoken: "{{ csrf_token }}",
+                        'abandono': abandonado,
+                        'comentariosEntrada': comentariosEntrada,
+                        'comentariosSaida': comentariosSaida,
+                        'dataHoraEntrada': dataHoraEntrada,
+                        'dataHoraSaida': dataHoraSaida,
+                        'id': data[17]
+                    },
+                    success: function () {
+                        window.location.reload()
+                       // elem.disabled = false    
+                       /*  window.location = "{% url 'shippers:submitGatewayRowUpdate'  %}" */
+                    }
+                })
+            });
 
+
+            function clickUpdate(scope) {
+                var data = table.row($(this).parents('tr')).data();
+                var abandonado = $(this).closest("tr").find('td:eq(12) input[name=abandonado]:checkbox').is(":checked")
+                var comentariosEntrada = $(this).closest("tr").find('td:eq(13) input').val()
+                var comentariosSaida = $(this).closest("tr").find('td:eq(15) input').val()
+                var dataHoraEntrada = ''
+                var dataHoraSaida = ''
+
+                if (data[11].startsWith("<input")) {
+                    dataHoraEntrada = $(this).closest("tr").find('td:eq(11) input').val()
+                }
+                if (data[14].startsWith("<input")) {
+                    dataHoraSaida = $(this).closest("tr").find('td:eq(14) input').val()
+                }
+                console.log("ID->", data[17])
                 $.ajax({
                     type: 'POST',
                     url: '/shippers/submitGatewayRowUpdate/',
@@ -1258,7 +1179,8 @@
                         window.location = "{% url 'shippers:submitGatewayRowUpdate'  %}"
                     }
                 })
-            });
+            };
+
 
             $(document).on('click', '#botaoVeiculo', function () {
                 $("#criarNovo").hide();
@@ -1286,15 +1208,16 @@
                 $("#tipoViatura").hide();
                 $(".modal-backdrop").remove();
                 $("#valorNovo").html('<a type="button" class="fas fa-plus-circle fa-2x button5" id="botaoVeiculo" style="color: orange; margin-top: -12px; background-color: black; border-radius: 50%"></a>');
+                        var myModal = new bootstrap.Modal(document.getElementById('criarNovo'))
+                        myModal.show()
                 $.ajax({
                     type: 'POST',
-                    url: '/shippers/resetVeiculoDB/',
+                    url: '/shippers/    /',
                     data: {
                         csrfmiddlewaretoken: "{{ csrf_token }}"
                     },
                     success: function () {
-                        var myModal = new bootstrap.Modal(document.getElementById('criarNovo'))
-                        myModal.show()
+                       
                         $('#checkboxVeiculo').prop("checked", false);
                     }
                 })
@@ -1302,6 +1225,8 @@
 
             $(document).on('click', '#clickCriarNovo', function () {
                 $("#valorNovo").html('<a type="button" class="fas fa-plus-circle fa-2x button5" id="botaoVeiculo" style="color: orange; margin-top: -12px; background-color: black; border-radius: 50%"></a>');
+                        var myModal = new bootstrap.Modal(document.getElementById('criarNovo'))
+                        myModal.show()
                 $.ajax({
                     type: 'POST',
                     url: '/shippers/resetVeiculoDB/',
@@ -1309,8 +1234,7 @@
                         csrfmiddlewaretoken: "{{ csrf_token }}"
                     },
                     success: function () {
-                        var myModal = new bootstrap.Modal(document.getElementById('criarNovo'))
-                        myModal.show()
+                       
                         $('#condutor').val('')
                         $('#condutorID').val('')
                         $('#contacto').val('')
@@ -1534,34 +1458,5 @@
             } else
                 document.getElementById('selectVeiculo').style.backgroundColor = "transparent";
         }
-
-        function firstClick() {
-            window.location.replace("{% url 'shippers:portaria' %}?page=1")
-        }
-
-        function prevClick() {
-            var page = parseInt("{{ current_page }}")
-            if ( page == 1)
-                alert("Min page reached (" + 1 + ")")
-            else
-                window.location.replace("{% url 'shippers:portaria' %}?page=" + (page-1))
-        }
-
-        function nextClick() {
-            var page = parseInt("{{ current_page }}")
-            var page_max = parseInt("{{ page_max }}")
-            if (page == page_max)
-                alert("Max page reached (" + page_max + ")")
-            else
-                window.location.replace("{% url 'shippers:portaria' %}?page=" + (page+1))
-        }
-
-        function lastClick() {
-            var page_max = parseInt("{{ page_max }}")
-            window.location.replace("{% url 'shippers:portaria' %}?page=" + (page_max))
-        }
-
-
     </script>
-
 {% endblock %}

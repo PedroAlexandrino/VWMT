@@ -334,6 +334,7 @@ class Gateway(models.Model):
     destinoCarga = models.CharField(max_length=100, null=True)
     tipoViatura = models.CharField(max_length=100, null=True)
     dataHoraEntrada = models.CharField(max_length=100, null=True)
+    dataHoraCarga = models.CharField(max_length=100, null=True)
     estado = models.CharField(max_length=100, null=True)
     abandono = models.CharField(max_length=100, null=True)
     comentEntrada = models.CharField(max_length=300, null=True)
@@ -473,7 +474,7 @@ class GatewayTipoViatura(models.Model):
 class TrackingPage(models.Model):
     nShipper = models.CharField(max_length=10, null=True, blank=True)
     qtyCaixas = models.CharField(null=True, blank=True, max_length=15)
-    inicioPrep = models.DateField(null=True, blank=True)
+    inicioPrep = models.DateTimeField(null=True, blank=True)
     fimPrep= models.DateTimeField(null=True, blank=True)
     confirmacao = models.DateTimeField(null=True, blank=True)
     comentarios = models.CharField(max_length=100, null=True, blank=True)

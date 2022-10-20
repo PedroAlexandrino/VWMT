@@ -735,14 +735,17 @@ $('#example').on('change', 'input', function () {
 
 });
             var table = $('#example').DataTable({
-                "paging": false,
+                paging: true,
+                scroller: {
+                    loadingIndicator: true
+                },
                 orderCellsTop: true,
                 fixedHeader: true,
                 overflow: true,
-                "scrollY": "620px",
-                "scrollX": true,
-                "info": false,
-                "scrollCollapse": true,
+                scrollY: "620px",
+                scrollX: true,
+                info: false,
+                scrollCollapse: true,
                
                 columnDefs: [{
                     targets: "_all",
@@ -763,9 +766,6 @@ $('#example').on('change', 'input', function () {
                 },
                 
                 order: [[0, 'asc']],
-            
-                
-                
                 initComplete: function () {
                     this.api().columns([0, 1]).every(function () {
                         $(document).ready(function() {

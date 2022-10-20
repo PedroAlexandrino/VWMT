@@ -4,12 +4,11 @@ from django.conf.urls.static import static
 from django.views.static import serve
 from django.conf import settings
 from django.conf.urls import url
-from django.urls import path
+from django.urls import path 
 
 app_name = "shippers"
 
 urlpatterns = [
-        path('sentry-debug/', views.trigger_error), #test PATH sentry dash
 
     path("shippersTracking/", views.shippersTracking, name="shippersTracking"),
     path("deleteRowTracking/", views.deleteRowTracking, name="deleteRowTracking"),
@@ -19,14 +18,10 @@ urlpatterns = [
     #Nova PaginaTrackingPage
     path("trackingPage/", views.trackingPage, name="trackingPage"),
     path("addLine/", views.addLine, name="addLine"),
-    path("addData/", views.addData, name="addData"),
-    path("addInicioPrep/", views.addInicioPrep, name="addInicioPrep"),
-    path("addFimPrep/", views.addFimPrep, name="addFimPrep"),
-    path("addConfirmacao/", views.addConfirmacao, name="addConfirmacao"),
     path("addNewRowTracking/", views.addNewRowTracking, name="addNewRowTracking"),
     path("botaoDadosQAD/", views.botaoDadosQAD, name="botaoDadosQAD"),
-    path("historico/", views.historico, name="historico"),
-    #Fim do TrackingPage
+    path("downloadExcelHistoricoTracking/", views.downloadExcelHistoricoTracking, name="downloadExcelHistoricoTracking"),
+    #Fim d path("vware/", include("vware.urls")),o TrackingPage
     path("tracking/", views.tracking, name="tracking"),
     path("tracking2/", views.tracking2, name="tracking2"),
     path("security/", views.security, name="security"),

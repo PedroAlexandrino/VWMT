@@ -1,11 +1,14 @@
+from time import time
 import tablib
 import io
 import math
+import openpyxl
 import typing as t
+import time
 
 from datetime import datetime
 from openpyxl import Workbook
-from openpyxl.reader.excel import load_workbook
+ 
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import EmailMultiAlternatives
@@ -38,9 +41,20 @@ from vware.models import (
     ClienteProduto,
     
 )
+from xlwt import Workbook
 
 from .models import PackageType
+from contextlib import contextmanager
 
+@contextmanager
+def timer():
+    try:
+        # __enter__
+        t = time.perf_counter()
+        yield
+    finally:
+        # __exit__
+        print(f"A função  demorou {time.perf_counter() -t}s")
 
 # Mostra a tabela dos Requests
 @login_required()
@@ -113,7 +127,13 @@ def expendablePacking(request):
     lambda u: u.groups.filter(Q(name="pManagement") | Q(name="StockPackage")).exists()
 )
 def stockPackage(request):
-    partnumbers = StockPackage.objects.all()
+    with timer():
+        partnumbers = StockPackage.objects.all()
+        print("QUERY normal-> ")
+
+    """ with timer(): CASO A PAGINA FQUE COM MUITOS DADOS
+        partnumbers1 = StockPackage.objects.raw("SELECT * FROM vware_stockpackage") """
+    print("QUERY RAW-> ")
     #ver se dá para fazer a query e ordenar os dados por ordem decrescente
     # onde estás a limitar as querys
 
@@ -199,7 +219,7 @@ def updateStockPackage(request):
         #edit_tipo = request.POST.get("tipoEdit")
         edit_tipo = request.POST["tipoEdit"]
 
-        
+        print("LINK-->",edit_link)
         if rowId == "":
             return HttpResponseBadRequest(
             "Não recebe o ID "
@@ -354,6 +374,7 @@ def uploadStockFileStock(request):
         # elimina todos os elementos que estavam na base de dados
 
         workbook = load_workbook(file.open("rb"), data_only = True)
+        # se calhar vais ter de fazer difrente, agarras o nome do file(o path), e manipulas com isso
         sheet = workbook.get_sheet_by_name(workbook.sheetnames[0])
         db = StockPackage.objects
         db.all().delete()
@@ -1596,8 +1617,7 @@ def display_pdf(fobj: io.FileIO, fname: str):
 
 def pdf_view(request):
     #esta func server para converter PPTs para PDFs e abrir no browser
-    import aspose.slides as slides
-
+ 
     link = request.GET.get("link")
     filename = link.split("/")[-1]
     # é aqui que vais por o sistema de pastas, ele está aw ir ao defaultStorage buscar
@@ -1612,7 +1632,7 @@ def pdf_view(request):
         response = display_pdf(f, filename)
     elif fmt == "pptx":
         ffile = io.BytesIO()
-        slides.Presentation(f.name).save(ffile, slides.export.SaveFormat.PDF)
+        #slides.Presentation(f.name).save(ffile, slides.export.SaveFormat.PDF)
         ffile.seek(0)
         response = display_pdf(ffile, filename)
     else:

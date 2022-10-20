@@ -717,7 +717,7 @@ def enviarEmailSchedule():
     # textPath = '//PAVPD002/E_Proj/sharedir/MP&L/Schedule/2021/Novembro 2021/#Daily_Schedule_03.11.2021.xlsx'
 
     table = '</br><table class="display"><thead style="background-color: lightgray"><tr><th>Line</th><th>Site</th><th>Due Date</th><th>Item Number</th><th>Description</th><th>To Complete</th><th>Receiving</th><th>Comentário Receiving</th><th>Shipping</th><th>Comentário Shipping</th></tr></thead><tbody>'
-   
+    print("ENTROU")
     if (
         (timeNow < timeEnd and timeNow > timeBefore)
         and (actualDay.strftime("%A") != "Saturday")

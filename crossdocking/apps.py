@@ -6,5 +6,4 @@ class CrossdockingConfig(AppConfig):
 
     def ready(self):
         from .scheduler import beginSchedule
-
         beginSchedule()

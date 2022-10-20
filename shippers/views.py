@@ -1,5 +1,7 @@
+from fileinput import filename
 from http.client import HTTPResponse
 import os
+import io
 import time
 import math
 from tkinter import NS
@@ -11,7 +13,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 from django.core.mail import EmailMultiAlternatives
-from django.http import JsonResponse
+from django.http import JsonResponse,FileResponse
 from django.shortcuts import render, redirect
 from django.db.models import Q
 from django.core.paginator import Paginator
@@ -20,11 +22,13 @@ from django.urls import path
 
 
 # Create your views here.
-from xlwt import Workbook
+from openpyxl import Workbook
 
 from shippers.models import *
 from qad_ee.models import *
 from contextlib import contextmanager
+
+
 
 
 @contextmanager
@@ -83,27 +87,34 @@ def security(request):
     ).exists()
 )
 def portaria(request):
-    with timer():
+    #Função que vai carregar os dados da bd para a pagina da portaria, em baixo estão as duas manerias de fazer querys à bd, pelos metodos do Django ou com o raw, raw é mais rapido para muotos dados
 
+    with timer():
         readOnly = request.user.groups.filter(name="shippingPortariaReadOnly").exists()
         entrada = request.session.get("entrada")
         saida = request.session.get("saida")
-        empresas = GatewayEmpresa.objects
-        condutores = GatewayCondutor.objects
-        condutoresID = GatewayCondutorID.objects
-        primeiraMatricula = GatewayPrimeiraMatricula.objects
-        segundaMtricula = GatewaySegundaMatricula.objects
-        cargaDescarga = GatewayCargaDescarga.objects
-        docas = GatewayDoca.objects
-        destinosCarga = GatewayDestinoCarga.objects
         elementosGateway = Gateway.objects.all()
-        viatura = GatewayTipoViatura.objects.first()
-        infoCondutores = GatewayInfoCondutor.objects
-
-        p = Paginator(elementosGateway, 20)
+        elementosGateway1 = Gateway.objects.raw("SELECT * FROM shippers_gateway")
+        p = Paginator(elementosGateway, 5)
         page_num = request.GET.get("page", 1)
 
         page_content = p.page(page_num)
+        for i in elementosGateway:
+            print("->",i)
+       
+     
+  
+        empresas = GatewayEmpresa.objects.raw("SELECT * FROM shippers_gatewayempresa")
+        condutores = GatewayCondutor.objects.raw("SELECT * FROM shippers_gatewaycondutor")
+        condutoresID = GatewayCondutorID.objects.raw("SELECT * FROM shippers_gatewaycondutorid")
+        primeiraMatricula = GatewayPrimeiraMatricula.objects.raw("SELECT * FROM shippers_gatewayprimeiramatricula") # 1 Fk
+        segundaMtricula = GatewaySegundaMatricula.objects.raw("SELECT * FROM shippers_gatewaysegundamatricula")
+        cargaDescarga = GatewayCargaDescarga.objects.raw("SELECT * FROM shippers_gatewaycargadescarga")
+        docas = GatewayDoca.objects.raw("SELECT * FROM shippers_gatewaydoca")
+        destinosCarga = GatewayDestinoCarga.objects.raw("SELECT * FROM shippers_gatewaydestinocarga")
+        viatura = GatewayTipoViatura.objects.raw("SELECT TOP 1 * FROM shippers_gatewaytipoviatura")
+        infoCondutores = GatewayInfoCondutor.objects.raw("SELECT * FROM shippers_gatewayinfocondutor") #muitas fK
+        print("TEMPO DA FUNC COM QUERY RAW")
 
     return render(
         request,
@@ -126,6 +137,7 @@ def portaria(request):
             "items": page_content,
             "current_page": page_num,
             "page_max": math.ceil(len(elementosGateway) / 20),
+            
         },
     )
 
@@ -188,7 +200,7 @@ def tracking(request):
                 abs["abs_status"] = "Yes"
             else:
                 abs["abs_status"] = "No"
-            QADad = dadosQADad.filter(ad_addr=abs["abs_shipto"]).distinct()
+            QADad = dadosQADad.filter(ad_addr=abs["abs_shipto"]).distinct() #podes fazer querry
             for ad in QADad.all():
                 row = {
                     "id": abs["abs_id"],
@@ -273,7 +285,7 @@ def tracking2(request):
 
         for abs in AbsMstrPriv.objects.all():
             for ad in dadosQADad.all():
-                if ad["ad_addr"] == abs.abs_shipto_2:
+                if ad["ad_addr" ] == abs.abs_shipto_2:
                     rowAD = AdPriv()
                     rowAD.ad_addr_2 = (abs,)
                     rowAD.ad_city_2 = (ad["ad_city"],)
@@ -363,6 +375,7 @@ def uploadFiles(request):
         excel_files = [
             "//PAVPD002/E_Proj/sharedir/MP&L/Warehouse/PWMS/Shipping/Teste_Browse.xlsx",
             "//PAVPD002/E_Proj/sharedir/MP&L/Warehouse/PWMS/Shipping/Teste_Detail.xlsx",
+            
         ]
 
         filteredTable.objects.all().delete()
@@ -682,6 +695,7 @@ def resetVeiculoDB(request):
 
 
 def submitGatewayRowUpdate(request):
+    print("REQUEST------->",request.POST)
     if (
         request.method == "POST"
         and request.user.groups.filter(name="shippingPortaria").exists()
@@ -700,6 +714,8 @@ def submitGatewayRowUpdate(request):
             dataHoraSaida = request.POST["dataHoraSaida"]
 
         elemento = Gateway.objects.get(id=id)
+        print("ELEM->", elemento)
+        elemento1 = Gateway.objects.raw(f"SELECT * FROM shippers_gateway WHERE id ='{id}")
         if dataHoraSaida != "":
             elemento.dataHoraSaida = dataHoraSaida
         if dataHoraEntrada != "":
@@ -867,8 +883,9 @@ def submitGatewayRowUpdate(request):
     else:
         return redirect("shippers:portaria")
 
-
+#FUNÇÂO QUE VAI CRIAR NOVA ENTRADA PARA A PORTARIA
 def submitPortaria(request):
+    
     if (
         request.method == "POST"
         and request.user.groups.filter(name="shippingPortaria").exists()
@@ -994,6 +1011,7 @@ def submitViatura(request):
 
 
 def comparaMatriculas(request):
+    start = datetime.now()
     if request.method == "POST":
         matricula = request.POST["matricula"]
         actualDay = datetime.today().strftime("%Y-%m-%d")
@@ -1025,6 +1043,9 @@ def comparaMatriculas(request):
         for elem in gateway.all():
             elem.estado = "verde"
             elem.save()
+        end = datetime.now()
+        td = (end - start).total_seconds() * 10**3
+        print("tempo de execução -> ", td)
         return redirect("shippers:tracking2")
 
 
@@ -1224,8 +1245,15 @@ def changeUserGroups(request):
 
 def searchAllInfo(request):
     if request.method == "GET":
+        print("ENTROU no search")
+        print("REQUEST", request.GET)
         resposta = []
-        todos = GatewayInfoCondutor.objects.all()
+        with timer():
+            todos = GatewayInfoCondutor.objects.all()
+            print("FUNC NORMAL")
+        with timer():
+            todos1= GatewayInfoCondutor.objects.raw("SELECT * FROM shippers_gatewayinfocondutor")
+            print("func com o raw",todos1)
         for elem in todos:
             row = {
                 "condutor": elem.condutor.nome,
@@ -1244,6 +1272,7 @@ def searchEmpresa(request):
             resposta = []
             if GatewayInfoCondutor.objects.filter(empresa__nome=empresa).exists():
                 elem = GatewayInfoCondutor.objects.filter(empresa__nome=empresa)
+                elem1 = GatewayInfoCondutor.objects.raw(f"SELECT * FROM shippers_gatewayinfocondutor WHERE empresa_nome ='{empresa}'")
                 for elem1 in elem.all():
                     row = {
                         "condutor": elem1.condutor.nome,
@@ -1260,12 +1289,15 @@ def searchCondutor(request):
         if request.method == "GET":
             condutor = request.GET["condutor"]
             resposta = []
+            GatewayInfoCondutor.objects.raw("SELECT * FROM shippers_gatewayinfocondutor WHERE EXISTS(SELECT empresa_id FROM shippers_gatewayempresa, shippers_gatewayinfocondutor WHERE empresa_id = shippers_gatewayempresa.id)")
             if GatewayInfoCondutor.objects.filter(
                 condutor__in=GatewayCondutor.objects.filter(nome=condutor)
             ).exists():
                 elem = GatewayInfoCondutor.objects.get(
                     condutor=GatewayCondutor.objects.get(nome=condutor)
                 )
+                #para testar
+                elem1 = GatewayInfoCondutor.objects.raw("SELECT * FROM shippers_gatewayinfocondutor, shippers_gatewaycondutor WHERE shippers_gatewaycondutor.nome = shippers_gatewayinfocondutor.nome  ")
                 row = {
                     "condutor": elem.condutor.nome,
                     "condutorID": elem.condutorID.nome,
@@ -1283,10 +1315,12 @@ def searchCondutorID(request):
             resposta = []
             if GatewayInfoCondutor.objects.filter(
                 condutorID__in=GatewayCondutorID.objects.filter(nome=condutorID)
-            ).exists():
+            ).exists(): # SELECT * FROM shippers_gatewayinfocondutor WHERE EXISTS(SELECT * FROM shippers_gatewaycondutorid WHERE condutor_id = shippers_gatewayinfocondutor.id) 
+
                 elem = GatewayInfoCondutor.objects.get(
                     condutorID=GatewayCondutorID.objects.get(nome=condutorID)
-                )
+                )#para Testar
+                 #SELECT * FROM shippers_gatewayinfocondutor WHERE EXISTS(SELECT * from shippers_gatewaycondutorid WHERE condutor_id = shippers_gatewaycondutorid.id)  (NÂO ESTÀ OK)
                 row = {
                     "condutor": elem.condutor.nome,
                     "condutorID": elem.condutorID.nome,
@@ -1305,9 +1339,11 @@ def searchContacto(request):
             if GatewayInfoCondutor.objects.filter(
                 contacto__in=GatewayContactoCondutor.objects.filter(nome=contacto)
             ).exists():
+
                 elem = GatewayInfoCondutor.objects.get(
                     contacto=GatewayContactoCondutor.objects.get(nome=contacto)
                 )
+                #elem1 = GatewayInfoCondutor.objects.raw("SELECT * FROM shippers_gatewayinfocondutor, shippers_gatewaycontactocondutor WHERE ")
                 row = {
                     "condutor": elem.condutor.nome,
                     "condutorID": elem.contacto.nome,
@@ -1322,6 +1358,7 @@ def setDataHoraSaida(request):
     if request.method == "POST":
         id = request.POST["id"]
         elem = Gateway.objects.get(id=id)
+        elem1 = Gateway.objects.raw(f"SELECT * FROM shippers_gateway WHERE id = '{id}'")
         if elem.dataHoraEntrada != "":
             elem.dataHoraSaida = datetime.today().strftime("%Y-%m-%d %H:%M")
         elem.save()
@@ -1332,6 +1369,7 @@ def setDataHoraEntrada(request):
     if request.method == "POST":
         id = request.POST["id"]
         elem = Gateway.objects.get(id=id)
+        elem1 = Gateway.objects.raw(f"SELECT * FROM shippers_gateway WHERE id = '{id}'")
         elem.dataHoraEntrada = datetime.today().strftime("%Y-%m-%d %H:%M")
         elem.save()
         return redirect("shippers:portaria")
@@ -1537,20 +1575,26 @@ def reportConfirmation(request):
     lambda u: u.groups.filter(Q(name="TrackingAdmin")).exists())
 def trackingPage (request):
     import datetime
-    user = User.objects.all()
-    users_in_group = Group.objects.get(name="TrackingAdmin").user_set.all()
-    tracking = TrackingPage.objects.all()
+    from dateutil import parser
+    with timer():
+    
+        #tracking = TrackingPage.objects.raw("SELECT * FROM shippers_trackingpage")
+        tracking = TrackingPage.objects.all()
+        actualDay_menos2 = datetime.datetime.now() - datetime.timedelta(days=2) #date
+        print(type(actualDay_menos2))
+        actualDay_menos2 = actualDay_menos2.strftime("%Y-%m-%d")  #str
+        actualDay_menos2 = parser.parse(actualDay_menos2)
+        actualDay_menos2 = actualDay_menos2.date()
+        print("DATA 2-> ", actualDay_menos2, type(actualDay_menos2))
 
-    results_tracking_updated = TrackingPage.objects.raw("SELECT * FROM shippers_trackingpage WHERE inicioPrep > GETDATE()-2 ")
-    results_tracking_historico = TrackingPage.objects.raw("SELECT * FROM shippers_trackingpage WHERE inicioPrep < GETDATE()-2 ")
-    actualDay_menos2 = datetime.datetime.now() - datetime.timedelta(days=2)
-    print(actualDay_menos2, type(actualDay_menos2))
-    tracking_historic = TrackingPage()
 
-    #actualDay_menos2 = actualDay_menos2.strftime("%Y-%m-%d %H:%S")
-    for i in results_tracking_historico:
-        #if i.inicioPrep < actualDay_menos2:
-            print("dados da query-> ", i) 
+    #A função  demorou 0.0015433999999991954s
+    #datetime_object = datetime.strptime(my_date_string, '%b %d %Y %I:%M%p')
+    #actualDay_menos2 = time.strptime(actualDay_menos2, "%Y-%m-%d")
+    """ print("DIA----> ",actualDay_menos2, type(actualDay_menos2))
+    datetime_object = datetime .strptime(actualDay_menos2, "%Y-%m-%d")
+    print("DATA 2-> ", datetime_object, type(datetime_object)) """
+   
 
         #print("DATA->" ,i.inicioPrep, type(i.inicioPrep)," + ", actualDay_menos2, type(actualDay_menos2) )
     return render(
@@ -1558,10 +1602,6 @@ def trackingPage (request):
         "shippers/tracking.html",
         {
             "items": tracking,
-            "users": user,
-            "users_in_group": users_in_group,
-            "historico" : results_tracking_historico,
-            "updated_data": results_tracking_updated,
             "actualDay_menos2": actualDay_menos2,
         },
     )
@@ -1588,7 +1628,6 @@ def addNewRowTracking(request):
             query = TrackingPage.objects.get(id=id)
         else:
             query = TrackingPage()
-        print("TESTE DATE" ,  get_time(request.POST.get("inicioPrep")))
         if (nShipper := request.POST.get("nShipper")):
             query.nShipper = nShipper
         if (qtyCaixas := request.POST.get("qtyCaixas")):
@@ -1597,81 +1636,100 @@ def addNewRowTracking(request):
             query.inicioPrep = inicioPrep
         if (fimPrep := get_time(request.POST.get("fimPrep"))):
             query.fimPrep = fimPrep
-        if (confirmacao := get_time(request.POST.get("confirmacao"))):
-            query.confirmacao = confirmacao
+
         if (comentarios := request.POST.get("comentarios")):
             query.comentarios = comentarios
         query.save()
-
     return JsonResponse({"message": "OK"})
 
 
 def addLine(request):
-        """    user = User.objects.get(username="andre")  # get Some User
-        print("USER",user)
-        if user.groups.filter(name="TrackingAdmin"):
-            print("PERTENCE AO GRUPO")
-        """
-
         dataEmpty = TrackingPage()
-
         dataEmpty.save()
         return redirect("shippers:trackingPage")
 
-def addData(request):
-    """ PARA ELIMINAR """
-    from datetime import date 
-    ids = request.POST["ids"]
-    print("ID",ids)
-    #dataEmpty = TrackingPage()
-    dataEmpty = TrackingPage.objects.filter(id=ids)
-    print("data",TrackingPage.objects.filter(id=ids))
-    today = date.today()
-    #dataEmpty.data= today
-    print("HJ", today)
-    #dataEmpty.save()
+ 
+def guardaFicheiroHistorico(): #guardaFicheiroHistorico
+    import openpyxl as xl
+    print("ENtrou no scheduler")
+    #esta func vai correr todos os dias 1 do mes e vai guardar dados referentes aos 2 meses anteriores
+    #VER COMO FUNCIONsA O SCHEDULER no DJANGO
+    #1-> criar o excell com os dados certos
+    #2_> agarrar no ficheiro e fguardar numa dererminada pasta
+    #3-> por a cena do calendario a dar trigger e depois definir para o primeiro dia do mes(já está em principio) "C:\\Users\\PMARTI30\Desktop\\fileTeste1"
+    elementos_historico = TrackingPage.objects.raw("SELECT  * FROM shippers_trackingpage WHERE MONTH(inicioPrep) <=  MONTH(DATEADD(MONTH, -2, CURRENT_TIMESTAMP))")
+    wbProduction = Workbook()
+    file = io.BytesIO()
+    sheetProduction = wbProduction.get_sheet_by_name("Sheet")
 
-def addInicioPrep(request):
-    from datetime import date 
-    ids = request.POST["ids"]
-    dataEmpty = TrackingPage()
-    dataEmpty = TrackingPage.objects.filter(id=ids)
-    
-    today = date.today()
-    dataEmpty.incioPrep= today
-    dataEmpty.save()
+    sheetProduction.append(
+        [
+            "Nº Shipper",
+            "QT Cx",
+            "Inicio Prep",
+            "Fim Prep",
+            "Ship Date",
+            "Ship Time",
+            "Carrier",
+            "Comentários"
+        ]
+        )
 
-def addFimPrep(request):
-    from datetime import date 
-    ids = request.POST["ids"]
-    dataEmpty = TrackingPage.objects.filter(id=ids)
-    today = date.today()
-    dataEmpty.fimPrep= today
-    dataEmpty.save()
+    for elem in elementos_historico: # em principio não precisa do all()
+        sheetProduction.append(
+            [
+                str(elem.nShipper),
+                str(elem.qtyCaixas),
+                str(elem.inicioPrep),
+                str(elem.fimPrep),
+                str(elem.comentarios),
+                str(elem.ship_date),
+                str(elem.ship_time),
+                str(elem.ship_carrier),
+            ]
+        )
 
-def addConfirmacao(request):
-    #ir na bd-> QAD_EE,    buscar os 3 campos, em principio vao ser relacionar pelo prrowid
-    ids = request.POST["ids"]
-    dataEmpty = TrackingPage.objects.filter(id=ids)
-    from datetime import date 
-    today = date.today()
-    dataEmpty.confirmacao= today
-    dataEmpty.save()
+    #wbProduction.save(caminho)
+    # Voltar a pocição inicial do IO file object
+    file.seek(0)
+
+    data_fmt = datetime.now().strftime("%d-%m-%Y")
+    caminho =  "C:\\Users\\PMARTI30\\Desktop\\historicoTrackingPage"+data_fmt+".xlsx"
+    caminho1 =  "\\\\pavpd002\\e_proj\sharedir\\MP&L\\PROCEDIMENTOS\\Packaging\\TMP_NP\\historicoTrackingPage"+data_fmt+".xlsx"
+
+     
+    wbProduction.save(caminho)
+    wbProduction.save(file)
+    print("FICHEIRO GUARDADO")
+    #wb=xl.Workbook()
+    #wb.save(f"C:\\Users\\PMARTI30\Desktop\\TrackingPage_Historico2Mes_{data_fmt}.xlsx")
+    #caminho =  "C:\\Users\\PMARTI30\Desktop\\fileTeste1"
+    #wb.save(file)
+    #file.open(caminho+"teste", fresp)
+
+    #return fresp
+
+ 
+ 
 
 def botaoDadosQAD(request):
     from qad_ee.models import AbsMstr, AbscDet
     from datetime import timedelta
     from django.http import HttpResponseNotFound
+    #aqui vão ser retornados mais valores do QAD, mas estes não são para serem msotrados na tablea, apenas serão mostrados quando é fieto o download do ficheiro para excel
+    
+
     nShipper = request.POST["nShipper"]
     if not nShipper:
         return HttpResponseNotFound(
             "nShipper não pode estar vazio"
             )
-    results_mstr = AbsMstr.objects.raw(f"SELECT * FROM abs_mstr WHERE abs_domain = 3511010 AND abs_id LIKE '_%%{nShipper}' AND abs_id LIKE 's%%' OR abs_id LIKE 'd%%' OR abs_id LIKE 'p%%' ")
-    results_det = AbscDet.objects.raw(f"SELECT * FROM absc_det WHERE absc_domain = 3511010 AND absc_abs_id LIKE '_%%{nShipper}' AND absc_abs_id LIKE 's%%' OR absc_abs_id LIKE 'd%%' OR absc_abs_id LIKE 'p%%' ")
+    results_mstr = AbsMstr.objects.raw(f"SELECT * FROM abs_mstr WHERE abs_domain = 3511010 AND abs_id LIKE '_{nShipper}'")
+    results_det = AbscDet.objects.raw(f"SELECT * FROM absc_det WHERE absc_domain = 3511010 AND absc_abs_id LIKE '_{nShipper}'")
     abs_mstr = list(results_mstr)
     absc_det = list(results_det)
-    print("RESULTS -->", abs_mstr, absc_det)
+    print("RESULTS MSTR-->", abs_mstr)
+    print("RESULTS MSTR-->", abs_mstr)
     id_tracking = request.POST["id"]
     
     if not abs_mstr or not absc_det:
@@ -1687,51 +1745,50 @@ def botaoDadosQAD(request):
             convertData= str(abs_shp_date).split(" ")
             ref.ship_date =  convertData[0]
             ref.ship_time = convert
-
             print("DATA->",  convertData[0])
         for i in absc_det:
             absc_carrier= i.absc_carrier
             ref.ship_carrier = absc_carrier
-           
+        ref.confirmacao = datetime.now()
         ref.save()
         print("GUARDOU!")
     return redirect("shippers:trackingPage")
 
-def downloadExcelHistoricoTracking(request):
+
+def downloadExcelHistoricoTracking(request): # downloadExcelHistoricoTracking
     #aqui ele tem de sair pelo menos os dados do ultimo mês, até dois dias antes do dia atual
     #caso apanhes btns ou campos vazios/Empty, no ficheiro tem de aparecer vazio ou mete o texto dos btns
-    """ 
-     if request.method == "GET":
-        elementos = TrackingPage.objects.raw("SELECT * FROM trackingPage WHERE inicioPrep < GETDATE()-2) #fazer a verificação pelo mês
+    
+    if request.method == "GET":
+        elementos_historico = TrackingPage.objects.raw("SELECT  * FROM shippers_trackingpage WHERE MONTH(inicioPrep) >=  MONTH(DATEADD(MONTH, -1, CURRENT_TIMESTAMP))")
         wbProduction = Workbook()
         file = io.BytesIO()
         # Não criar um sheet novo e ter um existente ;)
         sheetProduction = wbProduction.get_sheet_by_name("Sheet")
-
         sheetProduction.append(
             [
                 "Nº Shipper",
                 "QT Cx",
                 "Inicio Prep",
                 "Fim Prep",
-                "Confirmação",
                 "Ship Date",
                 "Ship Time",
                 "Carrier",
                 "Comentários"
             ]
         )
-
-        for elem in elementos.all(): # em principio não precisa do all()
+        for elem in elementos_historico: 
+            print("RLEMS--->", elem.confirmacao)
             sheetProduction.append(
                 [
-                    str(elem.pn),
-                    str(elem.descricao),
-                    str(elem.comentario),
-                    str(elem.quantidade),
-                    str(elem.inventario),
-                    str(elem.link),
-                    str(elem.tipo),
+                    str(elem.nShipper),
+                    str(elem.qtyCaixas),
+                    str(elem.inicioPrep),
+                    str(elem.fimPrep),
+                    str(elem.comentarios),
+                    str(elem.ship_date),
+                    str(elem.ship_time),
+                    str(elem.ship_carrier),
                 ]
             )
 
@@ -1741,20 +1798,17 @@ def downloadExcelHistoricoTracking(request):
 
         data_fmt = datetime.now().strftime("%d-%m-%Y %H:%M")
         fresp = FileResponse(
-            file, filename=f"StockPackage_{data_fmt}.xlsx", as_attachment=True
+            file, filename=f"TrackingPage_Historico1Mes_{data_fmt}.xlsx", as_attachment=True
         )
         return fresp
-     """
-    ...
+    
 
 
 def deleteRowTracking(request):
-    # Acho que falta fazer as verificações de campos vazios
     stockPackagePack = TrackingPage.objects
     if request.method == "POST":
         print("REQ",request.POST)
         row_id = request.POST["rowIdDelete"]
-        # Aqui ele vai buscar o partNumber id e nesse id vai eliminar a cell
         print(stockPackagePack.all().get(id=row_id))
         stockPackagePack.all().get(id=row_id).delete()
     return redirect("shippers:trackingPage")

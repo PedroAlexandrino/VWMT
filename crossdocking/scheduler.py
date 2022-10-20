@@ -12,7 +12,7 @@ from .views import (
     updatePortariaDia15,
 )
 
-from shippers.views import portaria
+from shippers.views import guardaFicheiroHistorico
 
 
 def beginSchedule():
@@ -20,6 +20,8 @@ def beginSchedule():
     scheduler.add_job(
         enviarEmailSchedule, "cron", hour="8", max_instances=1, misfire_grace_time=None
     )
+    #scheduler.add_job(guardaFicheiroHistorico, "cron", day="1", hour="1", max_instances=1, misfire_grace_time=None)
+    #scheduler.add_job(guardaFicheiroHistorico, 'interval', seconds = 5, max_instances=1, misfire_grace_time=None)
     # enviarEmailSchedule()
     # updateSchedule()
     # updatePortariaDia1()
@@ -50,7 +52,7 @@ def beginSchedule():
     # LOOP de 5 em 5 segundos da func "enviarEmailSchedule"
     # scheduler.add_job(updateSchedule, 'interval', seconds = 5, max_instances=1, misfire_grace_time=None)
 
-    # BUG DE FORMATAÇÂO
+
     scheduler.add_job(
         updateLineRequestDia1,
         "cron",
@@ -62,7 +64,7 @@ def beginSchedule():
     # LOOP de 5 em 5 segundos da func updateLineRequestDia1 NAO ESTÀ OK
     # updateLineRequestDia1()
     # scheduler.add_job(updateLineRequestDia1, 'interval', seconds = 5, max_instances=1, misfire_grace_time=None)
-    # BUG DE FORMATAÇÂO
+
     scheduler.add_job(
         updatePortariaDia1,
         "cron",
@@ -83,7 +85,6 @@ def beginSchedule():
     )
     # scheduler.add_job(updatePortariaDia15, 'interval', seconds = 5, max_instances=1, misfire_grace_time=None)
 
-    # BUG DE FORMATAÇÂO
     scheduler.add_job(
         updateProductionDia1,
         "cron",
