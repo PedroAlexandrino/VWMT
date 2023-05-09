@@ -1,4 +1,4 @@
-{% extends "vware/baseArmazem1.html" %}
+{% extends "vware/baseArmazem.html" %}
 {% load static %}
 
 {% block body_title %}
@@ -8,7 +8,6 @@
                 class="text-secondary"> Home | </span></a> Portaria</b></h6>
     </div>
     <style>
-
         .button {
             width: 35%;
             height: 70px;
@@ -69,7 +68,7 @@
     <div class="containerPrincipal">
         {% if readOnly %}
             <p style="text-align: center; font-size: 60px; margin-bottom: -25px"><b>PORTARIA</b></p>
-            <table id="gatewayHistory" class="stripe hover row-border" style="width:100%">
+            <table id="gatewayHistory" class="stripe hover row-border" style="width:100%;">
                 <thead>
                 <tr>
                     <th style="font-size: 13px">Data/hora chegada</th>
@@ -91,8 +90,8 @@
                 </tr>
                 </thead>
                 <tbody>
-                {% for elem in elementosGateway.all %}
-                    <tr>
+                <!-- {% for elem in elementosGateway.all %}
+                    <tr style="text-overflow: ellipsis ellipsis">
                         <td title="{{ elem.dataHoraChegada }}">{{ elem.dataHoraChegada }}</td>
                         <td title="{{ elem.condutor }}">{{ elem.condutor }}</td>
                         <td title="{{ elem.ident }}">{{ elem.ident }}</td>
@@ -121,7 +120,7 @@
                         <td>{{ elem.dataHoraSaida }}</td>
                         <td>{{ elem.comentSaida }}</td>
                     </tr>
-                {% endfor %}
+                {% endfor %} -->
                 </tbody>
                 <tfoot>
                 <tr>
@@ -168,8 +167,9 @@
     <!-- BTN EXCEL -->
             <div style="position: absolute;">
                 <button type="button" class="form-control" style="background-color: lightgrey" id="excel">Excel</button>
+                <button type="button" class="btn btn-secondary mb-3"  id="estatisticas">Estatísticas</button>
             </div>
-
+            
             <!-- BTN para veres as viaturas -->
             <div style="bottom: 0px; margin-left: 85%; position: absolute">
                 <h6><b><i style="font-size: 20px">Legenda de viaturas </i><a type="button"
@@ -227,129 +227,10 @@
                     <th style="font-size: 13px">Comentários saída</th>
                     <th style="font-size: 13px"></th>
                     <th style="display: none">ID</th>
+                    <td></td>
                 </tr>
                 </thead>
                 <tbody>
-                {% for elem in elementosGateway.all %}
-                    <tr>
-                        {% if elem.estado == 'verde' %}
-                            <td style="background-color: limegreen">{{ elem.dataHoraChegada }}</td>
-                            <td style="background-color: limegreen">{{ elem.condutor }}</td>
-                            <td style="background-color: limegreen">{{ elem.ident }}</td>
-                            <td style="background-color: limegreen">{{ elem.contacto }}</td>
-                            <td style="background-color: limegreen">{{ elem.empresa }}</td>
-                            <td style="background-color: limegreen">{{ elem.primeiraMatricula }}</td>
-                            <td style="background-color: limegreen">{{ elem.segundaMatricula }}</td>
-                            <td style="background-color: limegreen">{{ elem.cargaDescarga }}</td>
-                            <td style="background-color: limegreen">{{ elem.doca }}</td>
-                            <td style="background-color: limegreen">{{ elem.destinoCarga }}</td>
-                            <td style="background-color: limegreen">{{ elem.tipoViatura }}</td>
-                            {% if elem.dataHoraEntrada %}
-                                {% if elem.abandono == 'true' %}
-                                    <td style="max-width: 70px; text-align: center; background-color: rgba(255,0,0,0.50)"
-                                        class="column_left ">{{ elem.dataHoraEntrada }}</td>
-                                {% else %}
-                                    <td style="max-width: 70px; text-align: center; background-color: limegreen"
-                                        class="column_left">{{ elem.dataHoraEntrada }}</td>
-                                {% endif %}
-                            {% else %}
-                                <td class="column_left">
-                                    <input type='datetime-local' class="form-control" name="dataHoraEntrada"
-                                           style="max-width: 200px; background-color: limegreen"/>
-                                </td>
-                            {% endif %}
-                        {% else %}
-                            <td>{{ elem.dataHoraChegada }}</td>
-                            <td title="{{ elem.condutor }}">{{ elem.condutor }}</td>
-                            <td title="{{ elem.ident }}">{{ elem.ident }}</td>
-                            <td title="{{ elem.contacto }}">{{ elem.contacto }}</td>
-                            <td title="{{ elem.empresa }}">{{ elem.empresa }}</td>
-                            <td title="{{ elem.primeiraMatricula }}">{{ elem.primeiraMatricula }}</td>
-                            <td title="{{ elem.segundaMatricula }}">{{ elem.segundaMatricula }}</td>
-                            <td>{{ elem.cargaDescarga }}</td>
-                            <td title="{{ elem.doca }}">{{ elem.doca }}</td>
-                            <td title="{{ elem.destinoCarga }}">{{ elem.destinoCarga }}</td>
-                            <td>{{ elem.tipoViatura }}</td>
-                            {% if elem.dataHoraEntrada %}
-                                {% if elem.abandono == 'true' %}
-                                    <td style="max-width: 170px; text-align: center; background-color: rgba(255,0,0,0.50)"
-                                        class="column_left">{{ elem.dataHoraEntrada }}</td>
-                                {% else %}
-                                    {% if elem.estado == 'terminado' or elem.estado == 'feitoEsaiu' %}
-                                        <td style="max-width: 170px; text-align: center"
-                                            class="column_left">{{ elem.dataHoraEntrada }}</td>
-                                    {% else %}
-                                        <td style="max-width: 170px; text-align: center"
-                                            class="column_left"><input type="text"
-                                                                       value="{{ elem.dataHoraEntrada }}">
-                                        </td>
-                                    {% endif %}
-                                {% endif %}
-                            {% else %}
-                                <td class="column_left" style="max-width: 230px; text-align: center">
-                                    <button type="button" name="dataHoraEntrada" style="height: 17px"
-                                            class="btn btn-light-grey" id="dataHoraEntrada">Time
-                                    </button>
-                                </td>
-                            {% endif %}
-                        {% endif %}
-                        {% if elem.abandono == 'true' %}
-                            <td style="text-align: center; width: 20px"><input type="checkbox" id="abandonado"
-                                                                               title="Abandonado" name="abandonado"
-                                                                               checked
-                                                                               disabled>
-                            </td>
-                        {% else %}
-                            <td style="text-align: center; width: 10px"><input type="checkbox" id="abandonado"
-                                                                               name="abandonado" title="Abandonado">
-                            </td>
-                        {% endif %}
-                        <td>
-                            <input type="text" name="comentarioEntrada" style="width: 65px" data-toggle="tooltip"
-                                   data-placement="bottom" title='{{ elem.comentEntrada }}'
-                                   value='{{ elem.comentEntrada }}'>
-                        </td>
-
-                        {% if elem.dataHoraSaida %}
-                            {% if elem.abandono == 'true' %}
-                                <td style="max-width: 170px; text-align: center; background-color: rgba(255,0,0,0.50)"
-                                >{{ elem.dataHoraSaida }}</td>
-                            {% else %}
-                                {% if elem.estado == 'feitoEsaiu' %}
-                                    <td style="max-width: 170px; text-align: center">{{ elem.dataHoraSaida }}</td>
-                                {% else %}
-                                    <td style="max-width: 170px; text-align: center"><input type="text"
-                                                                                            value="{{ elem.dataHoraSaida }}">
-                                    </td>
-                                {% endif %}
-                            {% endif %}
-                        {% else %}
-                            <td style="max-width: 230px; text-align: center">
-                                <button type="button" style="height: 17px; margin-left: 15px"
-                                        class="btn btn-light-grey"
-                                        name="dataHoraSaida" id="dataHoraSaida">Time
-                                </button>
-                            </td>
-                        {% endif %}
-
-
-
-                        <td>
-                            <input type="text" name="comentarioSaida" style="width: 65px" data-toggle="tooltip"
-                                   data-placement="bottom" title='{{ elem.comentSaida }}'
-                                   value='{{ elem.comentSaida }}'>
-                        </td>
-                        <td>
-                            <button type="button" id="update" class="btn btn-outline-primary btn-xs"
-                                    style="height: 18px">
-                                Update
-                            </button>
-                        </td>
-                        <td style="display: none">{{ elem.id }}</td>
-                    </tr>
-                {% endfor %}
-                <a class="infinite-more-link" href="/next/page">More</a>
-
                 </tbody>
                 <tfoot>
                 <tr>
@@ -370,6 +251,7 @@
                     <td style="font-size: 13px"></td>
                     <td style="font-size: 13px"></td>
                     <td style="font-size: 13px"></td>
+                  
                 </tr>
                 <tr>
                     <td colspan="11"></td>
@@ -390,12 +272,14 @@
                                    title="Filtrar saída"></td>
                     {% endif %}
                     <td colspan="3"></td>
+                    <td></td>
                 </tr>
                 </tfoot>
                 
             </table>
 
             <button type="button" class="btn btn-secondary mb-3" id="excel">Excel</button>
+            <button type="button" class="btn btn-secondary mb-3" style= "display: none;" id="estatisticas">Estatísticas</button>
 
             <div style="bottom: 0px; margin-left: 82%; position: absolute">
                 <h6><b><i style="font-size: 20px">Legenda de viaturas </i><a type="button"
@@ -505,8 +389,9 @@
                     </table>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" id="confirmar" name="confirmar">Confirmar</button>
-                    <button type="button" class="btn btn-primary" id="fechar">Fechar</button>
+                    <button type="button" class="btn btn-primary" id="fechar">Sair</button>
+                    <button type="button" class="btn btn-primary" id="confirmar" name="confirmar">Ok</button>
+                    
                 </div>
             </div>
         </div>
@@ -565,15 +450,15 @@
                     </table>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" value="pending" data-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-primary" value="pending" data-dismiss="modal">Sair</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <form method="POST" enctype="multipart/form-data" action="{% url 'shippers:submitGateway' %}">
+    <form method="POST"  id="formsubmitPortaria"onSubmit="document.getElementById('criar').disabled=true;" enctype="multipart/form-data" action="{% url 'shippers:submitGateway' %}">
         {% csrf_token %}
-        <div class="modal fade" id="criarNovo" name="criarNovo" tabindex="-1" role="dialog"
+        <div class="modal fade" id="criarNovo" style="pointer-events:none;" name="criarNovo" tabindex="-1" role="dialog"
              aria-labelledby="myModalLabel">
             <div class="modal-dialog modal-xl" role="document">
                 <div class="modal-content">
@@ -585,6 +470,7 @@
                     </div>
                     <div class="modal-body"
                          style="background: linear-gradient(to bottom, rgba(236,144,0,0.86) 0%, ghostwhite 100%); ">
+                         <button type="button"style="margin-left:45%"  class="btn btn-secondary mb-3"data-toggle="modal" data-backdrop="static" data-keyboard="false" id="condutorRecorrente">Histórico</button>
                         <div class="form-inline" style="margin-top: 10px">
                             <div style="text-align: center">
                                 <p style="font-size: 20px"><strong>CONDUTOR</strong></p>
@@ -592,11 +478,7 @@
                                        list="condutorList"
                                        style="width: 525px; background-color: floralwhite"
                                        required>
-                                <datalist id="condutorList">
-                                    {% for condutor in infoCondutores.all %}
-                                        <option value='{{ condutor.condutor }}'>{{ condutor.condutor }}</option>
-                                    {% endfor %}
-                                </datalist>
+                               
                             </div>
                             <div style="margin-left: 50px; text-align: center">
                                 <p style="font-size: 20px"><strong>ID</strong></p>
@@ -604,11 +486,7 @@
                                        list="condutorIDList"
                                        style="width: 525px; background-color: floralwhite"
                                        required>
-                                <datalist id="condutorIDList">
-                                    {% for condutorID in infoCondutores.all %}
-                                        <option value='{{ condutorID.condutorID }}'>{{ condutorID.condutorID }}</option>
-                                    {% endfor %}
-                                </datalist>
+                                
                             </div>
                         </div>
                         <div class="form-inline" style="margin-top: 10px">
@@ -625,11 +503,7 @@
                                 <input type="text" class="form-control mt-n3" name="empresa" id="empresa"
                                        list="empresaList"
                                        style="width: 525px; background-color: floralwhite" required>
-                                <datalist id="empresaList">
-                                    {% for empresa in infoCondutores.all %}
-                                        <option value='{{ empresa.empresa }}'>{{ empresa.empresa }}</option>
-                                    {% endfor %}
-                                </datalist>
+                               
                             </div>
                         </div>
                         <div class="form-inline" style="margin-top: 10px">
@@ -640,11 +514,7 @@
                                        list="1matriculaList"
                                        style="width: 525px; background-color: floralwhite"
                                        required>
-                                <datalist id="1matriculaList">
-                                    {% for matricula in primeiraMatricula.all %}
-                                        <option value='{{ matricula.nome }}'>{{ matricula.nome }}</option>
-                                    {% endfor %}
-                                </datalist>
+                               
                             </div>
                             <div style="margin-left: 50px; text-align: center">
                                 <p style="margin-top: 20px; font-size: 20px"><strong>2ª
@@ -652,38 +522,41 @@
                                 <input type="text" class="form-control mt-n3" name="2matricula" id="2matricula"
                                        list="2matriculaList"
                                        style="width: 525px; background-color: floralwhite" required>
-                                <datalist id="2matriculaList">
-                                    {% for matricula in segundaMtricula.all %}
-                                        <option value='{{ matricula.nome }}'>{{ matricula.nome }}</option>
-                                    {% endfor %}
-                                </datalist>
+                               
                             </div>
                         </div>
                         <div class="form-inline" style="margin-top: 10px">
                             <div style="text-align: center">
                                 <p style="margin-top: 20px; font-size: 20px"><strong>CARGA /
                                     DESCARGA</strong></p>
-                                <input type="text" class="form-control mt-n3" name="cargaDescarga" id="cargaDescarga"
+                                <select type="text" class="form-control mt-n3" name="cargaDescarga" id="cargaDescarga"
                                        list="cargaDescargaList"
                                        style="width: 525px; background-color: floralwhite"
                                        required>
-                                <datalist id="cargaDescargaList">
-                                    {% for cargaDescarga in cargaDescarga.all %}
-                                        <option value='{{ cargaDescarga.nome }}'>{{ cargaDescarga.nome }}</option>
-                                    {% endfor %}
-                                </datalist>
+                                       <option></option>
+                                        <option value='Carga'>Carga</option>
+                                        <option value='Descarga'>Descarga</option>
+                                        <option value='Outros'>Outros</option>
+                                    </select>
                             </div>
                             <div style="margin-left: 50px; text-align: center">
                                 <p style="margin-top: 20px; font-size: 20px"><strong>DOCA</strong>
                                 </p>
-                                <input type="text" class="form-control mt-n3" name="doca" list="docaList" id="doca"
+                                <select  class="form-control mt-n3"  name="doca" list="docaList" id="doca"
                                        style="width: 525px; background-color: floralwhite"
                                        required>
-                                <datalist id="docaList">
-                                    {% for doca in docas.all %}
-                                        <option value='{{ doca.nome }}'>{{ doca.nome }}</option>
-                                    {% endfor %}
-                                </datalist>
+                                       <option></option>
+                                        <option value='D1 - Plásticos'>D1 - Plásticos</option>
+                                        <option value='D2 - ANP'>D2 - ANP</option>
+                                        <option value='D3 - Marítimos'>D3 - Marítimos</option>
+                                        <option value='D4 - Receiving'>D4 - Receiving</option>
+                                        <option value='D6 - Shipping'>D6 - Shipping</option>
+                                        <option value='D7 – Serviços/Protótipos'>D7 – Serviços/Protótipos</option>
+                                        <option value='Tenda'>Tenda</option>
+                                        <option value='Refeitório'>Refeitório</option>
+                                        <option value='Outros'>Outros</option>
+
+                                    </select>
                             </div>
                         </div>
                         <div class="form-inline" style="margin-top: 10px">
@@ -693,11 +566,7 @@
                                 <input type="text" class="form-control mt-n3" name="destinoCarga" id="destinoCarga"
                                        list="destinoCargaList"
                                        style="width: 525px; background-color: floralwhite" required>
-                                <datalist id="destinoCargaList">
-                                    {% for destinoCarga in destinosCarga.all %}
-                                        <option value='{{ destinoCarga.nome }}'>{{ destinoCarga.nome }}</option>
-                                    {% endfor %}
-                                </datalist>
+                               
                             </div>
                             <div style="margin-left: 50px; text-align: center">
                                 <p style="margin-top: 20px; font-size: 20px; margin-left: 200px;" id="selectVeiculo">
@@ -707,38 +576,414 @@
                         </div>
                     </div>
                     <div class="modal-footer" style="background-color: ghostwhite">
+                        <button type="button" class="btn btn-primary" id= "sairCriarEntrada" value="pending" data-dismiss="modal">Sair
                         <input style="margin-right: -25px; display: none" type="checkbox" id="checkboxVeiculo" required>
-                        <button type="submit" class="btn btn-primary" onclick="FbotonOn()" id="criar" name="criar">
-                            Criar
+                        <button type="submit" class="btn btn-primary" onclick="FbotonOn()"  id="criar" name="criar" ">
+                            OK
                         </button>
-                        <button type="button" class="btn btn-primary" value="pending" data-dismiss="modal">Fechar
+                        
                         </button>
                     </div>
                 </div>
             </div>
         </div>
     </form>
+   
+     
+ 
+
+<!-- Modal para aparecer quando é clicado o btn para apagar linha -->
+<form method="POST"  id="formDelete" class="form" action="{% url 'shippers:deleteLinhaPortaria' %}"
+enctype="multipart/form-data">
+{% csrf_token %}
+<div class="modal fade" id="deleteLinha" style="pointer-events:none;" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+
+<div class="modal-dialog modal-lg" role="document">
+   <div class="modal-content">
+       <div class="modal-header" style="background-color: rgba(236,144,0,0.86)">
+           <h4 class="modal-title" id="myModalLabel" style="margin-left: 45%; font-size: 40px"><i>Delete</i>
+           </h4>
+           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                   aria-hidden="true">&times;</span></button>
+       </div>
+       <div class="modal-body"
+            style="background: linear-gradient(to bottom, rgba(236,144,0,0.86) 0%, ghostwhite 100%); ">
+           <div style="margin-top: 10px">
+               <p style="font-size: 20px"><strong>Escreva aqui o motivo para estar a apagar a linha</strong></p>
+               <textarea class="form-control mt-n3" name="reportDelete" id="reportDelete" rows="11"
+                         style="background-color: floralwhite; text-align: center;font-family:sans-serif;font-size:1.5em"
+                         required></textarea>
+                      
+               <!--  -->
+                
+               <input type="hidden"  id="rowIdDelete" name="rowIdDelete" value="{{rowIdDelete}}">  
+               <input type="hidden"  id="condutorId" name="condutorId" value="{{condutorId}}">
+                <!--   -->
+                 
+           </div>
+       </div>
+       <div class="modal-footer" style="background-color: ghostwhite">
+           <button type="button" class="btn btn-primary" value="pending" id="btnDeleteModal" data-dismiss="modal">Sair
+           </button>
+           <button type="submit" id="submitReportDelete" class="btn btn-primary" onc>Ok</button>
+
+       </div>
+   </div>
+</div>
+</div>
+</form>
+<!-- Modal para aparecer quando é clicado o btn para apagar linha -->
+
+<div class="modal fade"  id="criarRecorrente" style="pointer-events: none;" data-keyboard='false' data-backdrop="static"  role="dialog"
+    aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document"  >
+       <div class="modal-content" style="width: 150%;  margin-left: -30%;">
+           <div class="modal-header">
+               <h3 class="modal-title" id="myModalLabel"><b>Histórico:</b></h3>
+               
+           </div>
+           <div class="modal-body" style="margin-bottom: -10%;">
+               <div class="containerPrincipal" style="width: 100%; height: 70%;">
+               <table id="pnExpendableTable" class="display" style="text-align: center">
+                   <thead>
+                   <tr>
+                       <th style="display: none"></th>
+                       <th>Condutor</th>
+                       <th>ID</th>
+                       <th>Contacto</th>
+                       <th>Empresa</th>
+                       <th>1ª Matricula</th>
+                       <th>2ª Matricula</th>
+                       <th style="display: none"></th>
+                   </tr>
+                   </thead>
+                   <tbody>
+                     <th style="display: none"></th>
+                     <th></th>
+                     <th></th>
+                     <th></th>
+                     <th></th>
+                     <th></th>
+                     <th></th>
+                     <th style="display: none"></th>
+                   </tbody>
+                   <tfoot>
+                   <tr>
+                       <th style="display: none"></th>
+                       <th></th>
+                       <th></th>
+                       <th></th>
+                       <th></th>
+                       <th></th>
+                       <th></th>
+                       <th style="display: none"></th>
+                   </tr>
+                   </tfoot>
+               </table>
+               </div>
+               <div class="modal-footer" style = "margin-bottom: 10%" >
+                <button type="button" id="closeModal" class="btn btn-default" data-dismiss="modal">Sair</button>
+                <button type="button" id="saveModal"  class="btn btn-primary"data-dismiss="modal">Ok</button>
+            </div>
+           
+           </div>
+        </div>
+    </div>
+</div>
+       
+        
 {% endblock %}
+ 
 
 {% block javascript %}
 
 <!-- <script src="/static/js/jquery.waypoints.min.js"></script>
-<script src="/static/js/infinite.min.js"></script>   -->
-<script src="https://unpkg.com/@webcreate/infinite-ajax-scroll/dist/infinite-ajax-scroll.min.js"></script>
+<script src="/static/js/infinite.min.js"></script>  
+infinite-ajax-scroll.min.js
+
+
+////////////////////-----------------------------------///////////////////////////
+ -->
 
 
 
     <script>
+    var timeoutID;
+ 
+ function setup() {
+     this.addEventListener("mousemove", resetTimer, false);
+     this.addEventListener("mousedown", resetTimer, false);
+     this.addEventListener("keypress", resetTimer, false);
+     this.addEventListener("DOMMouseScroll", resetTimer, false);
+     this.addEventListener("mousewheel", resetTimer, false);
+     this.addEventListener("touchmove", resetTimer, false);
+     this.addEventListener("MSPointerMove", resetTimer, false);
+  
+     startTimer();
+ }
+ setup();
+  
+ function startTimer() {
+     timeoutID = window.setTimeout(goInactive, 2000); //300000
+ }
+  
+ function resetTimer(e) {
+     window.clearTimeout(timeoutID);
+  
+     goActive();
+ }
+  
+ function goInactive() {
+    /*  $.ajax({
+                     type: 'GET',
+                     url: '/shippers/getIdForChandedItemPortaria/',
+                     data: {
+                         csrfmiddlewaretoken: "{{ csrf_token }}",
+                     },
+                     success: function (response) {
+                 var id_para_update = "{{ id_last_update }}"
+
+                 console.log("A resposta é->  ",response.resposta, "Tempo de Espera", id_para_update)
+                 if (response.resposta != id_para_update ){
+                    console.log("TAMOS AI",id_para_update, response.resposta)
+                     window.location.reload();
+                 }
+                     }
+                 }); */
+                 
+                 
+ }
+  
+ function goActive() {
+     
+     startTimer();
+ }
+ 
         $(document).ready(function () {
-            setInterval(function () {
-                if (!$('#criarNovo').hasClass('show')) {
-                    window.location.reload();
-                }
 
-            }, 300000)
+          
 
+        $('#criarRecorrente').on('hide.bs.modal', function (e) {
+            var tableExpendable = $('#pnExpendableTable').DataTable()
+            tableExpendable.rows( { selected: true } ).deselect()
+            $('#pnExpendableTable').dataTable().fnFilter('');
+        })
+
+$('#criarRecorrente').on('show.bs.modal', function (e) {
+    var tableExpendable = $('#pnExpendableTable').DataTable()
+    tableExpendable.rows( { selected: true } ).deselect()
+    tableExpendable.columns.adjust();
+    setTimeout(function() {
+        $('#pnExpendableTable').dataTable().fnFilter(' ');
+    console.log('3 segundos');
+        $('#pnExpendableTable').dataTable().fnFilter('');
+    }, 200);
+    })
+
+$('#deleteLinha').on('hide.bs.modal', function (e) {
+    var reportDeleteField = $('#reportDelete');
+    reportDeleteField.val("")
+
+})
+document.getElementById('formDelete').addEventListener('submit', function(event) {
+    console.log("TAS CA DENTRO")
+    document.getElementById('submitReportDelete').disabled = true;
+    }),
+
+
+document.getElementById('formsubmitPortaria').addEventListener('submit', function(event) {
+    console.log("TAS CA DENTRO")
+    document.getElementById('criar').disabled = true;
+    }),
+
+$('#criarNovo').on('hide.bs.modal', function (e) {
+            var condutorField = $('#condutor');
+            var condutorIDField = $('#condutorID');
+            var contactoField = $('#contacto');
+            var empresaField = $('#empresa');
+            var matricula1Field = $('#1matricula');
+            var matricula2Field = $('#2matricula');
+            var cargaDescargaField = $('#cargaDescarga');
+            var docaField = $('#doca');
+            var destinoCargaField = $('#destinoCarga');
+            var valorNovoCarroField = $('#valorNovoCarro');
+
+            condutorField.val("")
+            condutorIDField.val("")
+            contactoField.val("")
+            empresaField.val("")
+            matricula1Field.val( "")
+            matricula2Field.val("")
+            cargaDescargaField.val("")
+            docaField.val("")
+            destinoCargaField.val("")
+            valorNovoCarroField.val("")
+})
+          $(document).on('click', '#condutorRecorrente', function () {
+                var myModal = new bootstrap.Modal(document.getElementById('criarRecorrente'))
+                var tableExpendable = $('#pnExpendableTable').DataTable()
+                var myModal1 =  document.getElementById('criarNovo')
+                myModal1.style.display = "none";
+                
+                
+                tableExpendable.draw()
+                $('#pnExpendableTable').dataTable().redraw;
+                myModal.show() 
+             
+                console.log("ENTROU NO POPUP")
+            });
+
+            
+            $('button#saveModal').click(function () {
+        
+            /* Quando clicas no btn de sair */
+            console.log("Entrou")
+            /* Passa a info do modal que foi fechado para o modal de add entrada */
+
+            var tableExpendable = $('#pnExpendableTable').DataTable()
+
+            var condutorField = $('#condutor');
+                var condutorIDField = $('#condutorID');
+                var contactoField = $('#contacto');
+                var empresaField = $('#empresa');
+                var matricula1Field = $('#1matricula');
+                var matricula2Field = $('#2matricula');
+
+                condutorField.val( "")
+                condutorIDField.val("")
+                contactoField.val("")
+                empresaField.val("")
+                matricula1Field.val("")
+                matricula2Field.val("")
+                /* document.getElementById('saveModal').disabled = true; */
+
+                var myModal1 =  document.getElementById('criarNovo')
+                myModal1.style.display = "block";
+
+                var myModal =  document.getElementById('criarRecorrente')
+                myModal.style.display = "none";
+                
+
+                
+            $.each(tableExpendable.rows('.selected').nodes(), function (i, item) {
+                var data = tableExpendable.row(this).data();
+                console.log("pnExpendableTable", data);
+                 
+                var condutorField = $('#condutor');
+                var condutorIDField = $('#condutorID');
+                var contactoField = $('#contacto');
+                var empresaField = $('#empresa');
+                var matricula1Field = $('#1matricula');
+                var matricula2Field = $('#2matricula');
+
+                condutorField.val(condutorField.val()+ data[1])
+                condutorIDField.val(condutorIDField.val()+ data[2])
+                contactoField.val(contactoField.val()+ data[3])
+                empresaField.val(empresaField.val()+ data[4])
+                matricula1Field.val(matricula1Field.val()+ data[5])
+                matricula2Field.val(matricula2Field.val()+ data[6])
+            });
+            
+            });
+            //BUG começa aqui
+       
+        $('button#closeModal').click(function () {
+        
+        /* Quando clicas no btn de sair */
+        console.log("Entrou")
+        /* Passa a info do modal que foi fechado para o modal de add entrada */
+
+        //var tableExpendable = $('#pnExpendableTable').DataTable()
+
+        var condutorField = $('#condutor');
+            var condutorIDField = $('#condutorID');
+            var contactoField = $('#contacto');
+            var empresaField = $('#empresa');
+            var matricula1Field = $('#1matricula');
+            var matricula2Field = $('#2matricula');
+
+            condutorField.val("")
+            condutorIDField.val("")
+            contactoField.val("")
+            empresaField.val("")
+            matricula1Field.val( "")
+            matricula2Field.val("")
+            var myModal1 =  document.getElementById('criarRecorrente')
+            myModal1.style.display = "none";
+            var myModal1 =  document.getElementById('criarNovo')
+            myModal1.style.display = "block";
+            $('#pnExpendableTable').dataTable().fnFilter('');
+           
+            
+
+            
+        
+            
+        });
+        $('button#sairCriarEntrada').click(function () {
+        
+        /* Quando clicas no btn de sair */
+        console.log("Entrou")
+        /* Passa a info do modal que foi fechado para o modal de add entrada */
+
+        var tableExpendable = $('#pnExpendableTable').DataTable()
+
+        var condutorField = $('#condutor');
+            var condutorIDField = $('#condutorID');
+            var contactoField = $('#contacto');
+            var empresaField = $('#empresa');
+            var matricula1Field = $('#1matricula');
+            var matricula2Field = $('#2matricula');
+
+            condutorField.val("")
+            condutorIDField.val("")
+            contactoField.val("")
+            empresaField.val("")
+            matricula1Field.val( "")
+            matricula2Field.val("")
+
+            
+
+            
+        $.each(tableExpendable.rows('.selected').nodes(), function (i, item) {
+            var data = tableExpendable.row(this).data();
+            console.log("pnExpendableTable", data);
+             
+            var condutorField = $('#condutor');
+            var condutorIDField = $('#condutorID');
+            var contactoField = $('#contacto');
+            var empresaField = $('#empresa');
+            var matricula1 = $('#1matricula');
+            var matricula2 = $('#2matricula');
+            var cargaDescarga = $('#cargaDescarga');
+            var doca = $('#doca');
+            var destinoCarga = $('#destinoCarga');
+            var valorNovoCarro = $('#valorNovo');
+
+            condutorField.val("")
+            condutorIDField.val("")
+            contactoField.val("")
+            empresaField.val("")
+            matricula1.val("")
+            matricula2.val("")
+            cargaDescarga.val("")
+            doca.val("")
+            destinoCarga.val("")
+            valorNovoCarro.val("")
+            
+        });
+        }),
             $('input#empresa').change(function () {
                 var empresa = $(this).val()
+                var contactoCondutor = document.getElementById('condutor').value
+                console.log("Pacote/ Empresa->>>>", contactoCondutor)
+                $("#condutorList").empty();
+                        $("#condutorIDList").empty();
+                        for (elem in response.resposta) {
+                            $("<option/>").html(response.resposta[elem].condutor).appendTo("#condutorList");
+                            $("<option/>").html(response.resposta[elem].condutorID).appendTo("#condutorIDList");
+                        }
+                
 
                 $.ajax({
                     type: 'GET',
@@ -747,13 +992,9 @@
                         csrfmiddlewaretoken: "{{ csrf_token }}",
                         'empresa': empresa,
                     },
+                    
                     success: function (response) {
-                        $("#condutorList").empty();
-                        $("#condutorIDList").empty();
-                        for (elem in response.resposta) {
-                            $("<option/>").html(response.resposta[elem].condutor).appendTo("#condutorList");
-                            $("<option/>").html(response.resposta[elem].condutorID).appendTo("#condutorIDList");
-                        }
+                       
                         if (response.resposta.length == 0) {
                             $.ajax({
                                 type: 'GET',
@@ -777,13 +1018,15 @@
 
             $('input#condutor').change(function () {
                 var condutor = $(this).val()
-
+                var contactoCondutor = document.getElementById('condutor').value
+                console.log("Pacote/ Condutor->>>>", contactoCondutor)
                 $.ajax({
-                    type: 'GET',
+                    type: 'POST',
                     url: '/shippers/searchCondutor/',
                     data: {
                         csrfmiddlewaretoken: "{{ csrf_token }}",
                         'condutor': condutor,
+                        "condutor_id": contactoCondutor
                     },
                     success: function (response) {
                         if ($("#empresa:text").val() == '') {
@@ -801,7 +1044,8 @@
 
             $('input#condutorID').change(function () {
                 var condutorID = $(this).val()
-
+                var contactoCondutor = document.getElementById('condutor').value
+                console.log("Pacote/ Condutor->>>>", contactoCondutor)
                 $.ajax({
                     type: 'GET',
                     url: '/shippers/searchCondutorID/',
@@ -825,13 +1069,15 @@
 
             $('input#contacto').change(function () {
                 var contacto = $(this).val()
-
+                var contactoCondutor = document.getElementById('condutor').value
+                console.log("Pacote/ Condutor->>>>", contactoCondutor)
                 $.ajax({
-                    type: 'GET',
+                    type: 'POST',
                     url: '/shippers/searchContacto/',
                     data: {
                         csrfmiddlewaretoken: "{{ csrf_token }}",
                         'contacto': contacto,
+                        "condutor": contactoCondutor,
                     },
                     success: function (response) {
                         if ($("#condutor:text").val() == '') {
@@ -869,108 +1115,252 @@
                 $(this).html('<input class="form-control" style="margin-left: -12px; text-align: center" type="text" placeholder="Procurar" data-index="' + i + '" />');
             });
 
-            if ($(window).width() < 1700) {
-                var table = $('#gatewayHistory').DataTable({
-                    //pageLength: 20,
-                    //pagingType: "full_numbers",
-                    paging: true, 
-                    info: false,
-                    scrollY: 433,
-                    scroller: {
-                        loadingIndicator: true
-                    },
-                    scrollX: true,
-                    scrollCollapse: true,
-                    order: [[0, 'desc']],
-                    columnDefs: [{
-                        "targets": 0,
-                        "type": "time-date-sort"
-                    },
-                        {
-                            targets: [3, 4],
-                            render: function (data, type, row) {
-                                return data.length > 9 ?
-                                    data.substr(0, 9) + '…' :
-                                    data;
-                            }
-                        },
-                        {
-                            targets: [1, 2],
-                            render: function (data, type, row) {
-                                return data.length > 7 ?
-                                    data.substr(0, 7) + '…' :
-                                    data;
-                            }
-                        },
-                        {
-                            targets: 7,
-                            render: function (data, type, row) {
-                                return data.length > 8 ?
-                                    data.substr(0, 8) + '…' :
-                                    data;
-                            }
-                        },
-                        {
-                            targets: [5, 6, 8, 9],
-                            render: function (data, type, row) {
-                                return data.length > 6 ?
-                                    data.substr(0, 6) + '…' :
-                                    data;
-                            }
-                        }
-                    ],
-                });
-            } else {
-                var table = $('#gatewayHistory').DataTable({
-                    paging: true,
-                    info: false,
-                    scrollY: 485,
-                    scrollX: true,
-                    scrollCollapse: true,
-                    scroller: {
-                        loadingIndicator: true
-                    },
-                    order: [[0, 'desc']],
-                    columnDefs: [{
-                        "targets": 0,
-                        "type": "time-date-sort"
-                    },
-                        {
-                            targets: [3, 4],
-                            render: function (data, type, row) {
-                                return data.length > 9 ?
-                                    data.substr(0, 9) + '…' :
-                                    data;
-                            }
-                        },
-                        {
-                            targets: [1, 2],
-                            render: function (data, type, row) {
-                                return data.length > 7 ?
-                                    data.substr(0, 7) + '…' :
-                                    data;
-                            }
-                        },
-                        {
-                            targets: 7,
-                            render: function (data, type, row) {
-                                return data.length > 8 ?
-                                    data.substr(0, 8) + '…' :
-                                    data;
-                            }
-                        },
-                        {
-                            targets: [5, 6, 8, 9],
-                            render: function (data, type, row) {
-                                return data.length > 6 ?
-                                    data.substr(0, 6) + '…' :
-                                    data;
-                            }
-                        }
-                    ],
-                });
-            }
+            var tableExpendable = $('#pnExpendableTable').DataTable({
+                info: false,
+                paging: true,
+                deferRender: true,
+                processing: true,
+                deferLoading: 57,
+                ajax: 'scripts/server_processing.php',
+                scrollCollapse: true,
+                scrollY: "220px",
+                margin: "auto",
+                select: {
+                    style: 'single',
+                    selector: 'tr'
+                },
+                order: [[0, 'desc']],
+                columnDefs: [
+                    { targets: [0, 7], visible: false},
+                    { targets: '_all', visible: true }
+                ],
+            });
 
+            var table = $('#gatewayHistory').DataTable({
+                paging: true, 
+                info: false,
+                scrollY: 433,
+                scroller: {
+                    loadingIndicator: true
+                },
+                scrollX: true,
+                scrollCollapse: true,
+                order: [[0, 'desc']],
+                columnDefs: [{
+                    "targets": 0,
+                    "type": "time-date-sort"
+                },
+                    {
+                        targets: [3, 4],
+                        render: function (data, type, row) {
+                            return data.length > 9 ?
+                                data.substr(0, 9) + '…' :
+                                data;
+                        }
+                    },
+                    {
+                        targets: [1, 2],
+                        render: function (data, type, row) {
+                            return data.length > 7 ?
+                                data.substr(0, 7) + '…' :
+                                data;
+                        }
+                    },
+                    {
+                        targets: 7,
+                        render: function (data, type, row) {
+                            return data.length > 8 ?
+                                data.substr(0, 8) + '…' :
+                                data;
+                        }
+                    },
+                    {
+                        targets: [5, 6, 8, 9],
+                        render: function (data, type, row) {
+                            return data.length > 6 ?
+                                data.substr(0, 6) + '…' :
+                                data;
+                        }
+                    }
+                ],
+            });
+
+            $.ajax({
+                type: 'GET',
+                url: '/shippers/json_gateway',
+                error: () => alert("Error ao criar as tableas #gatewayHistory e #pnExpendableTable"),
+                success: (req) => {
+                    /* Popular a table com dados de /json */
+                    console.log(`[#gatewayHistory] a carregar ${req.length} dados para a tabela`)
+                    console.log("Read Only-->", "{{ readonly|safe }}" )
+                    const t1 = new Date();
+                    for (let value of req) {
+                        const tdStyle = value.estado === 'verde' ? 'style="background-color: limegreen"': '';
+
+                        let row = `<tr><td ${tdStyle}>${value.dataHoraChegada}</td>
+                                    <td ${tdStyle}>${value.condutor}</td>
+                                    <td ${tdStyle}>${value.ident}</td>
+                                    <td ${tdStyle}>${value.contacto}</td>
+                                    <td ${tdStyle}>${value.empresa}</td>
+                                    <td ${tdStyle}>${value.primeiraMatricula}</td>
+                                    <td ${tdStyle}>${value.segundaMatricula}</td>
+                                    <td ${tdStyle}>${value.cargaDescarga}</td>
+                                    <td ${tdStyle}>${value.doca}</td>
+                                    <td ${tdStyle}>${value.destinoCarga}</td>
+                                    <td ${tdStyle}>${value.tipoViatura}</td>`;
+                        if (value.estado === 'verde') {
+                            if (value.dataHoraEntrada) {
+                                const BgBackground = value.abandono === 'true' ? 'background-color: rgba(255,0,0,0.50)': 'background-color: limegreen'
+                                row += `<td style="max-width: 70px; text-align: center; ${BgBackground}" class="column_left ">${value.dataHoraEntrada}</td>`
+                            } else {
+                                row += `<td class="column_left">
+                                    <input type='datetime-local' class="form-control" name="dataHoraEntrada"
+                                        style="max-width: 200px; background-color: limegreen"/>
+                                </td>`
+                            }
+                        }
+                        else {
+                            if (value.dataHoraEntrada) {
+                                const BgBackground = value.abandono === 'true' ? 'background-color: rgba(255,0,0,0.50)': ''
+                                if (value.abandono === 'true') {
+                                    row += `<td style="max-width: 170px; text-align: center; background-color: rgba(255,0,0,0.50)" class="column_left ">${value.dataHoraEntrada}</td>`
+                                } else {
+                                if (value.estado == 'terminado' || value.estado == 'feitoEsaiu') {
+                                    row += `<td style="max-width: 170px; text-align: center"
+                                        class="column_left">${value.dataHoraEntrada}</td>`
+                                } else {
+                                    row += `<td style="max-width: 170px; text-align: center"
+                                                class="column_left"><input type="text"
+                                                                        value="${value.dataHoraEntrada}">
+                                            </td>`
+                                }
+                                }
+                            } else {
+                                row += `<td class="column_left" style="max-width: 230px; text-align: center">
+                                            <button type="button" name="dataHoraEntrada" style="height: 17px"
+                                                    class="btn btn-light-grey" id="dataHoraEntrada">Time
+                                            </button>
+                                        </td>`;
+                            }
+                        }
+                        
+                        if (value.abandono === 'true') {
+                            row += `<td style="text-align: center; width: 20px"><input type="checkbox" id="abandonado"
+                                    title="Abandonado" name="abandonado"
+                                    checked
+                                    disabled>`
+                        } else {
+                            row += `<td style="text-align: center; width: 10px"><input type="checkbox" id="abandonado"
+                                    name="abandonado" title="Abandonado">
+                                    </td>`
+                        }
+
+                        row += `<td>
+                                <input type="text" name="comentarioEntrada" style="width: 65px" data-toggle="tooltip"
+                                    data-placement="bottom" title='${value.comentEntrada}'
+                                    value='${value.comentEntrada}'>
+                                </td>`
+
+                        if (value.dataHoraSaida) {
+                            if (value.abandono === "true") {
+                                row += `<td style="max-width: 170px; text-align: center; background-color: rgba(255,0,0,0.50)">${value.dataHoraSaida}</td>`;
+                                
+                            } else {
+                                if (value.estado === 'terminado' || value.estado === 'feitoEsaiu') {
+                                    row += `<td style="max-width: 170px; text-align: center">${value.dataHoraSaida}</td>`
+                                } else {
+                                    row += `<td style="max-width: 170px; text-align: center"><input type="text" value="${value.dataHoraSaida}"></td>`
+                                }
+                            }
+                        } else {
+                            row += `<td style="max-width: 230px; text-align: center">
+                                        <button type="button" style="height: 17px; margin-left: 15px"
+                                            class="btn btn-light-grey"
+                                            name="dataHoraSaida" id="dataHoraSaida">Time
+                                        </button>
+                                    </td>`
+                        }
+
+                        row += `<td>
+                                <input type="text" name="comentarioSaida" style="width: 65px" data-toggle="tooltip"
+                                    data-placement="bottom" title='${value.comentSaida}'
+                                    value='${value.comentSaida}'>
+                            </td>
+                            <td>
+                                <button type="button" id="update" class="btn btn-outline-primary btn-xs"
+                                        style="height: 18px">
+                                    Update
+                                </button>
+                            </td>
+                            <td>
+                            <a type="button" id="botaoDelete" title="Delete" class="fas fa-trash-alt"
+                                    style="margin-left: 10px; height: 18px"
+                                    data-toggle="modal" data-target="#deleteLinha">
+                                    </a> </td>
+                            <td style="display: none"  value="${value.id}">${value.id}</td>
+                        `;
+                        row += "</tr>"
+                        table.rows.add($(row))
+                    }
+                        
+                    table.draw()
+                    console.log(`[#gatewayHistory] ${req.length} dado carregados com sucesso (dados carregados em ${new Date() - t1}ms)`)
+                    
+                    const t2 = new Date();
+                    console.log(`[#pnExpendableTable] a carregar ${req.length} dados para a tabela`)
+                    let pnExpendableTable = document.getElementById("pnExpendableTable");
+                    for(let value of req) {
+                        /* $("#pnExpendableTable tr #last").after(
+                            [
+                            `<td>${value["dataHoraChegada"]}</td>`,
+                            `<td>${value["condutor"]}</td>`,
+                            `<td>${value["ident"]}</td>`,
+                            `<td>${value["contacto"]}</td>`,
+                            `<td>${value["empresa"]}</td>`,
+                            `<td>${value["primeiraMatricula"]}</td>`,
+                            `<td>${value["segundaMatricula"]}</td>`,
+                            `<td>0</td>`,
+                            ].join(" ")) */
+                        tableExpendable.rows.add(
+                            [[
+                                value["dataHoraChegada"],
+                                value["condutor"],
+                                value["ident"],
+                                value["contacto"],
+                                value["empresa"],
+                                value["primeiraMatricula"],
+                                value["segundaMatricula"],
+                                "0"
+                            ]]
+                        )
+                    }
+                    /* tableExpendable.draw() */
+                    console.log(`[#pnExpendableTable] ${req.length} dado carregados com sucesso (dados carregados em ${new Date() - t2}ms)`)
+                }
+            })
+
+
+            var tableMedias= $("#tableMedias").DataTable({
+                info: false,
+                paging: false,
+                ordering: false,
+                select: {
+                    style: 'os',
+                    blurable: true
+                },
+                order: [[0, 'asc']],
+            });
+
+            $('#gatewayHistory tbody').on('click', '#botaoDelete', function () {
+                console.log("ENtrou DELETE")
+                var data = table.row($(this).parents('tr')).data();
+                console.log("DATA",data)
+                $("#rowIdDelete").val(data[18])
+                $("#condutorId").val(data[2])
+            });
+
+
+             
             // Filter event handler
             var checked = $('input[id=emptyEntrada]:checkbox').is(':checked');
             var checkedSaida = $('input[id=emptySaida]:checkbox').is(':checked');
@@ -1078,7 +1468,7 @@
                     url: '/shippers/setDataHoraEntrada/',
                     data: {
                         csrfmiddlewaretoken: "{{ csrf_token }}",
-                        'id': data[17]
+                        'id': data[18]
                     },
                     success: function () {
                         window.location = "{% url 'shippers:portaria'  %}"
@@ -1093,7 +1483,7 @@
                     url: '/shippers/setDataHoraSaida/',
                     data: {
                         csrfmiddlewaretoken: "{{ csrf_token }}",
-                        'id': data[17]
+                        'id': data[18]
                     },
                     success: function () {
                         window.location = "{% url 'shippers:portaria'  %}"
@@ -1104,9 +1494,7 @@
             
             $('#gatewayHistory tbody').on('click', '#update', function () {
                 //tens de por o btn update a ficar disabled
-                console.log("Tas ai")
-              
-                this.disabled= true
+             
                 //var elem =  this.getElementById("update")
                 //elem.disabled = true    
                 //buttonObject.disabled = true
@@ -1126,7 +1514,7 @@
                 if (data[14].startsWith("<input")) {
                     dataHoraSaida = $(this).closest("tr").find('td:eq(14) input').val()
                 }
-                console.log("ID->", data[17])
+                console.log("ID->", data[18])
                 $.ajax({
                     type: 'POST',
                     url: '/shippers/submitGatewayRowUpdate/',
@@ -1137,7 +1525,7 @@
                         'comentariosSaida': comentariosSaida,
                         'dataHoraEntrada': dataHoraEntrada,
                         'dataHoraSaida': dataHoraSaida,
-                        'id': data[17]
+                        'id': data[18]
                     },
                     success: function () {
                         window.location.reload()
@@ -1162,7 +1550,7 @@
                 if (data[14].startsWith("<input")) {
                     dataHoraSaida = $(this).closest("tr").find('td:eq(14) input').val()
                 }
-                console.log("ID->", data[17])
+                console.log("ID->", data[18])
                 $.ajax({
                     type: 'POST',
                     url: '/shippers/submitGatewayRowUpdate/',
@@ -1173,10 +1561,30 @@
                         'comentariosSaida': comentariosSaida,
                         'dataHoraEntrada': dataHoraEntrada,
                         'dataHoraSaida': dataHoraSaida,
-                        'id': data[17]
+                        'id': data[18]
                     },
                     success: function () {
                         window.location = "{% url 'shippers:submitGatewayRowUpdate'  %}"
+                    }
+                })
+            };
+
+
+            function clickUpdate(scope) {
+                var data = table.row($(this).parents('tr')).data();
+                document.getElementById('update').disabled = true;
+                
+                console.log("ID->",data, data[18])
+                $.ajax({
+                    type: 'POST',
+                    url: '/shippers/deleteLinhaPortaria/',
+                    data: {
+                        csrfmiddlewaretoken: "{{ csrf_token }}",
+                        'id': data[18]
+                    },
+                    success: function () {
+                        
+                        window.location = "{% url 'shippers:portaria'  %}"
                     }
                 })
             };
@@ -1227,42 +1635,7 @@
                 $("#valorNovo").html('<a type="button" class="fas fa-plus-circle fa-2x button5" id="botaoVeiculo" style="color: orange; margin-top: -12px; background-color: black; border-radius: 50%"></a>');
                         var myModal = new bootstrap.Modal(document.getElementById('criarNovo'))
                         myModal.show()
-                $.ajax({
-                    type: 'POST',
-                    url: '/shippers/resetVeiculoDB/',
-                    data: {
-                        csrfmiddlewaretoken: "{{ csrf_token }}"
-                    },
-                    success: function () {
-                       
-                        $('#condutor').val('')
-                        $('#condutorID').val('')
-                        $('#contacto').val('')
-                        $('#empresa').val('')
-                        $('#1matricula').val('')
-                        $('#2matricula').val('')
-                        $('#cargaDescarga').val('')
-                        $('#doca').val('')
-                        $('#destinoCarga').val('')
-                        $('#checkboxVeiculo').prop("checked", false);
-
-                        $.ajax({
-                            type: 'GET',
-                            url: '/shippers/searchAllInfo/',
-                            data: {
-                                csrfmiddlewaretoken: "{{ csrf_token }}",
-                            },
-                            success: function (response) {
-                                $("#condutorList").empty();
-                                $("#condutorIDList").empty();
-                                for (elem in response.resposta) {
-                                    $("<option/>").html(response.resposta[elem].condutor).appendTo("#condutorList");
-                                    $("<option/>").html(response.resposta[elem].condutorID).appendTo("#condutorIDList");
-                                }
-                            }
-                        })
-                    }
-                })
+               
             });
 
             $(document).on('click', '#excel', function () {
@@ -1453,10 +1826,13 @@
         });
 
         function FbotonOn() {
+          
             if (!document.getElementById('checkboxVeiculo').checked) {
                 document.getElementById('selectVeiculo').style.backgroundColor = "red";
             } else
                 document.getElementById('selectVeiculo').style.backgroundColor = "transparent";
+             
+            
         }
     </script>
 {% endblock %}

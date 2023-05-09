@@ -1,17 +1,7 @@
-{% extends "vware/baseArmazem.html" %}
+{% extends "vware/baseArmazem1.html" %}
 {% load static %}
 <!-- TRACKING ORIGINAL -->
-<style>
-    
-#clock {
-  font-size: 175px;
-  width: 900px;
-  margin: 200px;
-  text-align: center;
-  border: 2px solid black;
-  border-radius: 20px;
-}
-</style>
+
 {% block body_title %}
   <div class="text-primary" xmlns="http://www.w3.org/1999/html">
     <h6>
@@ -33,6 +23,8 @@
             <td style="text-align: center">QT Cx</td>
             <td style="text-align: center">Inicio Prep.</td>
             <td style="text-align: center">Fim Prep.</td>
+            <td style="text-align: center">Confirmação</td>
+           
             <td style="text-align: center">Ship Date</td>
             <td style="text-align: center">Ship Time</td>
             <td style="text-align: center">Carrier</td>
@@ -44,22 +36,18 @@
         </thead>
         <tbody>
         {% for tracking in items %}
-            {% if tracking.inicioPrep != actualDay_menos2 %}
             
-            {% if tracking.inicioPrep < tracking.ship_date %}
-            tas todo
-            {% endif %}
+     
         <tr>
 
-           <!-- Se a data INICIO PREP for superior à data do SHIPDATE aparece algo a vermelho ou outra cor -->
-
-            {% if tracking.fimPrep != None  %}
+           
+            {% if tracking.confirmacao != None  %}
                 <td style="width: 5%;text-align: center; background-color: lightgreen;" title="{{ tracking.nShipper|default:'Empty' }}">{{ tracking.nShipper|default:""}}</td>
             {% else %}
             {% if tracking.inicioPrep != None or tracking.ship_carrier != None %}
                 <td style="width: 5%;text-align: center" title="{{ tracking.nShipper|default:'Empty' }}">{{ tracking.nShipper|default:""}}</td>
             {% else %}
-                <td style="width: 5%;text-align: center;position: fixed;" title="{{ tracking.nShipper|default:'Empty' }}" contenteditable id="nShipper" class="editable">{{ tracking.nShipper|default:""}}</td>
+                <td style="width: 5%;text-align: center" title="{{ tracking.nShipper|default:'Empty' }}" contenteditable id="nShipper" class="editable">{{ tracking.nShipper|default:""}}</td>
             {% endif %}
             {% endif %}
             <td style="width: 5%;text-align: center">
@@ -71,7 +59,7 @@
             
         </td>
 
-            <td style="width: 10%;text-align: center;" title="{{ tracking.qtyCaixas|default:'Empty' }}" contenteditable id="qtyCaixas" class="editable">{{ tracking.qtyCaixas|default:""}}</td>
+            <td style="width: 10%;text-align: center" title="{{ tracking.qtyCaixas|default:'Empty' }}" contenteditable id="qtyCaixas" class="editable">{{ tracking.qtyCaixas|default:""}}</td>
           
             <td style="width: 10%;text-align: center;" title="{{ tracking.inicioPrep|default:'Empty'}}" id="inicioPreps">
                 {% if tracking.inicioPrep != None  %}
@@ -97,7 +85,17 @@
                     {% endif %}
                     {% endif %}
                 </td>
-             
+            <td style="width: 5%;text-align: center" id="confirmacao">
+                {% if tracking.confirmacao != None  %}
+                    {{ tracking.confirmacao|default:""}}
+                {% else %}
+                {% if tracking.fimPrep == None  %}
+                <button title="Editar"  disabled="true" type="submit" style="background: #FBA51A;" class="btn btn-primary" id="botaoConfirmacao" onclick="getButtonDate(this, 'confirmacao')">Confirmação</button>
+                {% else %}
+                    <button title="Editar"  type="submit" style="background: #FBA51A;" class="btn btn-primary" id="botaoConfirmacao" onclick="getButtonDate(this, 'confirmacao')">Confirmação</button>
+                {% endif %}
+                {% endif %}
+            </td>
             
             
 
@@ -115,7 +113,7 @@
             </td>
             <td style="display: none" id="idSave" value="{{ tracking.id }}">{{ tracking.id }}</td>
         </tr>
-        {% endif %}
+ 
     {% endfor %}
         </tbody>
         <tfoot>
@@ -127,13 +125,13 @@
             <th style="text-align: center">QT Cx</th>
             <th style="text-align: center">Inicio Prep</th>
             <th style="text-align: center"> Fim Prep </th>
+            <th style="text-align: center">Confirmação</th> <!-- Stock -->
             
             <th style="text-align: center">Ship Date</th>
             <th style="text-align: center">Ship Time</th>
             <th style="text-align: center">Carrier</th>
             <th style="text-align: center">Comentários</th>
-            <th></th> <!-- BTN DELETE -->
-
+            <th></th>
                 
                 <th style="display: none" ></th>
         </tr>
@@ -181,15 +179,13 @@
                 </div>
             </div>
     </form>
-
-    <div id="clock">8:10:45</div>
-
+    
     {% endblock %} {% block javascript %}
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <link rel="stylesheet" href="/resources/demos/style.css">
     <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/confetti.css">
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-    <script src="../../static/js/tabledit.js"></script>
+    <script src="/static/js/tabledit.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <style>
 .bg-golden {
@@ -249,7 +245,7 @@
           scrollY: 460,
           scrollCollapse: true,
           info: false,
-          order:[[3,'desc'],[10,'desc']],
+          order:[[3,'desc'],[11,'desc']],
           dom: 'frtipB',
           select: {
             style: "os",
@@ -290,16 +286,6 @@
                 $(this).addClass("bg-golden ").css("padding", "5px");
                 $(this).focus();
             })
-           
-            window.onload = (event) => {
-                console.log("vai Atualizar")
-                setTimeout(function(){
-                   console.log("vai Atualizar")
-                },30000,window.location.reload());
-          
-            };
-
- 
 
            
         $(document).on("focusout", ".editable", function () {
@@ -316,7 +302,7 @@
             const text = $(this).text()
             console.log(this.id )
             for (let item of tableRaw.rows) {
-                if (item.cells[10] == data[10]) continue
+                if (item.cells[11] == data[11]) continue
                 
                 if (item.cells[0].innerText == text && item.cells[0].innerText != "" && this.id == "nShipper"  ) { //tá a verificar a igualdade do camponShiper com o texto que eu lhe introduzo
                     return DefaultMixinCss.fire({
@@ -330,13 +316,14 @@
             window.location.reload()
             addOrEditTrackingRow({
                 csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
-                id: data[10].innerText,
+                id: data[11].innerText,
             
                 ...(data[3].tagName == "BUTTON" && {data: data[3].innerText}),
                 ...(data[4].tagName == "BUTTON" && {data: data[4].innerText}),
+                ...(data[5].tagName == "BUTTON" && {data: data[5].innerText}),
                 nShipper: data[0].innerText,
                 qtyCaixas: data[2].innerText,
-                comentarios: data[8].innerText,}
+                comentarios: data[9].innerText,}
             )
         })
 
@@ -347,17 +334,21 @@
 
     $('#example tbody').on('click', '#botaoDelete', function () {
         console.log("ENtrou")
-    var data = table.row($(this).parents('tr')).data();
+        var data = table.row($(this).parents('tr')).data();
+    //Estão a vir os btns
 
     console.log("DATA",data)
     var nShipper = data[0]
     var qtyCaixas = data[2]
     var inicioPrep = data[3] || ""
     var fimPrep = data[4] || ""
-    var comentario = data[8]
-    var ship_date = data[5]
-    var ship_time = data[6]
-    var ship_carrier = data[7]
+    var confirmacao= data[5]
+    var comentario = data[9]
+    //falta adicionar as outras 3
+    var ship_date = data[6]
+    var ship_time = data[7]
+    var ship_carrier = data[8]
+    
 
     if(inicioPrep.startsWith("<button")){
         inicioPrep=""
@@ -365,18 +356,30 @@
     if(fimPrep.startsWith("<button")){
         fimPrep=""
     }
+    if(confirmacao.startsWith("<button")){
+        confirmacao=""
+    }
+    
+
+     
+    //Falta fazer para os campos novos
+
     var modalInfo = 
         "<p>" + "<b>Nº Shipper:</b>&emsp;&emsp;&emsp;" + nShipper + "</p>" +
         "<p>" + "<b>QT Cx:</b>&emsp;&emsp;&emsp;" + qtyCaixas + "</p>" +
+      
         "<p>" + "<b>Inicio Prep:</b>&emsp;&emsp;&emsp;" + inicioPrep + "</p>" +
         "<p>" + "<b>Fim Prep:</b>&emsp;&emsp;" + fimPrep + "</p>" +
+
+        "<p>" + "<b>Confirmação:</b>&emsp;&emsp;" + confirmacao + "</p>" +
         "<p>" + "<b>Comentario:</b>&emsp;&emsp;" + comentario + "</p>" +
          "<p>" + "<b>Shiping Date:</b>&emsp;&emsp;" + ship_date + "</p>"+
          "<p>" + "<b>Shiping Time:</b>&emsp;&emsp;" + ship_time + "</p>"+
          "<p>" + "<b>Transportadora:</b>&emsp;&emsp;" + ship_carrier + "</p>"
+         
 
     //inventarioDelete
-    $("#rowIdDelete").val(data[10])
+    $("#rowIdDelete").val(data[11])
     $('#infoDelete').html(modalInfo);
     });
 
@@ -393,7 +396,7 @@
                 keyboard: false,
                 allowOutsideClick: false
             },
-            buttonsStyling: false //VAI SER NEEDED caso não exista nenhum resultado da view
+            buttonsStyling: false 
         })  
 
         const DefaultMixinCss1 = Swal.mixin({
@@ -401,13 +404,14 @@
                
 
             },
-            buttonsStyling: false //VAI SER NEEDED caso não exista nenhum resultado da view
+            buttonsStyling: false 
         })  
        
-        //nao tas no scope da tabela
-        console.log("DATA",data[10])
+        console.log("DATA",data[11])
         var nShipper = data[0]
-        var id = data[10]
+        var carrier = data[8]
+        var id = data[11]
+        console.log("CARRIER", carrier)
          Swal.fire({
             icon: 'success',
             title: 'A consultar o QAD...',
@@ -415,7 +419,7 @@
             allowOutsideClick: false,
             allowEscapeKey : true
         }).then((result) =>{
-            if (result.isDismissed = true) {console.log("saí"); window.location.reload()}
+            if (result.isDismissed = true) {console.log("sai"); window.location.reload()}
         })
         console.log(event.key)
         switch (event.key) {
@@ -441,13 +445,12 @@
             icon: 'error',
             title: 'A pesquisa falhou.',
             showConfirmButton: false
-        },60000, window.location.reload());
+        },90000, window.location.reload());
         })
          }
          });
         }
     );
-
 
     function addNewRow() {
         var table = document.getElementById('example');
@@ -463,12 +466,13 @@
         for (let item of [...table.rows].slice(1, table.rows.length-1)) {
             if ($(item.cells[3].innerHTML).prop("tagName") == "BUTTON"
                 && $(item.cells[4].innerHTML).prop("tagName") == "BUTTON"
+                && $(item.cells[5].innerHTML).prop("tagName") == "BUTTON"
                 && item.cells[0].innerText == ""
                 && item.cells[2].innerText == ""
-                && item.cells[5].innerText == ""
                 && item.cells[6].innerText == ""
                 && item.cells[7].innerText == ""
-                && item.cells[8].innerText == "") 
+                && item.cells[8].innerText == ""
+                && item.cells[9].innerText == "") 
                 return DefaultMixinCss.fire({
                     icon: 'error',
                     title: 'Ops...',
@@ -496,7 +500,7 @@
         var data = table.row($(scope).parents('tr')).data();
         addOrEditTrackingRow({
             csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
-            id: data[10],
+            id: data[11],
             [key]: new Date().getTime() / 1000,
         }, () => {let now = new Date(); Number($(scope).parent().html(`${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()} ${now.getHours()}:${now.getMinutes()}`))
     console.log("now",now)})
@@ -506,36 +510,6 @@
     $(document).on('click', '#downloadHistorico', function () {
             window.location.replace("{% url 'shippers:downloadExcelHistoricoTracking' %}")
         });
-
-        setInterval(showTime, 30000);
-function showTime() {
-    let time = new Date();
-    let hour = time.getHours();
-    let min = time.getMinutes();
-    let sec = time.getSeconds();
-    am_pm = "AM";
- 
-    if (hour > 12) {
-        hour -= 12;
-        am_pm = "PM";
-    }
-    if (hour == 0) {
-        hr = 12;
-        am_pm = "AM";
-    }
- 
-    hour = hour < 10 ? "0" + hour : hour;
-    min = min < 10 ? "0" + min : min;
-    sec = sec < 10 ? "0" + sec : sec;
- 
-    let currentTime = hour + ":"
-            + min + ":" + sec + am_pm;
- 
-    document.getElementById("clock")
-            .innerHTML = currentTime;
-}
-showTime();
-
 
 </script>
 {% endblock %}

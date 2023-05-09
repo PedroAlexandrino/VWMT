@@ -710,10 +710,28 @@ class HabilitarQuadrados(models.Model):
         return f"{self.posicao}"
 
 
-class DefinirTempos(models.Model):
+""" class DefinirTempos(models.Model):
     turno = models.CharField(max_length=150, blank="true", null=True)
     inicio = models.CharField(max_length=150, blank="true", null=True)
     final = models.CharField(max_length=150, blank="true", null=True)
+
+    # META CLASS
+    class Meta:
+        verbose_name = "Receiving - TPM - Configuration - tempos"
+        verbose_name_plural = "Receiving - TPM - Configuration - tempos"
+        managed = True
+
+    # TO STRING METHOD
+    def __str__(self):
+        return f"{self.turno}" """
+
+
+class DefinirTempos(models.Model):
+    turno = models.CharField(max_length=150, blank="true", null=True)
+    p1Inicio = models.CharField(max_length=150, blank="true", null=True)
+    p1Fim = models.CharField(max_length=150, blank="true", null=True)
+    p2Inicio = models.CharField(max_length=150, blank="true", null=True)
+    p2Fim = models.CharField(max_length=150, blank="true", null=True)
 
     # META CLASS
     class Meta:
@@ -873,3 +891,188 @@ class TriggerEnvioEmailsICDR(models.Model):
     # TO STRING METHOD
     def __str__(self):
         return f"{self.nome}"
+
+
+
+#---------------//////-----------------------////--------------------------
+#                   Medias FASupply
+
+class MNFGSupplyItems(models.Model):
+    wtsk_id = models.CharField(max_length=50, null=True)
+    wtsk_event_id    = models.CharField(max_length=50, null=True)
+    wtsk_wave_id = models.CharField(max_length=50, null=True)
+    wtsk_task_type = models.CharField(max_length=50, null=True)
+    wtsk_from_part = models.CharField(max_length=50, null=True)
+    wtsk_from_stor_zone = models.CharField(max_length=50, null=True)
+    wtsk_to_loc = models.CharField(max_length=50, null=True)
+    wtsk_qty_exp = models.CharField(max_length=50, null=True)
+    wtsk_create_date = models.CharField(max_length=50, null=True)
+    wtsk_create_time = models.CharField(max_length=50, null=True)
+    timestamp = models.CharField(max_length=50, null=True)
+
+    # META CLASS
+    class Meta:
+        verbose_name = "Fa Supply Items"
+        verbose_name_plural = "Fa Supply Items"
+        managed = True
+
+    # TO STRING METHOD
+    def __str__(self):
+        return f"{self.wtsk_id}"
+
+
+class FASupplyRedItems(models.Model):
+    taskID = models.CharField(max_length=50, null=True)
+    waveID = models.CharField(max_length=50, null=True)
+    taskType = models.CharField(max_length=50, null=True)
+    fromPart = models.CharField(max_length=50, null=True)
+    fromStorageZone = models.CharField(max_length=50, null=True)
+    toLocation = models.CharField(max_length=50, null=True)
+    createdDate = models.CharField(max_length=50, null=True)
+    createdTime = models.CharField(max_length=50, null=True)
+    timestamp = models.CharField(max_length=50, null=True)
+
+    # META CLASS
+    class Meta:
+        verbose_name = "mNFG Supply Red Items"
+        verbose_name_plural = "mNFG Supply Red Items"
+        managed = True
+
+    # TO STRING METHOD
+    def __str__(self):
+        return f"{self.taskID}"
+
+#---------------//////-----------------------////--------------------------
+#               MEDIAS BPDropinSupply
+class BPDropinSupplyRedItems(models.Model):
+    taskID = models.CharField(max_length=50, null=True)
+    waveID = models.CharField(max_length=50, null=True)
+    taskType = models.CharField(max_length=50, null=True)
+    fromPart = models.CharField(max_length=50, null=True)
+    fromStorageZone = models.CharField(max_length=50, null=True)
+    toLocation = models.CharField(max_length=50, null=True)
+    createdDate = models.CharField(max_length=50, null=True)
+    createdTime = models.CharField(max_length=50, null=True)
+    timestamp = models.CharField(max_length=50, null=True)
+
+    # META CLASS
+    class Meta:
+        verbose_name = "mNFG Supply Red Items"
+        verbose_name_plural = "mNFG Supply Red Items"
+        managed = True
+
+    # TO STRING METHOD
+    def __str__(self):
+        return f"{self.taskID}"
+
+
+#---------------//////-----------------------////--------------------------
+#               MEDIAS BPSMDSupply
+class BPSMDSupplyRedItems(models.Model):
+    taskID = models.CharField(max_length=50, null=True)
+    waveID = models.CharField(max_length=50, null=True)
+    taskType = models.CharField(max_length=50, null=True)
+    fromPart = models.CharField(max_length=50, null=True)
+    fromStorageZone = models.CharField(max_length=50, null=True)
+    toLocation = models.CharField(max_length=50, null=True)
+    createdDate = models.CharField(max_length=50, null=True)
+    createdTime = models.CharField(max_length=50, null=True)
+    timestamp = models.CharField(max_length=50, null=True)
+
+    # META CLASS
+    class Meta:
+        verbose_name = "mNFG Supply Red Items"
+        verbose_name_plural = "mNFG Supply Red Items"
+        managed = True
+
+    # TO STRING METHOD
+    def __str__(self):
+        return f"{self.taskID}"
+
+#---------------//////-----------------------////--------------------------
+#               REPORTS FaSupply
+
+class FaSupplyReportRedItems(models.Model):
+    report =  models.CharField(max_length=100, blank="true", null=True)
+    timestamp = models.CharField(max_length=200, null=True)
+    turno =  models.CharField(max_length=1, blank="true", null=True)
+
+
+    class Meta:
+        verbose_name = "FaSupplyReportRedItems"
+        verbose_name_plural = "FaSupplyReportRedItems"
+        managed = True
+
+    # TO STRING METHOD
+    def __str__(self):
+        return f"{self.report}"
+    
+#---------------//////-----------------------////--------------------------
+#               REPORTS BPDropinSupply
+
+class BPDropinSupplyReportRedItems(models.Model):
+    report =  models.CharField(max_length=100, blank="true", null=True)
+    timestamp = models.CharField(max_length=200, null=True)
+    turno =  models.CharField(max_length=1, blank="true", null=True)
+
+
+class Meta:
+    verbose_name = "BPDropinSupplyReportRedItems"
+    verbose_name_plural = "BPDropinSupplyReportRedItems"
+    managed = True
+
+# TO STRING METHOD
+def __str__(self):
+    return f"{self.report}"
+
+#---------------//////-----------------------////--------------------------
+#               REPORTS BPSMDSupply
+
+class BPSMDSupplyReportRedItems(models.Model):
+    report =  models.CharField(max_length=100, blank="true", null=True)
+    timestamp = models.CharField(max_length=200, null=True)
+    turno =  models.CharField(max_length=1, blank="true", null=True)
+
+
+class Meta:
+    verbose_name = "BPSMDSupplyReportRedItems"
+    verbose_name_plural = "BPSMDSupplyReportRedItems"
+    managed = True
+
+# TO STRING METHOD
+def __str__(self):
+    return f"{self.report}"
+
+#falta fazer a migração desta tabela
+class HistoricoErros(models.Model):
+    pagina = models.CharField(max_length=100, null=True)
+    erro = models.CharField(max_length=200, null=True)
+    timestamp = models.CharField(max_length=100, null=True)
+    
+    class Meta:
+        verbose_name = "HistoricoErros"
+        verbose_name_plural = "HistoricoErros"
+        managed = True
+
+    # TO STRING METHOD
+    def __str__(self):
+        return f"{self.lastUpdate}"
+
+
+#tens de fazer a view no table Plus para ir buiscar apenas para o dia atual
+class HistoricoErros_View(models.Model):
+    pagina = models.CharField(max_length=100, null=True)
+    erro = models.CharField(max_length=200, null=True)
+    timestamp = models.CharField(max_length=100, null=True)
+    
+    # TO STRING METHOD
+    def __str__(self):
+        return f"{self.lastUpdate}"
+    class Meta:
+        managed = False
+        db_table ="receiving_historicoerros"
+
+
+
+
+

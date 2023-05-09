@@ -2,8 +2,7 @@ from . import views
 from django.conf.urls.static import static
 from django.views.static import serve
 from django.conf import settings
-from django.conf.urls import url
-from django.urls import path
+from django.urls import path, re_path
 
 app_name = "pManagement"
 
@@ -109,8 +108,8 @@ urlpatterns = [
         views.downloadExcelStockPackage,
         name="downloadExcelStockPackage",
     ),
-    url(r"^view-pdf/$", views.pdf_view, name="pdf_view"),
-    url(r"^view1-pdf/$", views.pdf_view1, name="pdf_view1"),
+    re_path(r"^view-pdf/$", views.pdf_view, name="pdf_view"),
+    re_path(r"^view1-pdf/$", views.pdf_view1, name="pdf_view1"),
     path("uploadStockFile/", views.uploadStockFile, name="uploadStockFile"),
     path(
         "uploadStockFileStock/", views.uploadStockFileStock, name="uploadStockFileStock"
@@ -159,7 +158,7 @@ urlpatterns = [
     # Configurations
     path("changeUserGroups/", views.changeUserGroups, name="changeUserGroups"),
     path("configurations/", views.configurations, name="configurations"),
-    url(r"^download/(?P<path>.*)$", serve, {"document_root": settings.MEDIA_ROOT}),
+    re_path(r"^download/(?P<path>.*)$", serve, {"document_root": settings.MEDIA_ROOT}),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:

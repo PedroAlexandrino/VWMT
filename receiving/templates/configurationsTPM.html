@@ -354,34 +354,64 @@
             <form method="POST" class="form" action="{% url 'receiving:definirTempos' %}"
                   enctype="multipart/form-data">
                 {% csrf_token %}
-                <table id="definirTempos" class="compact" style="width:100%">
+                <table id="definirTempos" class="compact" style="width:100%;text-align: center">
                     <thead style="margin-left: -9px">
                     <tr>
-                        <th></th>
-                        <th>Tempo final turno 4</th>
-                        <th>Tempo inicio turno 1</th>
-                        <th>Tempo final turno 1</th>
-                        <th>Tempo inicio turno 2</th>
-                        <th>Tempo final turno 2</th>
-                        <th>Tempo inicio turno 4</th>
+                        <th>Turnos/Periodos</th>
+                        <th>Inicio</th>
+                        <th>Fim</th>
+                        
                     </tr>
                     </thead>
                     <tbody>
                     <tr>
-                        <td>Áreas</td>
-                        <td style="text-align: center"><input type="time" name="final4"
-                                                              value="{{ tempos.all.2.final }}"></td>
-                        <td style="text-align: center"><input type="time" name="inicio1"
-                                                              value="{{ tempos.all.0.inicio }}"></td>
-                        <td style="text-align: center"><input type="time" name="final1"
-                                                              value="{{ tempos.all.0.final }}"></td>
-                        <td style="text-align: center"><input type="time" name="inicio2"
-                                                              value="{{ tempos.all.1.inicio }}"></td>
-                        <td style="text-align: center"><input type="time" name="final2"
-                                                              value="{{ tempos.all.1.final }}"></td>
-                        <td style="text-align: center"><input type="time" name="inicio4"
-                                                              value="{{ tempos.all.2.inicio }}"></td>
+                        <td>T1 | P1</td>
+                        <td style="text-align: center"><input type="time" name="inicioT1P1"
+                                                              value="{{ tempos.all.0.p1Inicio }}"></td>
+                        <td style="text-align: center"><input type="time" name="fimT1P1"
+                                                              value="{{ tempos.all.0.p1Fim }}"></td>
+                       
                     </tr>
+
+                    <tr>
+                        <td>T1 | P2</td>
+                        <td style="text-align: center"><input type="time" name="inicioT1P2"
+                                                              value="{{ tempos.all.0.p2Inicio }}"></td>
+                        <td style="text-align: center"><input type="time" name="fimT1P2"
+                                                              value="{{ tempos.all.0.p2Fim }}"></td>
+                    </tr>
+
+                    <tr>
+                        <td>T2 | P1</td>
+                        <td style="text-align: center"><input type="time" name="inicioT2P1"
+                                                              value="{{ tempos.all.1.p1Inicio  }}"></td>
+                        <td style="text-align: center"><input type="time" name="fimT2P1"
+                                                              value="{{ tempos.all.1.p1Fim  }}"></td>
+                    </tr>
+
+                    <tr>
+                        <td>T2| P2</td>
+                        <td style="text-align: center"><input type="time" name="inicioT2P2"
+                                                              value="{{ tempos.all.1.p2Inicio  }}"></td>
+                        <td style="text-align: center"><input type="time" name="fimT2P2"
+                                                              value="{{ tempos.all.1.p2Fim  }}"></td>
+                    </tr>
+
+                    <tr>
+                        <td>T4 | P1</td>
+                        <td style="text-align: center"><input type="time" name="inicioT4P1"
+                                                              value="{{ tempos.all.2.p1Inicio }}"></td>
+                        <td style="text-align: center"><input type="time" name="fimT4P1"
+                                                              value="{{ tempos.all.2.p1Fim }}"></td>
+                    </tr>
+                    <tr>
+                        <td>T4 | P2</td>
+                        <td style="text-align: center"><input type="time" name="inicioT4P2"
+                                                              value="{{ tempos.all.2.p2Inicio }}"></td>
+                        <td style="text-align: center"><input type="time" name="fimT4P2"
+                                                              value="{{ tempos.all.2.p2Fim }}"></td>
+                    </tr>
+                    
                     </tbody>
                     <tfoot>
                     <tr>
@@ -405,7 +435,7 @@
                 class="text-secondary"> Back </span></a></b></h6>
     </div>
 
-    <!-- MODAL ONDE É ADICIONADO UM NOVO ITEM A QUALQUER POSIÇÃO -->
+    <!-- MODAL ONDE e ADICIONADO UM NOVO ITEM A QUALQUER POSIÇÃO -->
     <form method="POST" class="form" action="{% url 'receiving:addNewItemReceivingPos' %}"
           enctype="multipart/form-data">
         {% csrf_token %}
@@ -427,7 +457,7 @@
                         <select class="form-control ui fluid dropdown mt-3" style="margin-left: 45px; width: 375px"
                                 name="subItemTipo"
                                 id="subItemTipo">
-                            <option value="">Selecionar opção caso item tenha sub items</option>
+                            <option value="">Selecionar opcao caso item tenha sub items</option>
                             {% for tipo in tipoSubItems.all %}
                                 <option value="{{ tipo }}">{{ tipo }}</option>
                             {% endfor %}
@@ -443,7 +473,7 @@
         </div>
     </form>
 
-    <!-- MODAL ONDE É ADICIONADO UM NOVO SUB ITEM -->
+    <!-- MODAL ONDE e ADICIONADO UM NOVO SUB ITEM -->
     <form method="POST" class="form" action="{% url 'receiving:addNewSubItem' %}"
           enctype="multipart/form-data">
         {% csrf_token %}
@@ -474,11 +504,11 @@
                         <select class="form-control ui fluid dropdown mt-3" style="margin-left: 45px; width: 375px" name="usar"
                                 id="usar"
                                 required>
-                            <option value="">Selecionar tipo de restrições</option>
+                            <option value="">Selecionar tipo de restricoes</option>
                             <option value="Stop" style="background-color: red">Não usar o equipamento quando o item
                                 apresenta problemas
                             </option>
-                            <option value="Continue">Solicitar de imediato reparação e/ou atribuir severidade</option>
+                            <option value="Continue">Solicitar de imediato reparacao e/ou atribuir severidade</option>
                         </select>
                     </div>
                     <div class="modal-footer">
@@ -491,7 +521,7 @@
     </form>
 
 
-    <!-- MODAL ONDE É ELIMINADO UM OU MAIS ITEMS PARA CADA POSIÇÃO -->
+    <!-- MODAL ONDE e ELIMINADO/EDITADO UM OU MAIS ITEMS PARA CADA POSIÇÃO -->
     <div class="modal fade" id="deleteListModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -506,13 +536,15 @@
                         <tr>
                             <td></td>
                             <td>Items</td>
+                            <td></td>
                         </tr>
                         </thead>
                         <tbody>
                         {% for element in posicao1.all %}
                             <tr>
-                                <td></td>
+                                <td></td>   
                                 <td>{{ element.item }}</td>
+                                <td></td>
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -757,7 +789,7 @@
         </div>
     </div>
 
-    <!-- MODAL ONDE É ELIMINADO UM OU MAIS SUB ITEM -->
+    <!-- MODAL ONDE e ELIMINADO UM OU MAIS SUB ITEM -->
     <div class="modal fade" id="deleteListSubItems" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -833,11 +865,108 @@
             </div>
         </div>
     </form>
+
+    <div class="modal fade"  id="modalReportsTpm" style="pointer-events: none; padding-left: 20%; display: block;" data-keyboard='false' 
+    data-backdrop="static"  role="dialog" aria-labelledby="myModalLabel">
+<div class="modal-dialog" role="document"  >
+   <div class="modal-content" style="width: 120%; height: 135%; margin-left: -30%;">
+       <div class="modal-header">
+           <h3 class="modal-title" id="myModalLabel"><b>Estatisticas:</b></h3>
+       </div>   
+       <div class="modal-body" style="margin-bottom: -10%;">
+           <div class="containerPrincipal" style="width: 20%; height: 10%;margin-bottom: 2%;">
+                <div style="margin-left: 100%;margin-top: -25%"> 
+                    <div id="calendar" ></div>
+                </div>
+                
+
+                
+           </div>
+           <div class="modal-footer" style = "margin-bottom: 10%" >
+            <button type="button" id="closeModal" class="btn btn-primary" data-dismiss="modal">Sair</button>
+            <button type="button" id="saveModal"  class="btn btn-primary"data-dismiss="modal">Ok</button>
+        </div>
+       
+       </div>
+    </div>
+</div>
+</div>
+
+<button type="button" id="btnReport"  class="btn btn-primary" style="margin-left: 5%; margin-bottom: 4%;">Report NOKs TPM:</button>
+    
 {% endblock %}
 
 {% block javascript %}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/confetti.css">
     <script>
         $(document).ready(function () {
+            $("#btnReport").click(function(){
+            var today = new Date();
+            
+            $('#modalReportsTpm').modal('show');
+            })
+        
+            var selectedDates = [];
+    var today = new Date()
+    var datePicker =  flatpickr("#calendar", {
+    inline: true,
+    dateFormat: "d/m/Y",
+    mode: "single",
+    defaultDate: [today, today],
+    });
+
+    $("#saveModal").click(function(){
+        var start_date = datePicker.selectedDates[0];
+        const options = { day: 'numeric', month: 'numeric', year: 'numeric' };
+        const formattedDate = new Intl.DateTimeFormat('pt-BR', options).format(start_date);
+        console.log("DATA FORMATADA-->",formattedDate); 
+        $.ajax({
+                type: "POST",
+                url: '/receiving/getNokSmart/',
+                data: {csrfmiddlewaretoken: "{{ csrf_token }}", 
+                data_report : formattedDate },
+                success: function(response) {
+                    alert("report foi criado")
+                    var element = document.createElement('a');
+                        //Ainda por fazer
+                        element.setAttribute('href', '/media/receiving/tpmReports/workbookTPMNoks.xls');
+                        element.setAttribute('download', 'workbookTPMNoks.xls');
+
+                        element.style.display = 'none';
+                        document.body.appendChild(element);
+
+                        element.click();
+
+                        document.body.removeChild(element);
+                },
+            })
+        })
+        /* $(document).on('click', '#excel', function () {
+                $.ajax({
+                    type: 'GET',
+                    url: '/shippers/downloadExcelShippersTracking/',
+                    data: {},
+                    success: function () {
+                        var element = document.createElement('a');
+                        //Ainda por fazer
+                        element.setAttribute('href', '/media/shippers/portaria/workbookShipersTracking.xls');
+                        element.setAttribute('download', 'workbookShipersTracking.xls');
+
+                        element.style.display = 'none';
+                        document.body.appendChild(element);
+
+                        element.click();
+
+                        document.body.removeChild(element);
+                    }
+                })
+            });
+           
+ 
+        }); */
+
+
             $('#habilitarQuadrados').DataTable({
                 "info": false,
                 "paging": false,
@@ -1014,6 +1143,32 @@
                     csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
                     'items[]': JSON.stringify(selectedItems),
                     'posicao': '1'
+                },
+                success: function () {
+                    window.location.reload();
+                }
+            })
+        });
+        //ALTERAR O NOME DO ELEMENTO PARA O BTN DE EDITAR E REPETIR PARA AS OUTRAS AREAS
+        $(document).on('click', '#deleteItemsModal1', function () {
+            var selectedItems = []
+            $.each(delete1.rows('.selected').nodes(), function () {
+                var data = delete1.row(this).data();
+                selectedItems.push(data[1])
+            });
+            var data = table.row($(this).parents('tr')).data();
+                console.log("DATA", data)
+                var partNumber = data[0]
+            $.ajax({
+                type: 'POST',
+                url: '/receiving/deleteSelectedItems/',
+                data: {
+                    csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                    'items[]': JSON.stringify(selectedItems),
+                    'posicao': '1',
+                    'itemName' : "",
+                    'tipoSubItem' : "",
+                    'posicao' : "",
                 },
                 success: function () {
                     window.location.reload();

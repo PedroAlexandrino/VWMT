@@ -95,9 +95,10 @@ def confirmarPasswordRH(request):
             sheetProduction.write(row, col, "Data")
             sheetProduction.write(row, col + 1, "Comentários")
         row += 1
-
+        
         if tipoInquerito == "portaria":
             if password.nome == passwordInput:
+                #colocar
                 caminho = "C:/visteon/media/inqueritos/portaria"
                 if os.path.exists(caminho):
                     for entry in os.listdir(caminho):

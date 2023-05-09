@@ -1,0 +1,29 @@
+
+#bg {
+    position: center;
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+#bg::before {
+    content: "";
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+    background-color: rgba(250,250,250,0.85);
+}
+
+
+#meu {
+    position: relative;
+    width: auto;
+    margin-top: 20px;
+    padding-top: 13px;
+    padding-left: 60px;
+}
+
+

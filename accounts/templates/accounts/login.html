@@ -37,7 +37,9 @@
                    placeholder="Password">
         </div>
         <br/>
-        <br/>
+        <br/>   
+        <!-- To Add -->
+        <input type="hidden" name="next" value="{{ nextRedirect }}">
         <div class="text-center">
             <br/>
             <button type="submit" class="btn btn-secondary">Submit</button>
@@ -168,10 +170,11 @@
         var confirmModal = function () {
             var token = '{{csrf_token}}';
             var form = $(this);
+            console.log("doing request to", form.attr('data-url'))
 
             $.ajax({
                 headers: {"X-CSRFToken": token},
-                url: form.attr('data-url'),
+                url: form.attr('data-url') + "?next={{nextRedirect}}",
                 data: {"jsonPedidos": jsonPedido},
                 type: form.attr('method'),
                 dataType: 'json',
@@ -179,11 +182,11 @@
                     if (data.form_is_valid) {
                         showPedidoToast();
                         jsonPedido = {};
-                        location.reload();
+                        //location.reload();
                     } else {
                         jsonPedido = {};
                         $('#modalJS .modal-content').html(data.html_form);
-                        location.reload();
+                        //location.reload();
                     }
                 }
             });

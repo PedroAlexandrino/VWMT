@@ -1,0 +1,293 @@
+{% extends "vware/baseArmazem.html" %}
+{% load static %}
+
+{% block body_title %}
+    <div class="text-primary">
+        <h6><b><i class="fa fa-home text-secondary"></i><a href={% url 'main:main' %}><span
+                class="text-secondary"> Home | </span></a> Tenda MECFLOW</b></h6>
+    </div>
+
+    <style>
+        .dataTable tfoot th {
+            text-align: center;
+        }
+
+        .containerPrincipal {
+            height: 835px;
+            width: 100%;
+            top: 11px;
+            left: 0px;
+            position: relative;
+            border: 3px solid transparent;
+        }
+
+        .column_left {
+            border-left: 2px solid black;
+        }
+    </style>
+{% endblock %}
+
+
+{% block body_content %}
+    <div class="containerPrincipal">
+        <table id="tabelaTenda" class="display" style="width:100%">
+            <thead style="margin-left: -9px">
+            <tr>
+                <th>Item Number</th>
+                <th>Description</th>
+                <th style="text-align: center">Qty on Hand - WHOUT</th>
+                <th style="text-align: center">Qt</th>
+                <th style="text-align: center">Qty on Hand - MECFLOW</th>
+                <th style="text-align: center">Qt</th>
+                <th style="text-align: center">Qty on Hand - WH <p style="font-size: 10px">Not (WHOUT,MECFLOW,  QUALITY, WIP, PLC and PWB)</p></th>
+                <th style="text-align: center">Qt</th>
+                <th class="column_left" style="text-align: center">Unit Cost</th>
+                <th style="text-align: center">Total Cost<p style="font-size: 10px">(WHOUT)</p></th>
+                <th class="column_left" style="text-align: center; width: 10%;display: none;">1 day Consumption {{ elementos.0.diaAtual }}</th>
+                <th style="text-align: center; width: 10%;display: none">2 day Consumption {{ elementos.0.diaSeguinte }}</th>
+                <th style="text-align: center; width: 10%;display: none">3 day Consumption {{ elementos.0.diaAposDiaSeguinte }}</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for val in elementos %}
+                <tr>
+                    <td>{{ val.itemNumber }}</td>
+                    <td>{{ val.descricao }}</td>
+                    <td style="text-align: center">{{ val.qtyOnHand }}</td>
+                    <td style="text-align: center">{{ val.serialsWHOUT }}</td>
+                    <td style="text-align: center">{{ val.qtyOnHandMECFLOW  }}</td>
+                    <td style="text-align: center">{{ val.serialsMECFLOW }}</td>
+                    <td style="text-align: center">{{ val.qtyOnHandNotWHOUTNotMECFLOW }}</td> 
+                    <td style="text-align: center">{{ val.serialsNotWHOUTNotMECFLOW }}</td>
+                    <td class="column_left" style="text-align: center">{{ val.unitCost }}</td>
+                    <td style="text-align: center">{{ val.totalCost }}</td>
+                    <td class="column_left" style="text-align: center;display: none">{{ val.consumptionValue }}</td> <!-- PAra alterar -->
+                    <td style="text-align: center;display: none">{{ val.consumptionValueDiaSeguinte }}</td>
+                    <td style="text-align: center;display: none">{{ val.consumptionValueDiaAposDiaSeguinte }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            <tfoot>
+            <tr>
+                <th>{{ elementos|length }}</th>
+                <th>{{ elementos|length }}</th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th class="column_left"></th>
+                <th></th>
+                <th style="text-align: center;display: none" class="column_left"></th>
+                <th style="text-align: center;display: none"></th>
+                <th style="text-align: center;display: none"></th>
+            </tr>
+            </tfoot>
+        </table>
+        <div class="form-inline">
+            <!-- <form method="GET" enctype="multipart/form-data" action="{% url 'receiving:updateTenda' %}">
+                <div class="mt-n3" style="position: absolute; right: 30px">
+                    <button class="btn btn-primary" id="uploadFullTable">Upload full table</button>
+                </div>
+            </form> -->
+            <form method="GET" enctype="multipart/form-data" action="{% url 'receiving:uploadTendaMECFLOWCosts' %}">
+                <div class="mt-n3" style="position: absolute;right: 30px ">
+                    <button class="btn btn-primary" id="uploadFullTable">Upload table costs</button>
+                </div>
+            </form>
+            <div class="mt-1" style="position: absolute; left: 72%">
+                <button onclick="window.location = '{% url 'receiving:tendaMecflow' %}'" class="btn btn-primary">Upload half
+                    table
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div style="position: absolute;">
+        <button type="button" class="btn btn-secondary mb-3"  id="estatisticas">Estatísticas</button>
+    </div>
+
+    <button id="refresh-btn" style="width: 20%; height: 20%;margin-left:40%;"  class="btn btn-primary">Refresh  </button>
+{% endblock %}
+
+
+{% block javascript %}
+    <script>
+         $.ajax({
+                type: "POST",
+                url: '/receiving/getErros/',
+                data: {csrfmiddlewaretoken: "{{ csrf_token }}",
+                pagina: "Tenda_Mecflow",},
+                success: function(response) {
+                    //console.log("RESPONSE->",response)
+
+                    console.log("RESPOSTA -->", response)
+
+                    if (response.erro > 0){
+                        let data = response.timestamp.timestamp;
+                        let dataObj = new Date(data);
+                        let horas = dataObj.getHours();
+                        let minutos = dataObj.getMinutes();
+                        let horaFormatada = horas.toString().padStart(2, "0") + ":" + minutos.toString().padStart(2, "0");
+                        document.getElementById("refresh-btn").style.backgroundColor = "#FBA51A";
+                        document.getElementById("refresh-btn").textContent = "Last Error: " + response.timestamp.timestamp;
+
+                    }else{
+                        //document.getElementById("refresh-btn").style.backgroundColor = "";
+                        document.getElementById("refresh-btn").style.display = "none";
+                        
+
+                    }
+                },
+           
+            
+                    error: function(response) {
+                        //console.log("Contador:", response.media); tendaMECFLOW
+                        alert("Querry feita sem sucesso")
+                    }
+            });
+
+        $(document).ready(function () {
+            $("#refresh-btn").click(function(){console.log("Clicas-te no btn refresh")
+                /* Swal.fire({
+                        icon: 'error',
+                        title: 'A popular a base de dados, pode demorar',
+                        showConfirmButton: true
+                        }); */
+                        // temporizador 12s para dar tempo para popular as tabelas
+                    window.location.reload()
+                    
+            })
+
+            var numberRenderer = $.fn.dataTable.render.number( ',', '', 0, ''  ).display;
+            var numberRenderer2 = $.fn.dataTable.render.number( ',', '.', 2, '€'  ).display;
+
+            var tabelaTenda = $('#tabelaTenda').DataTable({
+                "info": false,
+                "paging": false,
+                "searching": false,
+                "scrollY": "600px",
+                dom: 'frtipB',
+                float: 'right',
+                buttons: [
+                    'excel', 'pdf', 'print', 'copy'
+                ],
+                "footerCallback": function (row, data, start, end, display) {
+                    var api = this.api();
+
+                    // Remove the formatting to get integer data for summation
+                    var intVal = function (i) {
+                        return typeof i === 'string' ?
+                            i.replace(/[\$,]/g, '') * 1 :
+                            typeof i === 'number' ?
+                                i : 0;
+                    };
+
+                    total3 = api
+                        .column(2)
+                        .data()
+                        .reduce(function (a, b) {
+                            return intVal(a) + intVal(b);
+                        }, 0);
+                    total4 = api
+                        .column(3)
+                        .data()
+                        .reduce(function (a, b) {
+                            return intVal(a) + intVal(b);
+                        }, 0);
+                    total5 = api
+                        .column(4)
+                        .data()
+                        .reduce(function (a, b) {
+                            return intVal(a) + intVal(b);
+                        }, 0);
+                    total6 = api
+                        .column(5)
+                        .data()
+                        .reduce(function (a, b) {
+                            return intVal(a) + intVal(b);
+                        }, 0);
+                    total7 = api
+                        .column(6)
+                        .data()
+                        .reduce(function (a, b) {
+                            return intVal(a) + intVal(b);
+                        }, 0);
+                    total8 = api
+                        .column(7)
+                        .data()
+                        .reduce(function (a, b) {
+                            return intVal(a) + intVal(b);
+                        }, 0);
+
+                    total9 = api
+                        .column(8)
+                        .data()
+                        .reduce(function (a, b) {
+                            if (typeof a === 'string') {
+                                a = a.replace(/[^\d.-]/g, '') * 1;
+                            }
+                            if (b === '-') {
+                                b = 0;
+                            }
+                            return intVal(a) + intVal(b);
+                        }, 0);
+                    total10 = api
+                        .column(9)
+                        .data()
+                        .reduce(function (a, b) {
+                            return intVal(a) + intVal(b);
+                        }, 0);
+                    total11 = api
+                        .column(10)
+                        .data()
+                        .reduce(function (a, b) {
+                            return intVal(a) + intVal(b);
+                        }, 0);
+                    total12 = api
+                        .column(11)
+                        .data()
+                        .reduce(function (a, b) {
+                            return intVal(a) + intVal(b);
+                        }, 0);
+
+                    // Update footer
+                    $(api.column(2).footer()).html(
+                        numberRenderer(total3)
+                    );
+                    $(api.column(3).footer()).html(
+                        total4
+                    );
+                    $(api.column(4).footer()).html(
+                        numberRenderer(total5)
+                    );
+                    $(api.column(5).footer()).html(
+                        total6
+                    );
+                    $(api.column(6).footer()).html(
+                        numberRenderer(total7)
+                    );
+                    $(api.column(7).footer()).html(
+                        numberRenderer(total8)
+                    );
+                   /*  $(api.column(7).footer()).html(
+                        numberRenderer2(total8)
+                    ); */
+                    $(api.column(8).footer()).html(
+                        numberRenderer2(total9)
+                    );
+                    $(api.column(9).footer()).html(
+                        numberRenderer(total10)
+                    );
+                    $(api.column(10).footer()).html(
+                        numberRenderer(total11)
+                    );
+                },
+            });
+            $(document).on('click', '#uploadFullTable', function () {
+                alert("Pode demorar uns instantes. Por favor aguarde")
+            });
+        });
+    </script>
+{% endblock %}

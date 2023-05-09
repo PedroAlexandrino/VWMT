@@ -11,36 +11,631 @@ from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import EmailMultiAlternatives
 from django.core.serializers import serialize
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse, FileResponse
 from django.shortcuts import render, redirect
 from django.db.models import Q
 
 from datetime import datetime, date, timedelta
 from collections import Counter
 
-from xlwt import Workbook
+from xlwt import Workbook, easyxf
 
 from qad_ee.models import *
 from receiving.models import *
 
+#from shippers.models import FASupplyRedItems, BPDropinSupplyRedItems, BPSMDSupplyRedItems, FaSupplyReportRedItems, BPDropinSupplyReportRedItems, BPSMDSupplyReportRedItems
+
+def testeSchedule():
+    print("ENTROU NO TESTE SO SCHEDULE")
+    #funcao de teste, esta apenas a guardar uma nova linha com o timestamp atual
+    HistoricoErros(timestamp=datetime.now().strftime("%Y-%m-%d %H:%M:%S"), pagina ="Tenda_Mecflow", erro = "Teste schedule").save()
+    
+def tendaMECFLOW(request):
+    try:
+        #print(2/0)
+        ldDetWHOUT1 = LdDet.objects.filter(ld_site="3515",ld_loc__in=["WHOUT","MECFLOW"]).values(
+            "ld_part", "ld_loc", "ld_qty_oh"
+        )
+
+        ldDetWHOUT = LdDet.objects.filter(ld_site="3515",  ld_loc="WHOUT").values(
+            "ld_part", "ld_loc", "ld_qty_oh"
+        )
+
+        ldDetMECFLOW = LdDet.objects.filter(ld_site="3515",  ld_loc ="MECFLOW").values(
+            "ld_part", "ld_loc", "ld_qty_oh"
+        )
+
+        ldDetNotWHOUTNotMECFLOW = ( LdDet.objects.filter(ld_site="3515", ld_part__in=ldDetWHOUT1.values_list("ld_part"))
+            .exclude(Q(ld_loc="MECFLOW") | Q(ld_loc="WHOUT") |  Q(ld_loc="QUALITY") | Q(ld_loc__contains="PWB") | Q(ld_loc__contains="PLC") | Q(ld_loc__contains="WIP")) #para ficar apenas o WHOUT -) tenda
+            .values("ld_part", "ld_loc")
+        )
+
+        ptMstr = PtMstr.objects.filter(pt_part__in=ldDetWHOUT1.values_list("ld_part"), pt_site="3515"
+        ).values("pt_part", "pt_desc1", "pt_desc2")
+        
+        serMstrWHOUT = SerMstr.objects.filter(ser_part__in=ldDetWHOUT.values_list("ld_part"), ser_site="3515", ser_loc="WHOUT"
+        ).values("ser_part")
+
+        serMstrMECFLOW = SerMstr.objects.filter(ser_part__in=ldDetMECFLOW.values_list("ld_part"), ser_site="3515", ser_loc="MECFLOW"
+        ).values("ser_part")
+
+        serMstrNotWHOUTNotMECFLOW = (SerMstr.objects.filter(ser_part__in=ldDetNotWHOUTNotMECFLOW.values_list("ld_part"), ser_site="3515")
+            .exclude(Q(ser_loc="WHOUT") | Q(ser_loc="MECFLOW") | Q(ser_loc="QUALITY") | Q(ser_loc__contains="PWB") | Q(ser_loc__contains="PLC") | Q(ser_loc__contains="WIP"))
+            .values("ser_part", "ser_qty_avail")
+        )
+        elementos = []
+
+        counterWHOUT = Counter()
+        #counterNotWHOUT = Counter()
+        counterSerWHOUT = Counter()
+        #counterSerNotWHOUT = Counter() 
+
+        counterMECFLOW = Counter()
+        counterSerMECFLOW = Counter()
+        counterSerNotWHOUTNotMECFLOW = Counter()
+        counterNotWHOUTNotMECFLOW = Counter()
+
+        for ld in ldDetWHOUT:
+            counterWHOUT[ld["ld_part"]] += ld["ld_qty_oh"]
+
+        for ld in ldDetMECFLOW:
+            counterMECFLOW[ld["ld_part"]] += ld["ld_qty_oh"]
+
+        
+        for ser in serMstrWHOUT:
+            counterSerWHOUT[ser["ser_part"].upper()] += 1
+
+        for ser in serMstrMECFLOW:
+            counterSerMECFLOW[ser["ser_part"].upper()] += 1
+
+        for ser in serMstrNotWHOUTNotMECFLOW:   #contador de serials para nenhum dos casos
+            counterSerNotWHOUTNotMECFLOW[ser["ser_part"].upper()] += 1
+            counterNotWHOUTNotMECFLOW[ser["ser_part"].upper()] += ser["ser_qty_avail"]
+
+        for ld in ldDetWHOUT1:
+            for pt in ptMstr:
+                if pt["pt_part"] == ld["ld_part"]:
+                    if len(pt["pt_desc1"]) == 24:
+                        pt["pt_desc1"] = pt["pt_desc1"] + "" + pt["pt_desc2"]
+                    else:
+                        pt["pt_desc1"] = pt["pt_desc1"] + " " + pt["pt_desc2"]
+                    if str(counterWHOUT[ld["ld_part"]]) == "0E-10":
+                        counterWHOUT[ld["ld_part"]] = "0.0000000000"
+                    if not any(elem["itemNumber"] == ld["ld_part"] for elem in elementos):
+                        row = {
+                            "itemNumber": ld["ld_part"],
+                            "descricao": pt["pt_desc1"],
+                            "qtyOnHand": 0,
+                            "serialsWHOUT": counterSerWHOUT[ld["ld_part"]],
+                            "qtyOnHandMECFLOW": 0,
+                            "serialsMECFLOW": counterSerMECFLOW[ld["ld_part"]],
+                            "qtyOnHandNotWHOUTNotMECFLOW": 0,
+                            "serialsNotWHOUTNotMECFLOW": counterSerNotWHOUTNotMECFLOW[ld["ld_part"]],
+                            "unitCost": "-",
+                            "min": "-",
+                            "max": "-",
+                            "consumptionValue": 0,
+                            "consumptionValueDiaSeguinte": 0,
+                            "consumptionValueDiaAposDiaSeguinte": 0,
+                            "totalCost": "-",
+                        }
+                        elementos.append(row)
+        for ldWHOUT in ldDetWHOUT:
+            for elem in elementos:
+                if elem["itemNumber"] == ldWHOUT["ld_part"]:
+                    elem["qtyOnHand"] = str(counterWHOUT[ldWHOUT["ld_part"]])[
+                        :-11
+                    ]
+                    if elem["qtyOnHand"] == "":
+                        elem["qtyOnHand"] = "0"
+                    break
+        
+        for ldMECFLOW in ldDetMECFLOW:
+            for elem in elementos:
+                if elem["itemNumber"] == ldMECFLOW["ld_part"]:
+                    elem["qtyOnHandMECFLOW"] = str(counterMECFLOW[ldMECFLOW["ld_part"]])[
+                        :-11
+                    ]
+                    if elem["qtyOnHandMECFLOW"] == "":
+                        elem["qtyOnHandMECFLOW"] = "0"
+                    break
+
+        for ldMECFLOW in ldDetNotWHOUTNotMECFLOW:
+            for elem in elementos:
+                if elem["itemNumber"] == ldMECFLOW["ld_part"]:
+                    elem["qtyOnHandNotWHOUTNotMECFLOW"] = str(counterNotWHOUTNotMECFLOW[ldMECFLOW["ld_part"]])[
+                        :-11
+                    ]
+                    if elem["qtyOnHandNotWHOUTNotMECFLOW"] == "":
+                        elem["qtyOnHandNotWHOUTNotMECFLOW"] = "0"
+                    break
+        return render(request, "tenda_Mecflow.html", {"elementos": elementos})
+    except:
+        HistoricoErros(timestamp=datetime.now().strftime("%Y-%m-%d %H:%M:%S"), pagina ="Tenda_Mecflow", erro = "Funcao não conseguiu realizar querrys para Tenda_Mecflow").save()
+    # for xx in xxusrw:
+    #     for wo in woMstr:
+    #         if wo['wo_part'] == xx['xxusrw_key4']:
+    #             for elem in elementos:
+    #                 if elem['itemNumber'] == xx['xxusrw_key6']:
+    #                     elem['contas'] += xx['xxusrw_key4'] + " " + str(xx['xxusrw_decfld_1']) + "*" + str(
+    #                         wo['wo_qty_exp_complete'])
+    #                     elem['consumptionValue'] += round(
+    #                         float(xx['xxusrw_decfld_1']) * float(wo['wo_qty_exp_complete']), 2)
+    #                     break
+
+    return render(request, "tenda_Mecflow.html")
+
+
+
+
+
+
+# def tenda2Ponto0(request):
+#     ldDetWHOUT = LdDet.objects.filter(ld_site='3515', ld_loc__in=["WHOUT", "whout"]).values('ld_part', 'ld_loc', 'ld_qty_oh')
+#     ldDetNotWHOUT = LdDet.objects.filter(ld_site='3515', ld_part__in=ldDetWHOUT.values_list('ld_part')).exclude(
+#         Q(ld_loc="WHOUT") | Q(ld_loc="QUALITY")).values(
+#         'ld_part', 'ld_loc')
+#     ptMstr = PtMstr.objects.filter(pt_part__in=ldDetWHOUT.values_list('ld_part'), pt_site='3515').values('pt_part',
+#                                                                                                          'pt_desc1',
+#                                                                                                          'pt_desc2')
+#     serMstrWHOUT = SerMstr.objects.filter(ser_part__in=ldDetWHOUT.values_list('ld_part'), ser_site="3515",
+#                                           ser_loc__in=["WHOUT", "whout"]).values('ser_part')
+    
+#     serMstrNotWHOUT = SerMstr.objects.filter(ser_part__in=ldDetWHOUT.values_list('ld_part'), ser_site="3515").exclude(
+#         Q(ser_loc="WHOUT") | Q(ser_loc="QUALITY")).values('ser_part', 'ser_qty_avail')
+
+#    # ///---------------/////----------------------/////
+    
+#     ldDetWHOUTNovo = LdDet.objects.filter(ld_site='3515', ld_loc__in=["WHOUT", "whout"]).values('ld_part', 'ld_loc', 'ld_qty_oh')
+#     ldDetNotWHOUTNovo = LdDet.objects.filter(ld_site='3515', ld_part__in=ldDetWHOUT.values_list('ld_part')).exclude(
+#         Q(ld_loc="WHOUT") | Q(ld_loc="QUALITY") | Q(ld_loc__contains="PWB") | Q(ld_loc__contains="PLC")).values(
+#         'ld_part', 'ld_loc')
+#     ptMstrNovo = PtMstr.objects.filter(pt_part__in=ldDetWHOUT.values_list('ld_part'), pt_site='3515').values('pt_part',
+#                                                                                                          'pt_desc1',
+#                                                                                                          'pt_desc2')
+#     serMstrWHOUTNovo = SerMstr.objects.filter(ser_part__in=ldDetWHOUT.values_list('ld_part'), ser_site="3515",
+#                                           ser_loc__in=["WHOUT", "whout"]).values('ser_part')
+    
+#     serMstrNotWHOUTNovo = SerMstr.objects.filter(ser_part__in=ldDetWHOUT.values_list('ld_part'), ser_site="3515").exclude(
+#         Q(ser_loc="WHOUT") | Q(ser_loc="QUALITY")  | Q(ser_loc__contains="PWB") | Q(ser_loc__contains="PLC")).values('ser_part', 'ser_qty_avail')
+    
+
+    
+#     elementos = []
+
+#     xxusrw = XxusrwWkfl.objects.filter(xxusrw_key6="KCB00602-AA", xxusrw_domain="3511010").values('xxusrw_decfld_1',
+#                                                                                                   'xxusrw_key4',
+#                                                                                                   'xxusrw_key6',
+#                                                                                                   'xxusrw_decfld_2')
+#     # woMstr = WoMstr.objects.filter(wo_part__in=xxusrw.values_list('xxusrw_key4'),
+#     #                                wo_due_date="2022-04-20").values(
+#     #     'wo_part', 'wo_qty_exp_complete')
+
+#     counterWHOUT = Counter()
+#     counterNotWHOUT = Counter()
+#     counterSerWHOUT = Counter()
+#     counterSerNotWHOUT = Counter()
+
+#     #///-----------////---------------------///-----///
+
+#     counterWHOUTNovo = Counter()
+#     counterNotWHOUTNovo = Counter()
+#     counterSerWHOUTNovo = Counter()
+#     counterSerNotWHOUTNovo = Counter()
+
+
+
+#     for ld in ldDetWHOUT:
+        
+#         counterWHOUT[ld['ld_part'].upper()] += ld['ld_qty_oh']
+
+#     # for ld in ldDetNotWHOUT:
+#     #     counterNotWHOUT[ld['ld_part']] += ld['ld_qty_oh']
+
+#     for ser in serMstrWHOUT:
+#         counterSerWHOUT[ser['ser_part'].upper()] += 1
+
+#     for ser in serMstrNotWHOUT:
+#         counterSerNotWHOUT[ser['ser_part'].upper()] += 1
+#         counterNotWHOUT[ser['ser_part'].upper()] += ser['ser_qty_avail']
+
+#     #//----------------------------//-----------------------------------////////---------------------------
+
+#     for ld in ldDetWHOUTNovo:
+#         counterWHOUTNovo[ld['ld_part'].upper()] += ld['ld_qty_oh']
+
+#     # for ld in ldDetNotWHOUT:
+#     #     counterNotWHOUT[ld['ld_part']] += ld['ld_qty_oh']
+
+#     for ser in serMstrWHOUTNovo:
+#         counterSerWHOUTNovo[ser['ser_part'].upper()] += 1
+
+#     for ser in serMstrNotWHOUTNovo:
+#         print("->",ser)
+#         counterSerNotWHOUTNovo[ser['ser_part'].upper()] += 1
+#         counterNotWHOUTNovo[ser['ser_part'].upper()] += ser['ser_qty_avail']
+
+#     for ld in ldDetWHOUT:
+#         for pt in ptMstr:
+#             #print("List-->", pt['pt_part'], ld['ld_part'])
+#             if pt['pt_part'].upper() == ld['ld_part'].upper():
+#                 if len(pt['pt_desc1']) == 24:
+#                     pt['pt_desc1'] = pt['pt_desc1'] + "" + pt['pt_desc2']
+#                 else:
+#                     pt['pt_desc1'] = pt['pt_desc1'] + " " + pt['pt_desc2']
+#                 if str(counterWHOUT[ld['ld_part']]) == '0E-10':
+#                     counterWHOUT[ld['ld_part']] = '0.0000000000'
+#                 if not any(elem['itemNumber'].upper() == ld['ld_part'].upper() for elem in elementos):
+#                     row = {
+#                         'itemNumber': ld['ld_part'],
+#                         'descricao': pt['pt_desc1'],
+#                         'qtyOnHand': str(counterWHOUT[ld['ld_part']])[:-11],
+#                         'serialsWHOUT': counterSerWHOUT[ld['ld_part']],
+#                         'qtyOnHandNotWHOUT': 0,
+#                         'serialsNotWHOUT': counterSerNotWHOUTNovo[ld['ld_part']],
+#                         'unitCost': '-',
+#                         'min': '-',
+#                         'max': '-',
+#                         'consumptionValue': 0,
+#                         'consumptionValueDiaSeguinte':0,
+#                         'consumptionValueDiaAposDiaSeguinte': 0,
+#                         'totalCost': '-',
+#                     }
+#                     elementos.append(row)
+    
+    
+#     for ldNotWHOUT in ldDetNotWHOUTNovo:
+#         for elem in elementos:
+
+#             if elem['itemNumber'].upper() == ldNotWHOUT['ld_part'].upper():
+#                 elem['qtyOnHandNotWHOUT'] = str(counterNotWHOUTNovo[ldNotWHOUT['ld_part']])[:-11]
+#                 if elem['qtyOnHandNotWHOUT'] == '':
+#                     elem['qtyOnHandNotWHOUT'] = '0'
+#                 break
+
+#     return render(request, 'tenda.html', {'elementos': elementos})
+
 
 def tenda(request):
+    ldDetWHOUT = LdDet.objects.filter(ld_site='3515', ld_loc__in=["WHOUT"]).values('ld_part', 'ld_loc', 'ld_qty_oh')
+    ldDetNotWHOUT = LdDet.objects.filter(ld_site='3515', ld_part__in=ldDetWHOUT.values_list('ld_part')).exclude(
+        Q(ld_loc="WHOUT") | Q(ld_loc="QUALITY") | Q(ld_loc="whout") | Q(ld_loc="quality")).values(
+        'ld_part', 'ld_loc')
+    ptMstr = PtMstr.objects.filter(pt_part__in=ldDetWHOUT.values_list('ld_part'), pt_site='3515').values('pt_part',
+                                                                                                         'pt_desc1',
+                                                                                                         'pt_desc2')
+    serMstrWHOUT = SerMstr.objects.filter(ser_part__in=ldDetWHOUT.values_list('ld_part'), ser_site="3515",
+                                          ser_loc='WHOUT').values('ser_part')
+    
+    serMstrNotWHOUT = SerMstr.objects.filter(ser_part__in=ldDetWHOUT.values_list('ld_part'), ser_site="3515").exclude(
+        Q(ser_loc="WHOUT") | Q(ser_loc="QUALITY") | Q(ser_loc="whout") | Q(ser_loc="quality")).values('ser_part', 'ser_qty_avail')
+
+   # ///---------------/////----------------------/////
+    
+    ldDetWHOUTNovo = LdDet.objects.filter(ld_site='3515', ld_loc="WHOUT").values('ld_part', 'ld_loc', 'ld_qty_oh')
+    ldDetNotWHOUTNovo = LdDet.objects.filter(ld_site='3515', ld_part__in=ldDetWHOUT.values_list('ld_part')).exclude(
+        Q(ld_loc="WHOUT") | Q(ld_loc="QUALITY") | Q(ld_loc__contains="PWB") | Q(ld_loc__contains="PLC") |
+         Q(ld_loc="whout") | Q(ld_loc="quality") | Q(ld_loc__contains="pwb") | Q(ld_loc__contains="plc")).values(
+        'ld_part', 'ld_loc')
+    ptMstrNovo = PtMstr.objects.filter(pt_part__in=ldDetWHOUT.values_list('ld_part'), pt_site='3515').values('pt_part',
+                                                                                                         'pt_desc1',
+                                                                                                         'pt_desc2')
+    serMstrWHOUTNovo = SerMstr.objects.filter(ser_part__in=ldDetWHOUT.values_list('ld_part'), ser_site="3515",
+                                          ser_loc='WHOUT').values('ser_part')
+    
+    serMstrNotWHOUTNovo = SerMstr.objects.filter(ser_part__in=ldDetWHOUT.values_list('ld_part'), ser_site="3515").exclude(
+        Q(ser_loc="WHOUT") | Q(ser_loc="QUALITY")  | Q(ser_loc__contains="PWB") | Q(ser_loc__contains="PLC")|
+        Q(ser_loc="whout") | Q(ser_loc="quality")  | Q(ser_loc__contains="pwb") | Q(ser_loc__contains="plc")).values('ser_part', 'ser_qty_avail')
+    
+
+    
+    elementos = []
+
+    xxusrw = XxusrwWkfl.objects.filter(xxusrw_key6="KCB00602-AA", xxusrw_domain="3511010").values('xxusrw_decfld_1',
+                                                                                                  'xxusrw_key4',
+                                                                                                  'xxusrw_key6',
+                                                                                                  'xxusrw_decfld_2')
+    # woMstr = WoMstr.objects.filter(wo_part__in=xxusrw.values_list('xxusrw_key4'),
+    #                                wo_due_date="2022-04-20").values(
+    #     'wo_part', 'wo_qty_exp_complete')
+
+    counterWHOUT = Counter()
+    counterNotWHOUT = Counter()
+    counterSerWHOUT = Counter()
+    counterSerNotWHOUT = Counter()
+
+    #///-----------////---------------------///-----///
+
+    counterWHOUTNovo = Counter()
+    counterNotWHOUTNovo = Counter()
+    counterSerWHOUTNovo = Counter()
+    counterSerNotWHOUTNovo = Counter()
+
+
+
+    for ld in ldDetWHOUT:
+        counterWHOUT[ld['ld_part']] += ld['ld_qty_oh']
+
+    # for ld in ldDetNotWHOUT:
+    #     counterNotWHOUT[ld['ld_part']] += ld['ld_qty_oh']
+
+    for ser in serMstrWHOUT:
+        counterSerWHOUT[ser['ser_part']] += 1
+
+    for ser in serMstrNotWHOUT:
+        counterSerNotWHOUT[ser['ser_part']] += 1
+        counterNotWHOUT[ser['ser_part']] += ser['ser_qty_avail']
+
+    #//----------------------------//-----------------------------------////////---------------------------
+
+    for ld in ldDetWHOUTNovo:
+        counterWHOUTNovo[ld['ld_part']] += ld['ld_qty_oh']
+
+    # for ld in ldDetNotWHOUT:
+    #     counterNotWHOUT[ld['ld_part']] += ld['ld_qty_oh']
+
+    for ser in serMstrWHOUTNovo:
+        counterSerWHOUTNovo[ser['ser_part']] += 1
+
+    for ser in serMstrNotWHOUTNovo:
+        counterSerNotWHOUTNovo[ser['ser_part']] += 1
+        counterNotWHOUTNovo[ser['ser_part']] += ser['ser_qty_avail']
+
+    for ld in ldDetWHOUT:
+        for pt in ptMstr:
+            if pt['pt_part'] == ld['ld_part']:
+                if len(pt['pt_desc1']) == 24:
+                    pt['pt_desc1'] = pt['pt_desc1'] + "" + pt['pt_desc2']
+                else:
+                    pt['pt_desc1'] = pt['pt_desc1'] + " " + pt['pt_desc2']
+                if str(counterWHOUT[ld['ld_part']]) == '0E-10':
+                    counterWHOUT[ld['ld_part']] = '0.0000000000'
+                if not any(elem['itemNumber'] == ld['ld_part'] for elem in elementos):
+                    row = {
+                        'itemNumber': ld['ld_part'],
+                        'descricao': pt['pt_desc1'],
+                        'qtyOnHand': str(counterWHOUT[ld['ld_part']])[:-11],
+                        'serialsWHOUT': counterSerWHOUT[ld['ld_part']],
+                        'qtyOnHandNotWHOUT': 0,
+                        'serialsNotWHOUT': counterSerNotWHOUTNovo[ld['ld_part']],
+                        'unitCost': '-',
+                        'min': '-',
+                        'max': '-',
+                        'consumptionValue': 0,
+                        'consumptionValueDiaSeguinte':0,
+                        'consumptionValueDiaAposDiaSeguinte': 0,
+                        'totalCost': '-',
+                    }
+                    elementos.append(row)
+    
+    #contadores
+    for ldNotWHOUT in ldDetNotWHOUTNovo:
+        for elem in elementos:
+            print("->",ldNotWHOUT['ld_part'],"|", elem['itemNumber'])
+            if elem['itemNumber'] == ldNotWHOUT['ld_part']:
+                elem['qtyOnHandNotWHOUT'] = str(counterNotWHOUTNovo[ldNotWHOUT['ld_part']])[:-11]
+                if elem['qtyOnHandNotWHOUT'] == '':
+                    elem['qtyOnHandNotWHOUT'] = '0'
+                break
+
+    # for xx in xxusrw:
+    #     for wo in woMstr:
+    #         if wo['wo_part'] == xx['xxusrw_key4']:
+    #             for elem in elementos:
+    #                 if elem['itemNumber'] == xx['xxusrw_key6']:
+    #                     elem['contas'] += xx['xxusrw_key4'] + " " + str(xx['xxusrw_decfld_1']) + "*" + str(
+    #                         wo['wo_qty_exp_complete'])
+    #                     elem['consumptionValue'] += round(
+    #                         float(xx['xxusrw_decfld_1']) * float(wo['wo_qty_exp_complete']), 2)
+    #                     break
+
+    return render(request, 'tenda.html', {'elementos': elementos})
+
+
+
+def tendaMeclux(request):
+    # = Table.SelectRows(dbo_ser_mstr, each [ser_domain] = "3511010" and [ser_loc] = "WHOUT" or [ser_loc] = "MECLUX")
+    # = QAD_EE1{[Schema="dbo",Item="ser_mstr"]}[Data]
+
+    """ SELECT * FROM ser_mstr
+        WHERE ser_domain = '3511010' AND (ser_loc = 'WHOUT' OR ser_loc = 'MECFLOW');
+    """
+
+    #APENAS PARA WHOUT
+    ldDetWHOUT = LdDet.objects.filter(ld_site='3515', ld_loc__in=["WHOUT"]).values('ld_part', 'ld_loc', 'ld_qty_oh')
+    ldDetNotWHOUT = LdDet.objects.filter(ld_site='3515', ld_part__in=ldDetWHOUT.values_list('ld_part')).exclude(
+        Q(ld_loc="MECFLOW") | Q(ld_loc="WIP") | Q(ld_loc="PWB") | Q(ld_loc="PLC")).values(
+        'ld_part', 'ld_loc')
+    ptMstr = PtMstr.objects.filter(pt_part__in=ldDetWHOUT.values_list('ld_part'), pt_site='3515').values('pt_part',
+                                                                                                         'pt_desc1',
+                                                                                                         'pt_desc2')
+    serMstrWHOUT = SerMstr.objects.filter(ser_part__in=ldDetWHOUT.values_list('ld_part'), ser_site="3515",
+                                          ser_loc__in=["WHOUT"]).values('ser_part')
+    
+    serMstrNotWHOUT = SerMstr.objects.filter(ser_part__in=ldDetWHOUT.values_list('ld_part'), ser_site="3515").exclude(
+        Q(ser_loc="MECFLOW") | Q(ser_loc="WIP")).values('ser_part', 'ser_qty_avail')
+
+   # ///---------------/////----------------------/////
+    # #APENAS PARA MECFLOW
+    # ldDetWHOUTNovo = LdDet.objects.filter(ld_site='3515', ld_loc__in=["MECFLOW"]).values('ld_part', 'ld_loc', 'ld_qty_oh')
+    # ldDetNotWHOUTNovo = LdDet.objects.filter(ld_site='3515', ld_part__in=ldDetWHOUTNovo.values_list('ld_part')).exclude(
+    #     Q(ld_loc="WHOUT") | Q(ld_loc="WIP") | Q(ld_loc__contains="PWB") | Q(ld_loc__contains="PLC")).values(
+    #     'ld_part', 'ld_loc')
+    # ptMstrNovo = PtMstr.objects.filter(pt_part__in=ldDetWHOUTNovo.values_list('ld_part'), pt_site='3515').values('pt_part',
+    #                                                                                                      'pt_desc1',
+    #                                                                                                      'pt_desc2')
+    # serMstrWHOUTNovo = SerMstr.objects.filter(ser_part__in=ldDetWHOUTNovo.values_list('ld_part'), ser_site="3515",
+    #                                       ser_loc__in=["WHOUT"]).values('ser_part')
+    
+    # serMstrNotWHOUTNovo = SerMstr.objects.filter(ser_part__in=ldDetWHOUTNovo.values_list('ld_part'), ser_site="3515").exclude(
+    #     Q(ser_loc="WHOUT")  |Q(ser_loc="WIP")  | Q(ser_loc__contains="PWB") | Q(ser_loc__contains="PLC")).values('ser_part', 'ser_qty_avail')
+    
+    # # ///---------------/////----------------------/////
+    # # PARA NENHUM DOS DOIS
+    # ldDetWHOUT_MECALUX = LdDet.objects.filter(ld_site='3515', ld_loc__in=["WHOUT", "MECFLOW"]).values('ld_part', 'ld_loc', 'ld_qty_oh')
+
+    # ldDetNotWHOUT_MECALUX = LdDet.objects.filter(ld_site='3515', ld_part__in=ldDetWHOUT_MECALUX.values_list('ld_part')).exclude(
+    #     Q(ld_loc="WHOUT") | Q(ld_loc="WIP") | Q(ld_loc="MECFLOW") | Q(ld_loc__contains="PWB") | Q(ld_loc__contains="PLC")).values(
+    #     'ld_part', 'ld_loc')
+    # ptMstr_MECALUX = PtMstr.objects.filter(pt_part__in=ldDetWHOUT_MECALUX.values_list('ld_part'), pt_site='3515').values('pt_part',
+    #                                                                                                      'pt_desc1',
+    #                                                                                                      'pt_desc2')
+    # serMstrWHOUT_MECALUX = SerMstr.objects.filter(ser_part__in=ldDetWHOUT_MECALUX.values_list('ld_part'), ser_site="3515",
+    #                                       ser_loc__in=["WHOUT", "MECFLOW"]).values('ser_part')
+    
+    # serMstrNotWHOUT_MECALUX = SerMstr.objects.filter(ser_part__in=ldDetWHOUT_MECALUX.values_list('ld_part'), ser_site="3515").exclude(
+    #     Q(ser_loc="WHOUT") | Q(ser_loc="WIP") | Q(ser_loc="MECFLOW")  | Q(ser_loc__contains="PWB") | Q(ser_loc__contains="PLC")).values('ser_part', 'ser_qty_avail')
+    
+    
+    elementos = []
+
+    xxusrw = XxusrwWkfl.objects.filter(xxusrw_key6="KCB00602-AA", xxusrw_domain="3511010").values('xxusrw_decfld_1',
+                                                                                                  'xxusrw_key4',
+                                                                                                  'xxusrw_key6',
+                                                                                                  'xxusrw_decfld_2')
+    # woMstr = WoMstr.objects.filter(wo_part__in=xxusrw.values_list('xxusrw_key4'),
+    #                                wo_due_date="2022-04-20").values(
+    #     'wo_part', 'wo_qty_exp_complete')
+
+    counterWHOUT = Counter()
+    counterNotWHOUT = Counter()
+    counterSerWHOUT = Counter()
+    counterSerNotWHOUT = Counter()
+
+    #///-----------////---------------------///-----///
+
+    counterWHOUTNovo = Counter()
+    counterNotWHOUTNovo = Counter()
+    counterSerWHOUTNovo = Counter()
+    counterSerNotWHOUTNovo = Counter()
+
+    #///-----------////---------------------///-----///
+
+    counterWHOUT_MECLUX = Counter()
+    counterNotWHOUT_MECLUX = Counter()
+    counterSerWHOUT_MECLUX = Counter()
+    counterSerNotWHOUT_MECLUX = Counter()
+
+
+
+    for ld in ldDetWHOUT:
+        
+        counterWHOUT[ld['ld_part'].upper()] += ld['ld_qty_oh']
+
+    # for ld in ldDetNotWHOUT:
+    #     counterNotWHOUT[ld['ld_part']] += ld['ld_qty_oh']
+
+    for ser in serMstrWHOUT:
+        counterSerWHOUT[ser['ser_part'].upper()] += 1
+
+    for ser in serMstrNotWHOUT:
+        counterSerNotWHOUT[ser['ser_part'].upper()] += 1
+        counterNotWHOUT[ser['ser_part'].upper()] += ser['ser_qty_avail']
+
+    #//----------------------------//-----------------------------------////////---------------------------
+
+    for ld in ldDetWHOUTNovo:
+        counterWHOUTNovo[ld['ld_part'].upper()] += ld['ld_qty_oh']
+
+    # for ld in ldDetNotWHOUT:
+    #     counterNotWHOUT[ld['ld_part']] += ld['ld_qty_oh']
+
+    for ser in serMstrWHOUTNovo:
+        counterSerWHOUTNovo[ser['ser_part'].upper()] += 1
+
+    for ser in serMstrNotWHOUTNovo:
+        print("->",ser)
+        counterSerNotWHOUTNovo[ser['ser_part'].upper()] += 1
+        counterNotWHOUTNovo[ser['ser_part'].upper()] += ser['ser_qty_avail']
+
+    #//----------------------------//-----------------------------------////////---------------------------
+
+    for ld in ldDetWHOUT_MECALUX:
+        counterWHOUT_MECLUX[ld['ld_part'].upper()] += ld['ld_qty_oh']
+
+    # for ld in ldDetNotWHOUT:
+    #     counterNotWHOUT[ld['ld_part']] += ld['ld_qty_oh']
+
+    for ser in serMstrWHOUT_MECALUX:
+        counterSerWHOUT_MECLUX[ser['ser_part'].upper()] += 1
+
+    for ser in serMstrNotWHOUT_MECALUX:
+        print("->",ser)
+        counterSerNotWHOUT_MECLUX[ser['ser_part'].upper()] += 1
+        counterNotWHOUT_MECLUX[ser['ser_part'].upper()] += ser['ser_qty_avail'] #conta os que não são de whou nem de meclux
+
+    #//----------------------------//-----------------------------------////////---------------------------
+
+    for ld in ldDetWHOUT:
+        for pt in ptMstr:
+            if pt['pt_part'].upper() == ld['ld_part'].upper():
+                if len(pt['pt_desc1']) == 24:
+                    pt['pt_desc1'] = pt['pt_desc1'] + "" + pt['pt_desc2']
+                else:
+                    pt['pt_desc1'] = pt['pt_desc1'] + " " + pt['pt_desc2']
+                if str(counterWHOUT[ld['ld_part']]) == '0E-10':
+                    counterWHOUT[ld['ld_part']] = '0.0000000000'
+                if not any(elem['itemNumber'].upper() == ld['ld_part'].upper() for elem in elementos):
+                    row = {
+                        'itemNumber': ld['ld_part'],
+                        'descricao': pt['pt_desc1'],
+                        'qtyOnHand': str(counterWHOUT[ld['ld_part']])[:-11],
+                        'serialsWHOUT': counterSerWHOUT[ld['ld_part']],     
+                        'qtyOnHandNotWHOUT': 0,
+                        'serialsNotWHOUT': counterSerNotWHOUT[ld['ld_part']],
+                        'unitCost': '-',
+                        'min': '-',
+                        'max': '-',
+                        'consumptionValue': 0,
+                        'consumptionValueDiaSeguinte':0,
+                        'consumptionValueDiaAposDiaSeguinte': 0,
+                        'totalCost': '-',
+                        'qtyOnHand_mecalux':str(counterWHOUT[ld['ld_part']])[:-11] ,
+                        'serialsMECALUX': counterSerNotWHOUTNovo[ld['ld_part']],
+
+                    }
+                    elementos.append(row)
+    
+    
+    for ldNotWHOUT in ldDetNotWHOUTNovo:
+        for elem in elementos:
+
+            if elem['itemNumber'].upper() == ldNotWHOUT['ld_part'].upper():
+                elem['qtyOnHandNotWHOUT'] = str(counterNotWHOUTNovo[ldNotWHOUT['ld_part']])[:-11]
+                if elem['qtyOnHandNotWHOUT'] == '':
+                    elem['qtyOnHandNotWHOUT'] = '0'
+                break
+    for ldNotWHOUT in ldDetNotWHOUT_MECALUX:
+        for elem in elementos:
+
+            if elem['itemNumber'].upper() == ldNotWHOUT['ld_part'].upper():
+                elem['qtyOnHand_mecalux'] = str(counterNotWHOUT_MECLUX[ldNotWHOUT['ld_part']])[:-11]
+                if elem['qtyOnHand_mecalux'] == '':
+                    elem['qtyOnHand_mecalux'] = '0'
+                break
+    
+
+    return render(request, 'tenda_Meclux.html', {'elementos': elementos})
+
+
+def downladExcelTenda(): #guardaFicheiroHistorico
+    import io
+    import openpyxl as xl
+    print("ENtrou no scheduler")
     ldDetWHOUT = LdDet.objects.filter(ld_site="3515", ld_loc="WHOUT").values(
         "ld_part", "ld_loc", "ld_qty_oh"
     )
-    ldDetNotWHOUT = (
-        LdDet.objects.filter(
-            ld_site="3515", ld_part__in=ldDetWHOUT.values_list("ld_part")
-        )
+    ldDetNotWHOUT = (LdDet.objects.filter(ld_site="3515", ld_part__in=ldDetWHOUT.values_list("ld_part"))
         .exclude(Q(ld_loc="WHOUT") | Q(ld_loc="QUALITY"))
         .values("ld_part", "ld_loc")
     )
-    ptMstr = PtMstr.objects.filter(
-        pt_part__in=ldDetWHOUT.values_list("ld_part"), pt_site="3515"
-    ).values("pt_part", "pt_desc1", "pt_desc2")
-    serMstrWHOUT = SerMstr.objects.filter(
-        ser_part__in=ldDetWHOUT.values_list("ld_part"), ser_site="3515", ser_loc="WHOUT"
-    ).values("ser_part")
+
+    ldDetNotWHOUTNovo = (LdDet.objects.filter(ld_site="3515", ld_part__in=ldDetWHOUT.values_list("ld_part"))
+    .exclude(Q(ld_loc="WHOUT") | Q(ld_loc="QUALITY")).values("ld_part", "ld_loc") ) 
+   
+    ptMstr = PtMstr.objects.filter(pt_part__in=ldDetWHOUT.values_list("ld_part"), pt_site="3515").values("pt_part", "pt_desc1", "pt_desc2")
+    
+    serMstrWHOUT = SerMstr.objects.filter(ser_part__in=ldDetWHOUT.values_list("ld_part"), ser_site="3515", ser_loc="WHOUT").values("ser_part")
     serMstrNotWHOUT = (
         SerMstr.objects.filter(
             ser_part__in=ldDetWHOUT.values_list("ld_part"), ser_site="3515"
@@ -48,6 +643,7 @@ def tenda(request):
         .exclude(Q(ser_loc="WHOUT") | Q(ser_loc="QUALITY"))
         .values("ser_part", "ser_qty_avail")
     )
+
 
     elementos = []
 
@@ -66,8 +662,8 @@ def tenda(request):
     for ld in ldDetWHOUT:
         counterWHOUT[ld["ld_part"]] += ld["ld_qty_oh"]
 
-    # for ld in ldDetNotWHOUT:
-    #     counterNotWHOUT[ld['ld_part']] += ld['ld_qty_oh']
+    for ld in ldDetNotWHOUT:
+        counterNotWHOUT[ld['ld_part']] += ld['ld_qty_oh']
 
     for ser in serMstrWHOUT:
         counterSerWHOUT[ser["ser_part"]] += 1
@@ -95,7 +691,7 @@ def tenda(request):
                         "serialsNotWHOUT": counterSerNotWHOUT[ld["ld_part"]],
                         "unitCost": "-",
                         "min": "-",
-                        "max": "-",
+                        "max": counterNotWHOUT,
                         "consumptionValue": 0,
                         "consumptionValueDiaSeguinte": 0,
                         "consumptionValueDiaAposDiaSeguinte": 0,
@@ -112,18 +708,68 @@ def tenda(request):
                     elem["qtyOnHandNotWHOUT"] = "0"
                 break
 
-    # for xx in xxusrw:
-    #     for wo in woMstr:
-    #         if wo['wo_part'] == xx['xxusrw_key4']:
-    #             for elem in elementos:
-    #                 if elem['itemNumber'] == xx['xxusrw_key6']:
-    #                     elem['contas'] += xx['xxusrw_key4'] + " " + str(xx['xxusrw_decfld_1']) + "*" + str(
-    #                         wo['wo_qty_exp_complete'])
-    #                     elem['consumptionValue'] += round(
-    #                         float(xx['xxusrw_decfld_1']) * float(wo['wo_qty_exp_complete']), 2)
-    #                     break
+    
+    wbProduction = Workbook()
+    file = io.BytesIO()
+    sheetProduction = wbProduction.get_sheet_by_name("Sheet")
+    sheetProduction.append(
+        [
+            "Item Number",
+            "Description",
+            "Qty on Hand-WHOUT",
+            "Qt",
+            "Qty on Hand-not WHOUT",
+            "Qt",
+            "Unit Cost",
+            "Total Cost (WHOUT)",
+            "1 day Consuption",
+            "2 day Consuption",
+            "3 day Consuption"
+        ])
+    for elem in elementos: # em principio não precisa do all()
+        sheetProduction.append(
+            [
+                str(elem.itemNumber),
+                str(elem.descricao),
+                str(elem.qtyOnHand),
+                str(elem.serialsWHOUT),
+                str(elem.qtyOnHandNotWHOUT),
+                str(elem.serialsNotWHOUT),
+                str(elem.unitCost),
+                str(elem.totalCost),
+                str(elem.consumptionValue),
+                str(elem.consumptionValueDiaSeguinte),
+                str(elem.consumptionValueDiaAposDiaSeguinte)
+            ]
+        )
 
-    return render(request, "tenda.html", {"elementos": elementos})
+    #wbProduction.save(caminho)
+    # Voltar a pocição inicial do IO file object
+    file.seek(0)
+
+    data_fmt = datetime.now().strftime("%d-%m-%Y")
+    #var caminho não vai dar a nenhum sitio
+    caminho =  "C:\\Users\\PMARTI30\\Desktop\\historicoTrackingPage"+data_fmt+".xlsx"
+    caminho1 =  "\\\\pavpd002\\e_proj\sharedir\\MP&L\\PROCEDIMENTOS\\Packaging\\TMP_NP\\historicoTrackingPage"+data_fmt+".xlsx"
+
+     
+    """ wbProduction.save(caminho)
+    wbProduction.save(file) """
+    print("FICHEIRO GUARDADO")
+    wbProduction.save(file)
+    # Voltar a pocição inicial do IO file object
+    file.seek(0) 
+
+    data_fmt = datetime.now().strftime("%d-%m-%Y %H:%M")
+    fresp = FileResponse(
+        file, filename=f"TrackingPage_Historico1Mes_{data_fmt}.xlsx", as_attachment=True
+    )
+    return fresp
+
+    return fresp
+
+
+
 
 
 def uploadTendaCosts(request):
@@ -242,6 +888,163 @@ def uploadTendaCosts(request):
                         break
 
         return render(request, "tenda.html", {"elementos": elementos})
+
+
+
+def uploadTendaCostsMECFLOW(request):
+    if request.method == "GET":
+        ldDetWHOUT1 = LdDet.objects.filter(ld_site="3515",ld_loc__in=["WHOUT","MECFLOW"]).values(
+        "ld_part", "ld_loc", "ld_qty_oh"
+        )
+
+        ldDetWHOUT = LdDet.objects.filter(ld_site="3515",  ld_loc="WHOUT").values(
+            "ld_part", "ld_loc", "ld_qty_oh"
+        )
+
+        ldDetMECFLOW = LdDet.objects.filter(ld_site="3515",  ld_loc ="MECFLOW").values(
+            "ld_part", "ld_loc", "ld_qty_oh"
+        )
+
+        ldDetNotWHOUTNotMECFLOW = ( LdDet.objects.filter(ld_site="3515", ld_part__in=ldDetWHOUT1.values_list("ld_part"))
+            .exclude(Q(ld_loc__contains="MECFLOW") | Q(ld_loc__contains="WHOUT") |  Q(ld_loc__contains="QUALITY") | Q(ld_loc__contains="PWB") | Q(ld_loc__contains="PLC") | Q(ld_loc="WIP")) #para ficar apenas o WHOUT -) tenda
+            .values("ld_part", "ld_loc")
+        )
+
+        ptMstr = PtMstr.objects.filter(pt_part__in=ldDetWHOUT1.values_list("ld_part"), pt_site="3515"
+        ).values("pt_part", "pt_desc1", "pt_desc2")
+        
+        serMstrWHOUT = SerMstr.objects.filter(ser_part__in=ldDetWHOUT.values_list("ld_part"), ser_site="3515", ser_loc="WHOUT"
+        ).values("ser_part")
+
+        serMstrMECFLOW = SerMstr.objects.filter(ser_part__in=ldDetMECFLOW.values_list("ld_part"), ser_site="3515", ser_loc="MECFLOW"
+        ).values("ser_part")
+
+        serMstrNotWHOUTNotMECFLOW = (SerMstr.objects.filter(ser_part__in=ldDetNotWHOUTNotMECFLOW.values_list("ld_part"), ser_site="3515")
+            .exclude(Q(ser_loc__contains="WHOUT") | Q(ser_loc__contains="MECFLOW") | Q(ser_loc__contains="QUALITY") | Q(ser_loc__contains="PWB") | Q(ser_loc__contains="PLC") | Q(ser_loc="WIP"))
+            .values("ser_part", "ser_qty_avail")
+        )
+
+        xx = []
+        elementos = []
+
+        partNumberList = ldDetWHOUT1.values_list("ld_part").values("ld_part").distinct()
+
+        for pn in partNumberList:
+            if SctDet.objects.filter(
+                sct_part=pn["ld_part"], sct_site="3515", sct_sim="Standard"
+            ).exists():
+                xx.append(
+                    SctDet.objects.filter(
+                        sct_part=pn["ld_part"], sct_site="3515", sct_sim="Standard"
+                    ).values("sct_cst_tot", "sct_part")
+                )
+            # if XxusrwWkfl.objects.filter(xxusrw_key6=pn['ld_part'], xxusrw_domain="3511010").exists():
+            #     xx.append(XxusrwWkfl.objects.filter(xxusrw_key6=pn['ld_part'], xxusrw_domain="3511010").values(
+            #         'xxusrw_decfld_1',
+            #         'xxusrw_key4',
+            #         'xxusrw_key6',
+            #         'xxusrw_decfld_2')[0])
+
+        counterWHOUT = Counter()
+        #counterNotWHOUT = Counter()
+        counterSerWHOUT = Counter()
+        #counterSerNotWHOUT = Counter()
+
+        counterMECFLOW = Counter()
+        counterSerMECFLOW = Counter()
+        counterSerNotWHOUTNotMECFLOW = Counter()
+        counterNotWHOUTNotMECFLOW = Counter()
+
+        for ld in ldDetWHOUT:
+            counterWHOUT[ld["ld_part"]] += ld["ld_qty_oh"]
+
+        for ld in ldDetMECFLOW:
+            counterMECFLOW[ld["ld_part"]] += ld["ld_qty_oh"]
+
+        for ser in serMstrWHOUT:
+            counterSerWHOUT[ser["ser_part"].upper()] += 1
+
+        for ser in serMstrMECFLOW:
+            counterSerMECFLOW[ser["ser_part"].upper()] += 1
+
+        for ser in serMstrNotWHOUTNotMECFLOW:   #contador de serials para nenhum dos casos
+            counterSerNotWHOUTNotMECFLOW[ser["ser_part"].upper()] += 1
+            counterNotWHOUTNotMECFLOW[ser["ser_part"].upper()] += ser["ser_qty_avail"]
+
+        for ld in ldDetWHOUT:
+            for pt in ptMstr:
+                if pt["pt_part"] == ld["ld_part"]:
+                    if len(pt["pt_desc1"]) == 24:
+                        pt["pt_desc1"] = pt["pt_desc1"] + "" + pt["pt_desc2"]
+                    else:
+                        pt["pt_desc1"] = pt["pt_desc1"] + " " + pt["pt_desc2"]
+                    if not any(
+                        elem["itemNumber"] == ld["ld_part"] for elem in elementos
+                    ):
+                        row = {
+                            "itemNumber": ld["ld_part"],
+                            "descricao": pt["pt_desc1"],
+                            "qtyOnHand": 0,
+                            "serialsWHOUT": counterSerWHOUT[ld["ld_part"]],
+                            "qtyOnHandMECFLOW": 0,
+                            "serialsMECFLOW": counterSerMECFLOW[ld["ld_part"]],
+                            "qtyOnHandNotWHOUTNotMECFLOW": 0,
+                            "serialsNotWHOUTNotMECFLOW": counterSerNotWHOUTNotMECFLOW[ld["ld_part"]],
+                            "unitCost": "-",
+                            "min": "-",
+                            "max": "-",
+                            "consumptionValue": 0,
+                            "consumptionValueDiaSeguinte": 0,
+                            "consumptionValueDiaAposDiaSeguinte": 0,
+                            "totalCost": "-",
+                        }
+                        elementos.append(row)
+        for ldWHOUT in ldDetWHOUT:
+            for elem in elementos:
+                if elem["itemNumber"] == ldWHOUT["ld_part"]:
+                    elem["qtyOnHand"] = str(counterWHOUT[ldWHOUT["ld_part"]])[
+                        :-11
+                    ]
+                    if elem["qtyOnHand"] == "":
+                        elem["qtyOnHand"] = "0"
+                    break
+    
+        for ldMECFLOW in ldDetMECFLOW:
+            for elem in elementos:
+                if elem["itemNumber"] == ldMECFLOW["ld_part"]:
+                    elem["qtyOnHandMECFLOW"] = str(counterMECFLOW[ldMECFLOW["ld_part"]])[
+                        :-11
+                    ]
+                    if elem["qtyOnHandMECFLOW"] == "":
+                        elem["qtyOnHandMECFLOW"] = "0"
+                    break
+
+        for ldMECFLOW in ldDetNotWHOUTNotMECFLOW:
+            for elem in elementos:
+                if elem["itemNumber"] == ldMECFLOW["ld_part"]:
+                    elem["qtyOnHandNotWHOUTNotMECFLOW"] = str(counterNotWHOUTNotMECFLOW[ldMECFLOW["ld_part"]])[
+                        :-11
+                    ]
+                    if elem["qtyOnHandNotWHOUTNotMECFLOW"] == "":
+                        elem["qtyOnHandNotWHOUTNotMECFLOW"] = "0"
+                    break
+
+        for elem in elementos:
+            for elemXX in xx:
+                for elemenXX in elemXX:
+                    if elem["itemNumber"] == elemenXX["sct_part"]:
+                        if elem["qtyOnHand"] == "":
+                            elem["qtyOnHand"] = "0"
+                        elem["unitCost"] = round(float(elemenXX["sct_cst_tot"]), 2)
+                        elem["totalCost"] = round(
+                            float(elem["qtyOnHand"]) * elem["unitCost"], 2
+                        )
+                        break
+
+        return render(request, "tenda_Mecflow.html", {"elementos": elementos})
+    
+
+
 
 
 def updateTenda(request):
@@ -546,16 +1349,30 @@ def configurationsTPM(request):
 @login_required()
 @user_passes_test(lambda u: u.groups.filter(name="receivingMNFG").exists())
 def mnfgSupply(request):
+    hoje = datetime.today()
+    agora = datetime.now().time()
+    data_formatada = hoje.strftime('%m/%d/%Y')
+    hora_formatada = agora.strftime('%H:%M')
+    dia_seguinte = hoje + timedelta(days=1)
+    data_seguinte_formatada = dia_seguinte.strftime('%m/%d/%Y')
+
+    timestamp = MNFGSupplyItems.objects.first()
+    print("Timesmtamp-->", timestamp.timestamp)
+    
+     
+    
     taskBrowse = TaskBrowse.objects
     data = LastUpdate.objects
     areaA = AreaA.objects
     areaB = AreaB.objects
     kardex = Kardex.objects
+    
 
     dia = date.today() - timedelta(days=10)
-    dadosQAD = WtskMstr.objects.filter(
+    """ dadosQAD = WtskMstr.objects.filter(
         wtsk_create_date__gt=dia.strftime("%Y-%m-%d")
-    ).exclude(wtsk_to_loc="kardex")
+    ).exclude(wtsk_to_loc="kardex") """
+
     wevDetFilterFA = WevdDet.objects.filter(
         wevd_create_date__gt=dia.strftime("%Y-%m-%d"),
         wevd_loc_to__startswith="F",
@@ -606,6 +1423,25 @@ def mnfgSupply(request):
                 }
                 elementosBP.append(row)
                 break
+    contador =0
+    
+    """ for i in dadosQAD:
+        if i.wtsk_from_stor_zone == "KARDEX": #assim estás a ver BPSMD SUPPLY
+            contador +=1
+            print("-",i.wtsk_create_time,contador) """
+        # agora =  datetime.now()
+        # data_atual = datetime.now().date()
+        # data_atual1 = data_atual.strftime('%Y-%m-%d')
+        # i_time = datetime.strptime(i["time"], "%H%M%S")
+        # proxima_hora = agora + timedelta(hours=1) 
+        # proxHora = proxima_hora.strftime("%H%M%S")
+        # if data_atual1 == i["date"]:
+        #     print("Data igual ao dia de hoje!", proxHora)
+        #     proxHora_dt = datetime.strptime(proxHora, "%H%M%S")
+        #     if proxHora_dt >= i_time:
+        #         contador += 1
+    dadosQAD = MNFGSupplyItems.objects.all()
+    #dadosQAD = MNFGSupplyItems.objects.filter(wtsk_from_stor_zone__in=areaB.values_list("storageZone"))
     return render(
         request,
         "mNFGSupply.html",
@@ -618,55 +1454,152 @@ def mnfgSupply(request):
             "dadosQAD": dadosQAD,
             "elementosFA": elementosFA,
             "elementosBP": elementosBP,
+            "timestamp": timestamp.timestamp
+            
+            
         },
     )
+def mostraContadores(request):
+    print(request.POST)
+    hoje = datetime.today()
+    agora = datetime.now().time()
+    data_formatada = hoje.strftime('%m/%d/%Y')
+    hora_formatada = agora.strftime('%H:%M')
+    dia_seguinte = hoje + timedelta(days=1)
+    data_seguinte_formatada = dia_seguinte.strftime('%m/%d/%Y')
+    #precisas de percorrer as tabelas todas para pegar o contador de cada uma ads 3 tabelas, sem if de tabela
+    print("MOSTRA contadores")
+
+    if request.POST["turno"] == "1":
+        print("Primeiro Turno")
+        contadorFA = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE timestamp BETWEEN '{data_formatada} 08:00' AND '{data_formatada} 16:30' """)
+        contadorBpsmd = BPSMDSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpsmdsupplyreditems WHERE timestamp BETWEEN '{data_formatada} 08:00' AND '{data_formatada} 16:30' """)
+        contadorBpDrop = BPDropinSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpdropinsupplyreditems WHERE timestamp BETWEEN '{data_formatada} 08:00' AND '{data_formatada} 16:30' """)
+    elif request.POST["turno"] == "2":
+        print("Segundo turno")
+        contadorFA = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE timestamp BETWEEN '{data_formatada} 16:30' AND '{data_seguinte_formatada} 01:00"' """)
+        contadorBpsmd = BPSMDSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpsmdsupplyreditems WHERE timestamp BETWEEN '{data_formatada} 16:30' AND '{data_seguinte_formatada} 01:00"' """)
+        contadorBpDrop = BPDropinSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpdropinsupplyreditems WHERE timestamp BETWEEN '{data_formatada}  16:30' AND '{data_formatada} 01:00' """)
+    else:
+        print("Terceiro turno")
+        contadorFA = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE timestamp BETWEEN '{data_formatada}  01:00' AND '{data_formatada} 08:00' """)
+        contadorBpsmd = BPSMDSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpsmdsupplyreditems WHERE timestamp BETWEEN '{data_formatada}  01:00' AND '{data_formatada} 08:00' """)
+        contadorBpDrop = BPDropinSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpdropinsupplyreditems WHERE timestamp BETWEEN '{data_formatada}  01:00' AND '{data_formatada} 08:00' """)
+    print(contadorBpsmd)
+
+    return JsonResponse({"message": "OK", "contadorFA" : len(contadorFA), "contadorBpsmd" : len(contadorBpsmd), "contadorBpDrop" : len(contadorBpDrop)})
 
 
 @login_required()
 @user_passes_test(lambda u: u.groups.filter(name="receivingMNFG").exists())
 def faSupply(request):
+    from datetime import datetime
+  
     taskBrowse = TaskBrowse.objects
     areaB = AreaB.objects
     data = LastUpdate.objects
+    redItemsBd =  FASupplyRedItems.objects
+    now = datetime.now()
+    #adiciona_val_vermelhos_automatico_Supply()
+    # hoje = datetime.today()
+    # data_formatada = hoje.strftime('%m/%d/%Y')
+    # agora = datetime.now().time()
+    # hora_formatada = agora.strftime('%H:%M')
+    # print("->", type(hora_formatada))
+    # dia_seguinte = hoje + timedelta(days=1)
+    # data_seguinte_formatada = dia_seguinte.strftime('%m/%d/%Y')
+    # hora_formatada = "08:40"
+    # if hora_formatada > "08:00" and hora_formatada < "16:30": 
+    #     print("Primeiro Turno")
+    #     contador = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE timestamp BETWEEN '{data_formatada} 08:00' AND '{data_formatada} 16:30' """)
+    # elif hora_formatada > "16:30" and hora_formatada < "24:00":
+    #     print("Segundo turno")
+    #     contador = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE timestamp BETWEEN '{data_formatada} 16:30' AND '{data_seguinte_formatada} 01:00"' """)
+    # else:
+    #     print("Terceiro turno")
+    #     contador = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE timestamp BETWEEN '{data_formatada}  01:00' AND '{data_formatada} 08:00' """)
+    # print("QUERRY-->",data)
+    #contador = FASupplyRedItems.objects.raw(f"""SELECT * from receiving_fasupplyreditems WHERE timestamp >= '{now.strftime("%m/%d/%Y")}'""")
+    #dateLastUpdate = Receiving_SupplyPages_Refresh.objects.all().values('lastUpdate').last()#.get('lastUpdate')
+    #print("dateLastUpdate---",dateLastUpdate)
+    #bd_estado = Receiving_SupplyPages_Refresh.objects.all().values('estado').last()#.get('estado')
     dia = date.today() - timedelta(days=10)
-    dadosQAD = WtskMstr.objects.filter(
+    
+    """ dadosQAD = WtskMstr.objects.filter(
         wtsk_create_date__gt=dia.strftime("%Y-%m-%d")
-    ).exclude(wtsk_to_loc="kardex")
-
+    ).exclude(wtsk_to_loc="kardex") """
+    #if line.wtsk_from_stor_zone == areaB.storageZone
+    dadosQAD = MNFGSupplyItems.objects.filter(wtsk_from_stor_zone__in=areaB.values_list("storageZone"))#.all()
+    #ldDetNotWHOUTNotMECFLOW = ( LdDet.objects.filter(ld_site="3515", ld_part__in=ldDetWHOUT1.values_list("ld_part"))
+                               
+    print("TAMANHO DOS DADOS", len(dadosQAD.all()))
     return render(
         request,
-        "fASupply.html",
-        {"taskBrowse": taskBrowse, "data": data, "areaB": areaB, "dadosQAD": dadosQAD},
+        "fASupplyNovaFunc.html",
+        {"taskBrowse": taskBrowse, "data": data, "areaB": areaB, "dadosQAD": dadosQAD, "redItemsBd" : redItemsBd},
     )
 
 
 @login_required()
 @user_passes_test(lambda u: u.groups.filter(name="receivingMNFG").exists())
 def bpDropinSupply(request):
+    from datetime import datetime
     taskBrowse = TaskBrowse.objects
     data = LastUpdate.objects
     areaA = AreaA.objects
+    #para trazer também
     dia = date.today() - timedelta(days=10)
-    dadosQAD = WtskMstr.objects.filter(
+    
+    hoje = datetime.today()
+    data_formatada = hoje.strftime('%m/%d/%Y')
+    agora = datetime.now().time()
+    hora_formatada = agora.strftime('%H:%M')
+    print("->", type(hora_formatada))
+    dia_seguinte = hoje + timedelta(days=1)
+    data_seguinte_formatada = dia_seguinte.strftime('%m/%d/%Y')
+    hora_formatada = "08:40"
+
+    #dateLastUpdate = Receiving_SupplyPages_Refresh.objects.all().values('lastUpdate').last()#.get('lastUpdate')
+    #print("dateLastUpdate---",dateLastUpdate)
+    #bd_estado = Receiving_SupplyPages_Refresh.objects.all().values('estado').last()
+    #contador = FASupplyRedItems.objects.raw(f"""SELECT * from receiving_fasupplyreditems WHERE timestamp >= '{now.strftime("%m/%d/%Y")}'""")
+    #tens de trazer este codigo quando for para fazer para correr com o apScheduler
+    """ dadosQAD = WtskMstr.objects.filter(
         wtsk_create_date__gt=dia.strftime("%Y-%m-%d")
-    ).exclude(wtsk_to_loc="kardex")
+    ).exclude(wtsk_to_loc="kardex") """
+    
+    dadosQAD = MNFGSupplyItems.objects.filter(wtsk_from_stor_zone__in=areaA.values_list("storageZone"))
     return render(
         request,
         "bPDropinSupply.html",
-        {"taskBrowse": taskBrowse, "data": data, "areaA": areaA, "dadosQAD": dadosQAD},
+        { "taskBrowse": taskBrowse, "data": data, "areaA": areaA, "dadosQAD": dadosQAD},
     )
-
 
 @login_required()
 @user_passes_test(lambda u: u.groups.filter(name="receivingMNFG").exists())
 def bpSMDSupply(request):
+    from datetime import datetime
+    
+
     taskBrowse = TaskBrowse.objects
     data = LastUpdate.objects
     kardex = Kardex.objects
     dia = date.today() - timedelta(days=10)
+    redItemsBd =  BPSMDSupplyRedItems.objects
+    
+    hoje = datetime.today()
+    data_formatada = hoje.strftime('%m/%d/%Y')
+    agora = datetime.now().time()
+    hora_formatada = agora.strftime('%H:%M')
+    dia_seguinte = hoje + timedelta(days=1)
+
+    #dateLastUpdate = Receiving_SupplyPages_Refresh.objects.all().values('lastUpdate').last()#.get('lastUpdate')
+    #bd_estado = Receiving_SupplyPages_Refresh.objects.all().values('estado').last()
     dadosQAD = WtskMstr.objects.filter(
         wtsk_create_date__gt=dia.strftime("%Y-%m-%d")
     ).exclude(wtsk_to_loc="kardex")
+
+    dadosQAD = MNFGSupplyItems.objects.filter(wtsk_from_stor_zone__in=kardex.values_list("storageZone"))
     return render(
         request,
         "bPSMDSupply.html",
@@ -675,6 +1608,9 @@ def bpSMDSupply(request):
             "data": data,
             "kardex": kardex,
             "dadosQAD": dadosQAD,
+            "redItemsBd" : redItemsBd,
+           
+
         },
     )
 
@@ -773,10 +1709,128 @@ def pending(request):
         {"data": data, "elementosFA": elementosFA, "elementosBP": elementosBP},
     )
 
+def getNokSmart(request):
+    #buscar os noks tens de ver se o val é 1 ou null
+    print("entrou",request.POST["data_report"])
+    smartNoksHistInicioT = ReceivingPosicao2Historico.objects.filter(dataPosicao__contains =request.POST["data_report"], inicioTurnoNok = "1")
+    for x in smartNoksHistInicioT:
+        print("VALOR ENCONTRADO para NOKs",x)
+    smartNoksHistFimT = ReceivingPosicao2Historico.objects.filter(dataPosicao__contains =request.POST["data_report"], fimTurnoNok = "1")
+    smartSubItemsNok = ReceivingPosicao2SubItems.objects.filter(nok ="1")
+    wbProduction = Workbook()
+    sheetProduction = wbProduction.add_sheet("Sheet 1")
+    row = 0
+    col = 0
+    sheetProduction.write(row, col, "Data Posicao")
+    sheetProduction.write(row, col + 1, "Item")
+    sheetProduction.write(row, col + 2, "Comentario Final Turno")
+    sheetProduction.write(row, col + 3, "Comentario Inicio Turno")
+    sheetProduction.write(row, col + 4, "Responsavel Inicio Turno")
+    sheetProduction.write(row, col + 5, "Responsavel Final Turno")
+    sheetProduction.write(row, col + 6, "Data Final Turno")
+    sheetProduction.write(row, col + 7, "Data Inicio Turno")
+    sheetProduction.write(row, col + 8, "Hora Final Turno")
+    sheetProduction.write(row, col + 9, "Hora Inicio Turno")
+    sheetProduction.write(row, col + 10, "Fim Turno Ok")
+    sheetProduction.write(row, col + 11, "Fim Turno Nok")
+    sheetProduction.write(row, col + 12, "Inicio Turno Ok")
+    sheetProduction.write(row, col + 13, "Inicio Turno Nok")
+    sheetProduction.write(row, col + 14, "Tipo")
+    row += 1
 
+    for elem in smartNoksHistInicioT:
+        sheetProduction.write(row, col, elem.dataPosicao)
+        sheetProduction.write(row, col + 1, elem.item)
+        sheetProduction.write(row, col + 2, elem.comentarioFinalTurno)
+        sheetProduction.write(row, col + 3, elem.comentarioInicioTurno)
+        sheetProduction.write(row, col + 4, elem.responsavelInicioTurno)
+        sheetProduction.write(row, col + 5, elem.responsavelFinalTurno)
+        sheetProduction.write(row, col + 6, elem.dataFinalTurno)
+        sheetProduction.write(row, col + 7, elem.dataInicioTurno)
+        sheetProduction.write(row, col + 8, elem.horaFinalTurno)
+        sheetProduction.write(row, col + 9, elem.horaInicioTurno)
+        sheetProduction.write(row, col + 10, elem.fimTurnoOk)
+        sheetProduction.write(row, col + 11, elem.fimTurnoNok)
+        sheetProduction.write(row, col + 12, elem.inicioTurnoOk)
+        sheetProduction.write(row, col + 13, elem.inicioTurnoNok)
+        sheetProduction.write(row, col + 14, elem.tipo)
+        row += 1
+        
+    for elem in smartNoksHistFimT:
+        sheetProduction.write(row, col , elem.dataPosicao)
+        sheetProduction.write(row, col + 1, elem.item)
+        sheetProduction.write(row, col + 2, elem.comentarioFinalTurno)
+        sheetProduction.write(row, col + 3, elem.comentarioInicioTurno)
+        sheetProduction.write(row, col + 4, elem.responsavelInicioTurno)
+        sheetProduction.write(row, col + 5, elem.responsavelFinalTurno)
+        sheetProduction.write(row, col + 6, elem.dataFinalTurno)
+        sheetProduction.write(row, col + 7, elem.dataInicioTurno)
+        sheetProduction.write(row, col + 8, elem.horaFinalTurno)
+        sheetProduction.write(row, col + 9, elem.horaInicioTurno)
+        sheetProduction.write(row, col + 10, elem.fimTurnoOk)
+        sheetProduction.write(row, col + 11, elem.fimTurnoNok)
+        sheetProduction.write(row, col + 12, elem.inicioTurnoOk)
+        sheetProduction.write(row, col + 13, elem.inicioTurnoNok)
+        sheetProduction.write(row, col + 14, elem.tipo)
+        row += 1
+    
+    row += 1
+    sheetProduction.write(row, col+2, "SUB ITEMS")
+    row += 1
+
+    sheetProduction.write(row, col, "Id Dia")
+    sheetProduction.write(row, col + 1, "Item")
+    sheetProduction.write(row, col + 2, "Ok")
+    sheetProduction.write(row, col + 3, "Nok")
+    sheetProduction.write(row, col + 4, "Comentario")
+    row += 1
+
+    for elem in smartSubItemsNok:
+        sheetProduction.write(row, col, elem.idDia)
+        sheetProduction.write(row, col + 1, elem.item)
+        sheetProduction.write(row, col + 2, elem.ok)
+        sheetProduction.write(row, col + 3, elem.nok)
+        sheetProduction.write(row, col + 4, elem.comentario)
+        row += 1
+    
+    wbProduction.save("..\\visteon\\media\\receiving\\tpmReports\\workbookTPMNoks.xls")
+    return JsonResponse({"message": "OK"})
 @login_required()
 @user_passes_test(lambda u: u.groups.filter(name="receivingTPM").exists())
 def tpm(request):
+    # import keyboard
+    # import threading
+
+ 
+
+    # def on_press(event):
+    #     global text
+    #     print(event.name)
+    #     """  if event.name == "space":
+    #         print(text, end=" ")
+    #         text = ""
+    #     elif event.name == "esc":
+    #         print(text)
+    #         text = ""
+    #     else:
+    #         text += event.name """
+
+    # def start_listener():
+    #     # Adiciona um listener para todas as teclas pressionadas
+    #     keyboard.on_press(on_press)
+
+    #     # Mantém o script em execução
+    #     keyboard.wait()
+
+    # # Cria uma nova thread para executar o listener
+    # listener_thread = threading.Thread(target=start_listener)
+    # listener_thread.start()
+
+    # # Aguarda a thread terminar (o que nunca acontecerá)
+    # listener_thread.join()
+
+
+
     posicao1 = ReceivingPosicao1Items.objects
     posicao2 = ReceivingPosicao2Items.objects
     posicao3 = ReceivingPosicao3Items.objects
@@ -1120,6 +2174,7 @@ def uploadTaskBrowse(request):
         # worksheet = workbook['Info']
         diaCorrente = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
         oldLastUpdate = LastUpdate.objects.get()
+        oldLastUpdate1 = LastUpdate.objects.all()#.raw("SELECT * FROM receiving_lastupdate")
         novaData = LastUpdate(
             None,
             diaCorrente,
@@ -1127,8 +2182,9 @@ def uploadTaskBrowse(request):
             oldLastUpdate.yellowHour,
             oldLastUpdate.lastUpdateRed,
         )
-        novaData.save()
         oldLastUpdate.delete()
+        novaData.save()
+
 
         if "_updateFA" in request.POST:
             return redirect("receiving:faSupply")
@@ -1248,6 +2304,21 @@ def createKardex(request):
             return redirect("receiving:configurationMNFG")
     return redirect("receiving:configurationMNFG")
 
+def alteraEstadoAlertaSupply(request):
+    bd_item = Receiving_SupplyPages_Refresh.objects.all()
+    for i in bd_item:
+        i.estado= "false"
+        i.save()
+
+  
+    return redirect("receiving:configurationMNFG")
+
+def getEstadoAlertaSupply(request):
+    bd_item = Receiving_SupplyPages_Refresh.objects.all().values('estado').last().get('estado')
+    return JsonResponse({"message": "OK","estado" : bd_item})
+
+  
+
 
 def deleteAreaA(request):
     if request.method == "POST":
@@ -1311,9 +2382,11 @@ def deleteKardex(request):
 
 def updateTimers(request):
     if request.method == "POST":
-
-        oldLastUpdate = LastUpdate.objects.get()
+        for x in LastUpdate.objects.all():
+            print("var-->",x)
+        oldLastUpdate = LastUpdate.objects.first()
         lastUpdate = LastUpdate()
+
         if request.POST["redLine"] != "":
             lastUpdate.redHour = request.POST["redLine"]
         else:
@@ -1326,8 +2399,9 @@ def updateTimers(request):
             lastUpdate.lastUpdateRed = request.POST["redTime"]
         else:
             lastUpdate.lastUpdateRed = oldLastUpdate.lastUpdateRed
-
+        print("Teste->")
         lastUpdate.data = oldLastUpdate.data
+        print("lastUpdate->",lastUpdate.data)
         lastUpdate.save()
 
         message = (
@@ -1347,7 +2421,7 @@ def updateTimers(request):
         subject, from_email, to = (
             "Alteração em Receiving - MNFG Supply - Configurations",
             "noreply@visteon.com",
-            ["aroque1@visteon.com"],
+            ["pmarti30@visteon.com"],
         )
         msg = EmailMultiAlternatives(subject, message, from_email, to)
         msg.attach_alternative(message, "text/html")
@@ -2676,6 +3750,62 @@ def deleteSelectedItems(request):
                 ReceivingPosicao8Items.objects.get(item=elem).delete()
     return redirect("receiving:configurationsTPM")
 
+def editSelectedItems(request):
+    if request.method == "POST":
+        id_selected_item = json.loads(request.POST["items[]"])#json.loads(request.POST["items[]"])
+        posicao = request.POST["posicao"]
+
+        if posicao == "1":
+            item = ReceivingPosicao1Items.objects.get(item=id_selected_item)
+            item.item = request.POST["itemName"]
+            item.tipo = request.POST["tipoSubItem"]
+            item.posicao = request.POST["posicao"]
+            item.save()
+        if posicao == "2":
+            item = ReceivingPosicao2Items.objects.get(item=id_selected_item)
+            item.item = request.POST["itemName"]
+            item.tipo = request.POST["tipoSubItem"]
+            item.posicao = request.POST["posicao"]
+            item.save()            
+        if posicao == "3":
+            item = ReceivingPosicao3Items.objects.get(item=id_selected_item)
+            item.item = request.POST["itemName"]
+            item.tipo = request.POST["tipoSubItem"]
+            item.posicao = request.POST["posicao"]
+            item.save()
+        if posicao == "4":
+            item = ReceivingPosicao4Items.objects.get(item=id_selected_item)
+            item.item = request.POST["itemName"]
+            item.tipo = request.POST["tipoSubItem"]
+            item.posicao = request.POST["posicao"]
+            item.save()
+        if posicao == "5":
+            item = ReceivingPosicao5Items.objects.get(item=id_selected_item)
+            item.item = request.POST["itemName"]
+            item.tipo = request.POST["tipoSubItem"]
+            item.posicao = request.POST["posicao"]
+            item.save()
+        if posicao == "6":
+            item = ReceivingPosicao6Items.objects.get(item=id_selected_item)
+            item.item = request.POST["itemName"]
+            item.tipo = request.POST["tipoSubItem"]
+            item.posicao = request.POST["posicao"]
+            item.save()
+        if posicao == "7":
+            item = ReceivingPosicao7Items.objects.get(item=id_selected_item)
+            item.item = request.POST["itemName"]
+            item.tipo = request.POST["tipoSubItem"]
+            item.posicao = request.POST["posicao"]
+            item.save()
+        if posicao == "8":
+            item = ReceivingPosicao8Items.objects.get(item=id_selected_item)  
+            item.item = request.POST["itemName"]
+            item.tipo = request.POST["tipoSubItem"]
+            item.posicao = request.POST["posicao"]
+            item.save()  
+
+    return redirect("receiving:configurationsTPM")
+
 
 def deleteSelectedSubItems(request):
     items = json.loads(request.POST["items[]"])
@@ -3119,6 +4249,18 @@ def definirTempos(request):
         msg = EmailMultiAlternatives(subject, message, from_email, to)
         msg.attach_alternative(message, "text/html")
         msg.send()
+        return redirect("receiving:configurationsTPM")
+
+
+
+def definirTempos(request):
+    if request.method == "POST":
+        print(request.POST)
+        elementos = DefinirTempos.objects.all()
+        elementos.delete()
+        DefinirTempos(turno = "1", p1Inicio = request.POST["inicioT1P1"],  p1Fim = request.POST["fimT1P1"],  p2Inicio = request.POST["inicioT1P2"] , p2Fim = request.POST["fimT1P2"]).save()
+        DefinirTempos(turno = "2", p1Inicio = request.POST["inicioT2P1"],  p1Fim = request.POST["fimT2P1"],  p2Inicio = request.POST["inicioT2P2"] , p2Fim = request.POST["fimT2P2"]).save()
+        DefinirTempos(turno = "4", p1Inicio = request.POST["inicioT4P1"],  p1Fim = request.POST["fimT4P1"],  p2Inicio = request.POST["inicioT4P2"] , p2Fim = request.POST["fimT4P2"]).save()
         return redirect("receiving:configurationsTPM")
 
 
@@ -3942,7 +5084,7 @@ def downloadExcel(request):
             sheetProduction.write(row, col + 20, elem.dataCycleCount)
             sheetProduction.write(row, col + 21, elem.auditCheck)
             row += 1
-        wbProduction.save("C:\\visteon\\media\\receiving\\icdr\\workbookICDR.xls")
+        wbProduction.save("..\\visteon\\media\\receiving\\icdr\\workbookICDR.xls")
 
         return redirect("receiving:icdr")
 
@@ -4465,3 +5607,1294 @@ def convert(seconds):
     minutes = seconds // 60
     seconds %= 60
     return "%02d:%02d:%02d" % (hour, minutes, seconds)
+
+def getVermelhosSupply(request):
+    hoje = datetime.today()
+    data_formatada = hoje.strftime('%m/%d/%Y')
+    agora = datetime.now().time()
+    hora_formatada = agora.strftime('%H:%M')
+    print("->", type(hora_formatada))
+    dia_seguinte = hoje + timedelta(days=1)
+    data_seguinte_formatada = dia_seguinte.strftime('%m/%d/%Y')
+     
+
+    if request.POST["table"] == "receiving_fasupplyreditems":
+        #if request.POST["turno"] == "1"
+        if hora_formatada > "08:00" and hora_formatada < "16:30": 
+            contador = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE timestamp BETWEEN '{data_formatada} 08:00' AND '{data_formatada} 16:30' """)
+            print("Primeiro Turno",len(contador),contador)
+        #elif request.POST["turno"] == "2"
+        elif hora_formatada > "16:30" and hora_formatada <= "24:00":
+            print("Segundo turno")
+            contador = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE timestamp BETWEEN '{data_formatada} 16:30' AND '{data_seguinte_formatada} 01:00"' """)
+        else:
+            print("Terceiro turno")
+            contador = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE timestamp BETWEEN '{data_formatada}  01:00' AND '{data_formatada} 08:00' """)
+        return JsonResponse({"message": "OK", "contador": len(contador)})
+    
+    elif request.POST["table"] == "receiving_bpsmdsupplyreditems":
+        if hora_formatada > "08:00" and hora_formatada < "16:30": 
+            contador = BPSMDSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpsmdsupplyreditems WHERE timestamp BETWEEN '{data_formatada} 08:00' AND '{data_formatada} 16:30' """)
+            print("Primeiro Turno",len(contador))
+
+        elif hora_formatada > "16:30" and hora_formatada < "24:00":
+            print("Segundo turno")
+            contador = BPSMDSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpsmdsupplyreditems WHERE timestamp BETWEEN '{data_formatada} 16:30' AND '{data_seguinte_formatada} 01:00"' """)
+        else:
+            print("Terceiro turno")
+            contador = BPSMDSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpsmdsupplyreditems WHERE timestamp BETWEEN '{data_formatada}  01:00' AND '{data_formatada} 08:00' """)
+        return JsonResponse({"message": "OK", "contador": len(contador)})
+    
+    elif request.POST["table"] == "all":
+        """-------------------------------- TODOS OS TOTAIS -------------------------------------------- """
+        print("queres ver os totais para todas as tabelas")
+        if hora_formatada > "08:00" and hora_formatada < "16:30": 
+            contadorBPT1 = BPDropinSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpdropinsupplyreditems WHERE timestamp BETWEEN '{data_formatada} 08:00' AND '{data_formatada} 16:30' """)
+            contadorBPSMDT1 = BPSMDSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpsmdsupplyreditems WHERE timestamp BETWEEN '{data_formatada} 08:00' AND '{data_formatada} 16:30' """)
+            contadorFAT1 = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE timestamp BETWEEN '{data_formatada} 08:00' AND '{data_formatada} 16:30' """)
+            return JsonResponse({"message": "OK", "contadorBP": len(contadorBPT1), "contadorBPSMD": len(contadorBPSMDT1), "contadorFA": len(contadorFAT1)})
+
+        elif hora_formatada > "16:30" and hora_formatada < "24:00":
+            print("Segundo turno")
+            contadorBPT2 = BPDropinSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpdropinsupplyreditems WHERE timestamp BETWEEN '{data_formatada} 16:30' AND '{data_seguinte_formatada} 01:00"' """)
+            contadorBPSMDT2 = BPSMDSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpsmdsupplyreditems WHERE timestamp BETWEEN '{data_formatada} 16:30' AND '{data_seguinte_formatada} 01:00"' """)
+            contadorFAT2 = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE timestamp BETWEEN '{data_formatada} 16:30' AND '{data_seguinte_formatada} 01:00"' """)
+            return JsonResponse({"message": "OK", "contadorBP": len(contadorBPT2), "contadorBPSMD": len(contadorBPSMDT2), "contadorFA": len(contadorFAT2)})
+        
+        else:
+            print("Terceiro turno")
+            contadorBPT3 = BPDropinSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpdropinsupplyreditems WHERE timestamp BETWEEN '{data_formatada}  01:00' AND '{data_formatada} 08:00' """)
+            contadorBPSMDT3 = BPSMDSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpsmdsupplyreditems WHERE timestamp BETWEEN '{data_formatada}  01:00' AND '{data_formatada} 08:00' """)
+            contadorFAT3 = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE timestamp BETWEEN '{data_formatada}  01:00' AND '{data_formatada} 08:00' """)
+            return JsonResponse({"message": "OK", "contadorBP": len(contadorBPT3), "contadorBPSMD": len(contadorBPSMDT3), "contadorFA": len(contadorFAT3)})
+    else:
+        if hora_formatada > "08:00" and hora_formatada < "16:30": 
+            contador = BPDropinSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpdropinsupplyreditems WHERE timestamp BETWEEN '{data_formatada} 08:00' AND '{data_formatada} 16:30' """)
+            print("Primeiro Turno",len(contador))
+
+        elif hora_formatada > "16:30" and hora_formatada < "24:00":
+            print("Segundo turno")
+            contador = BPDropinSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpdropinsupplyreditems WHERE timestamp BETWEEN '{data_formatada} 16:30' AND '{data_seguinte_formatada} 01:00"' """)
+        else:
+            print("Terceiro turno")
+            contador = BPDropinSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpdropinsupplyreditems WHERE timestamp BETWEEN '{data_formatada}  01:00' AND '{data_formatada} 08:00' """)
+        return JsonResponse({"message": "OK", "contador": len(contador)})
+
+
+    return JsonResponse({"message": "OK"})
+
+def getErros(request):
+    print("REQUESt->",request.POST)
+    erro = HistoricoErros_View.objects.filter(pagina =request.POST["pagina"])
+    timestamp = HistoricoErros_View.objects.filter(pagina =request.POST["pagina"]).values("timestamp").first()
+    print("tamanho ", len(erro))
+    return JsonResponse({"message": "OK", "erro" : len(erro), "timestamp" : timestamp})
+
+
+def sendRelatorioDiarioSupply(request = None): 
+    print("entrou no sendRelatorioDiario")
+    import datetime
+    """  ["pmarti30@visteon.com",'npires2@visteon.com',
+                     'abrandao@visteon.com','sanasta1@visteon.com',
+                    'rsalgue2@visteon.com', 'nlopes8@visteon.com',
+                    'abilro1@visteon.com', 'jrodri80@visteon.com',
+                    'evenanc1@visteon.com'] """
+    #timeNow = datetime.datetime.now()
+    print("FUNC REPORT CONTADORES MNFG SUPPLY EMAIL")
+    #print("REQUEST para tirar excel", request.POST)
+
+    #acabar formatacao
+    table = """<h1>REPORT MNFG PAGES:</h1> <h2><br></br> Contadores </h2></br><table class="display"><thead style="background-color: lightgray">
+    <tr><th></th>
+    <th> 1 Turno </th>
+    <th> 2 Turno </th>
+    <th> 3 Turno </th>
+    </tr></thead>
+    <tbody>"""
+    hoje = datetime.datetime.now()
+    """ hoje = datetime.datetime.now()
+    data_formatada = hoje.strftime('%m/%d/%Y')
+    dia_seguinte = hoje + timedelta(days=1)
+    data_seguinte_formatada = dia_seguinte.strftime('%m/%d/%Y')
+    dia_anterior = hoje - timedelta(days=1)
+    data_anterior_formatada = dia_anterior.strftime('%m/%d/%Y') """
+    try:
+       
+        if request.POST["data_report"]:
+        #if len(request) > 0:
+            data_report = request.POST["data_report"]
+            data_obj = datetime.datetime.strptime(data_report, "%d/%m/%Y")
+            data_str = data_obj.strftime("%m/%d/%Y")
+            dia_seguinte_obj = data_obj + datetime.timedelta(days=1)
+            dia_seguinte_str = dia_seguinte_obj.strftime("%m/%d/%Y")
+            dia_anterior = data_obj - datetime.timedelta(days=1)
+            data_anterior_formatada = dia_anterior.strftime("%m/%d/%Y")
+
+            print("Primeiro turno")
+            contadorBPT1 = BPDropinSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpdropinsupplyreditems WHERE timestamp BETWEEN '{data_str} 08:00' AND '{data_str} 16:30' """)
+            contadorBPSMDT1 = BPSMDSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpsmdsupplyreditems WHERE timestamp BETWEEN '{data_str} 08:00' AND '{data_str} 16:30' """)
+            contadorFAT1 = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE timestamp BETWEEN '{data_str} 08:00' AND '{data_str} 16:30' """)
+
+            print("Segundo turno")
+            contadorBPT2 = BPDropinSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpdropinsupplyreditems WHERE timestamp BETWEEN '{data_str} 16:30' AND '{dia_seguinte_str} 01:00"' """)
+            contadorBPSMDT2 = BPSMDSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpsmdsupplyreditems WHERE timestamp BETWEEN '{data_str} 16:30' AND '{dia_seguinte_str} 01:00"' """)
+            contadorFAT2 = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE timestamp BETWEEN '{data_str} 16:30' AND '{dia_seguinte_str} 01:00"' """)
+
+            contadorBPT3 = BPDropinSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpdropinsupplyreditems WHERE timestamp BETWEEN '{data_str}  01:00' AND '{data_str} 08:00' """)
+            contadorBPSMDT3 = BPSMDSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpsmdsupplyreditems WHERE timestamp BETWEEN '{data_str}  01:00' AND '{data_str} 08:00' """)
+            contadorFAT3 = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE timestamp BETWEEN '{data_str}  01:00' AND '{data_str} 08:00' """)
+            print("Terceiro turno",request.POST["data_report"], "|", contadorFAT3)
+        
+        else:
+            #Se nao houver request
+            print("não ha request")
+            data_report = request.POST["data_report"]
+            data_obj = datetime.datetime.strptime(data_report, "%d/%m/%Y")
+            data_str = data_obj.strftime("%m/%d/%Y")
+            dia_seguinte_obj = data_obj + datetime.timedelta(days=1)
+            dia_seguinte_str = dia_seguinte_obj.strftime("%m/%d/%Y")
+            dia_anterior = data_obj - datetime.timedelta(days=1)
+            data_anterior_formatada = dia_anterior.strftime("%m/%d/%Y")
+
+            data_atual = datetime.datetime.now()
+            data_atual_str = data_atual.strftime("%m/%d/%Y")
+            dia_seguinte_obj_novo = data_atual + datetime.timedelta(days=1)
+            dia_seguinte_str_novo = dia_seguinte_obj_novo.strftime("%m/%d/%Y")
+
+            print("Primeiro turno")
+            contadorBPT1 = BPDropinSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpdropinsupplyreditems WHERE timestamp BETWEEN '{data_atual_str} 08:00' AND '{data_atual_str} 16:30' """)
+            contadorBPSMDT1 = BPSMDSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpsmdsupplyreditems WHERE timestamp BETWEEN '{data_atual_str} 08:00' AND '{data_atual_str} 16:30' """)
+            contadorFAT1 = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE timestamp BETWEEN '{data_atual_str} 08:00' AND '{data_atual_str} 16:30' """)
+
+            print("Segundo turno")
+            contadorBPT2 = BPDropinSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpdropinsupplyreditems WHERE timestamp BETWEEN '{data_atual_str} 16:30' AND '{dia_seguinte_str_novo} 01:00' """)
+            contadorBPSMDT2 = BPSMDSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpsmdsupplyreditems WHERE timestamp BETWEEN '{data_atual_str} 16:30' AND '{dia_seguinte_str_novo} 01:00' """)
+            contadorFAT2 = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE timestamp BETWEEN '{data_atual_str} 16:30' AND '{dia_seguinte_str_novo} 01:00' """)
+
+            print("Terceiro turno")
+            contadorBPT3 = BPDropinSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpdropinsupplyreditems WHERE timestamp BETWEEN '{data_atual_str}  01:00' AND '{data_atual_str} 08:00' """)
+            contadorBPSMDT3 = BPSMDSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpsmdsupplyreditems WHERE timestamp BETWEEN '{data_atual_str}  01:00' AND '{data_atual_str} 08:00' """)
+            contadorFAT3 = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE timestamp BETWEEN '{data_atual_str}  01:00' AND '{data_atual_str} 08:00' """)
+
+
+        table += (
+            '<tr><td style="padding:0 15px 0 15px;">'
+        + "FA Supply"
+        + '</td><td style="padding:0 15px 0 15px;">'
+        + str(len(contadorFAT1)) # site
+        + '</td><td style="padding:0 15px 0 15px;">'
+        + str(len(contadorFAT2)) # due_date
+        + '</td><td style="padding:0 15px 0 15px;">'
+        + str(len(contadorFAT3)) # item_number
+        + '</td>'
+        + "</td></tr>"
+        )
+
+        table += (
+            '<tr><td style="padding:0 15px 0 15px;">'
+        + "BPDropin Supply"
+        + '</td><td style="padding:0 15px 0 15px;">'
+        + str(len(contadorBPT1)) # site
+        + '</td><td style="padding:0 15px 0 15px;">'
+        + str(len(contadorBPT2)) # due_date
+        + '</td><td style="padding:0 15px 0 15px;">'
+        + str(len(contadorBPT3)) # item_number
+        + '</td>'
+        + "</td></tr>"
+        )
+
+        table += (
+            '<tr><td style="padding:0 15px 0 15px;">'
+        + "BPSMD Supply"
+        + '</td><td style="padding:0 15px 0 15px;">'
+        + str(len(contadorBPSMDT1)) # site
+        + '</td><td style="padding:0 15px 0 15px;">'
+        + str(len(contadorBPSMDT2)) # due_date
+        + '</td><td style="padding:0 15px 0 15px;">'
+        + str(len(contadorBPSMDT3)) # item_number
+        + '</td>'
+        + "</td></tr>"
+        )
+
+        table += "</tbody></table>"
+
+        
+        subject, from_email, to = (
+            "Receiving Supply Report: " + hoje.strftime("%d-%m-%Y"),
+            "noreply@visteon.com",
+            ["pmarti30@visteon.com"],
+        ) 
+        
+        msg = EmailMultiAlternatives(subject, table, from_email, to)
+        msg.attach_alternative(table, "text/html")
+        #print("Mensagem a ser enviada no mail", nextDay.strftime("%d-%m-%Y"))
+        print(2/0)
+        msg.send()
+        return JsonResponse({"message": "OK"})
+    except:
+        #se nao for possivel enviar a informacao por email ele cria um excel e faz download
+        # data_report = request.POST["data_report"]
+        # data_obj = datetime.strptime(data_report, "%d/%m/%Y")
+        # dia_seguinte_obj = data_obj + timedelta(days=1)
+        # dia_seguinte_str = dia_seguinte_obj.strftime("%d/%m/%Y")
+            try:
+                data_report = request.POST["data_report"]
+                data_obj = datetime.datetime.strptime(data_report, "%d/%m/%Y")
+                dia_seguinte_obj = data_obj + datetime.timedelta(days=1)
+                dia_seguinte_str = dia_seguinte_obj.strftime("%d/%m/%Y")
+
+                data_report = request.POST["data_report"]
+                data_obj = datetime.datetime.strptime(data_report, "%d/%m/%Y")
+                data_str = data_obj.strftime("%d/%m/%Y")
+
+                print("Primeiro turno")
+                contadorBPT1 = BPDropinSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpdropinsupplyreditems WHERE timestamp BETWEEN '{data_str} 08:00' AND '{data_str} 16:30' """)
+                contadorBPSMDT1 = BPSMDSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpsmdsupplyreditems WHERE timestamp BETWEEN '{data_str} 08:00' AND '{data_str} 16:30' """)
+                contadorFAT1 = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE timestamp BETWEEN '{data_str} 08:00' AND '{data_str} 16:30' """)
+
+                print("Segundo turno")
+                contadorBPT2 = BPDropinSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpdropinsupplyreditems WHERE timestamp BETWEEN '{data_str} 16:30' AND '{dia_seguinte_str} 01:00' """)
+                contadorBPSMDT2 = BPSMDSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpsmdsupplyreditems WHERE timestamp BETWEEN '{data_str} 16:30' AND '{dia_seguinte_str} 01:00' """)
+                contadorFAT2 = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE timestamp BETWEEN '{data_str} 16:30' AND '{dia_seguinte_str} 01:00' """)
+
+                print("Terceiro turno", contadorBPT3, "|", data_obj)
+                contadorBPT3 = BPDropinSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpdropinsupplyreditems WHERE timestamp BETWEEN '{data_str}  01:00' AND '{data_str} 08:00' """)
+                contadorBPSMDT3 = BPSMDSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpsmdsupplyreditems WHERE timestamp BETWEEN '{data_str}  01:00' AND '{data_str} 08:00' """)
+                contadorFAT3 = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE timestamp BETWEEN '{data_str}  01:00' AND '{data_str} 08:00' """)
+                # nome do file workbookReportMNFG
+                style = easyxf('pattern: pattern solid, fore_colour red;')
+                wbProduction = Workbook()
+                sheetProduction = wbProduction.add_sheet("Sheet 1")
+                row = 0
+                col = 0
+                
+                sheetProduction.write(row, col, "Vermelhos MNFG",style)
+                sheetProduction.write(row, col + 1, "")
+                sheetProduction.write(row, col + 2, "")
+                sheetProduction.write(row, col + 3, "")
+                
+                row += 1
+
+                sheetProduction.write(row, col, "")
+                sheetProduction.write(row, col + 1, "Turno 1")
+                sheetProduction.write(row, col + 2, "Turno 2")
+                sheetProduction.write(row, col + 3, "Turno 4")
+
+                row += 1
+
+                sheetProduction.write(row, col,"FA")
+                sheetProduction.write(row, col + 1,len(contadorFAT1))
+                sheetProduction.write(row, col + 2,len(contadorFAT2))
+                sheetProduction.write(row, col + 3,len(contadorFAT3))
+
+                row += 1
+
+                sheetProduction.write(row, col , "BPSMD")
+                sheetProduction.write(row, col + 1,len(contadorBPSMDT1))
+                sheetProduction.write(row, col + 2,len(contadorBPSMDT2))
+                sheetProduction.write(row, col + 3,len(contadorBPSMDT3))
+
+                row += 1
+
+                sheetProduction.write(row, col , "BPDropin")
+                sheetProduction.write(row, col + 1,len(contadorBPT1))
+                sheetProduction.write(row, col + 2,len(contadorBPT2))
+                sheetProduction.write(row, col + 3,len(contadorBPT3))
+
+                wbProduction.save("..\\visteon\\media\\receiving\\MNFG\\workbookReportMNFG.xls")
+                return JsonResponse({"message": "Excel"})
+            except:
+                data_atual = datetime.datetime.now()
+                data_formatada_atual = data_atual.strftime("%m/%d/%Y")
+
+                data_ontem = data_atual - datetime.timedelta(days=1)
+                data_formatada_ontem = data_ontem.strftime("%m/%d/%Y")
+
+                print("Primeiro turno",data_formatada_atual,data_formatada_ontem)
+
+                contadorBPT1 = BPDropinSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpdropinsupplyreditems WHERE timestamp BETWEEN '{data_formatada_ontem} 08:00' AND '{data_formatada_ontem} 16:30' """)
+                contadorBPSMDT1 = BPSMDSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpsmdsupplyreditems WHERE timestamp BETWEEN '{data_formatada_ontem} 08:00' AND '{data_formatada_ontem} 16:30' """)
+                contadorFAT1 = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE timestamp BETWEEN '{data_formatada_ontem} 08:00' AND '{data_formatada_ontem} 16:30' """)
+
+                print("Segundo turno",contadorBPT1)
+                contadorBPT2 = BPDropinSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpdropinsupplyreditems WHERE timestamp BETWEEN '{data_formatada_ontem} 16:30' AND '{data_formatada_atual} 01:00' """)
+                contadorBPSMDT2 = BPSMDSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpsmdsupplyreditems WHERE timestamp BETWEEN '{data_formatada_ontem} 16:30' AND '{data_formatada_atual} 01:00' """)
+                contadorFAT2 = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE timestamp BETWEEN '{data_formatada_ontem} 16:30' AND '{data_formatada_atual} 01:00' """)
+
+                print("Terceiro turno",contadorBPT2)
+                contadorBPT3 = BPDropinSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpdropinsupplyreditems WHERE timestamp BETWEEN '{data_formatada_ontem}  01:00' AND '{data_formatada_ontem} 08:00' """)
+                contadorBPSMDT3 = BPSMDSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpsmdsupplyreditems WHERE timestamp BETWEEN '{data_formatada_ontem}  01:00' AND '{data_formatada_ontem} 08:00' """)
+                contadorFAT3 = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE timestamp BETWEEN '{data_formatada_ontem}  01:00' AND '{data_formatada_ontem} 08:00' """)
+                table += (
+                    '<tr><td style="padding:0 15px 0 15px;">'
+                + "FA Supply"
+                + '</td><td style="padding:0 15px 0 15px;">'
+                + str(len(contadorFAT1)) # site
+                + '</td><td style="padding:0 15px 0 15px;">'
+                + str(len(contadorFAT2)) # due_date
+                + '</td><td style="padding:0 15px 0 15px;">'
+                + str(len(contadorFAT3)) # item_number
+                + '</td>'
+                + "</td></tr>"
+                )
+
+                table += (
+                    '<tr><td style="padding:0 15px 0 15px;">'
+                + "BPDropin Supply"
+                + '</td><td style="padding:0 15px 0 15px;">'
+                + str(len(contadorBPT1)) # site
+                + '</td><td style="padding:0 15px 0 15px;">'
+                + str(len(contadorBPT2)) # due_date
+                + '</td><td style="padding:0 15px 0 15px;">'
+                + str(len(contadorBPT3)) # item_number
+                + '</td>'
+                + "</td></tr>"
+                )
+
+                table += (
+                    '<tr><td style="padding:0 15px 0 15px;">'
+                + "BPSMD Supply"
+                + '</td><td style="padding:0 15px 0 15px;">'
+                + str(len(contadorBPSMDT1)) # site
+                + '</td><td style="padding:0 15px 0 15px;">'
+                + str(len(contadorBPSMDT2)) # due_date
+                + '</td><td style="padding:0 15px 0 15px;">'
+                + str(len(contadorBPSMDT3)) # item_number
+                + '</td>'
+                + "</td></tr>"
+                )
+
+                table += "</tbody></table>"
+
+                
+                subject, from_email, to = (
+                    "Receiving Supply Report: " + hoje.strftime("%d-%m-%Y"),
+                    "noreply@visteon.com",
+                    ["pmarti30@visteon.com"],
+                ) 
+                
+                msg = EmailMultiAlternatives(subject, table, from_email, to)
+                msg.attach_alternative(table, "text/html")
+                print("Mensagem a ser enviada no mail")
+                #print(2/0)
+                msg.send()
+                return JsonResponse({"message": "OK"})
+        
+    return JsonResponse({"message": "OK"})
+    return redirect("crossdocking:configurationsEmailDiario")
+
+#verrsão sem excel
+def sendRelatorioDiarioSupply(request = None): 
+    print("entrou no sendRelatorioDiario")
+    import datetime
+    """  ["pmarti30@visteon.com",'npires2@visteon.com',
+                     'abrandao@visteon.com','sanasta1@visteon.com',
+                    'rsalgue2@visteon.com', 'nlopes8@visteon.com',
+                    'abilro1@visteon.com', 'jrodri80@visteon.com',
+                    'evenanc1@visteon.com'] """
+    #timeNow = datetime.datetime.now()
+    print("FUNC REPORT CONTADORES MNFG SUPPLY EMAIL")
+    #print("REQUEST para tirar excel", request.POST)
+
+    #acabar formatacao
+    table = """<h1>REPORT MNFG PAGES:</h1> <h2><br></br> Contadores </h2></br><table class="display"><thead style="background-color: lightgray">
+    <tr><th></th>
+    <th> 1 Turno </th>
+    <th> 2 Turno </th>
+    <th> 3 Turno </th>
+    </tr></thead>
+    <tbody>"""
+    hoje = datetime.datetime.now()
+    """ hoje = datetime.datetime.now()
+    data_formatada = hoje.strftime('%m/%d/%Y')
+    dia_seguinte = hoje + timedelta(days=1)
+    data_seguinte_formatada = dia_seguinte.strftime('%m/%d/%Y')
+    dia_anterior = hoje - timedelta(days=1)
+    data_anterior_formatada = dia_anterior.strftime('%m/%d/%Y') """
+    try:
+       
+        if request.POST["data_report"]:
+        #if len(request) > 0:
+            data_report = request.POST["data_report"]
+            data_obj = datetime.datetime.strptime(data_report, "%d/%m/%Y")
+            data_str = data_obj.strftime("%m/%d/%Y")
+            dia_seguinte_obj = data_obj + datetime.timedelta(days=1)
+            dia_seguinte_str = dia_seguinte_obj.strftime("%m/%d/%Y")
+            dia_anterior = data_obj - datetime.timedelta(days=1)
+            data_anterior_formatada = dia_anterior.strftime("%m/%d/%Y")
+
+            print("Primeiro turno")
+            contadorBPT1 = BPDropinSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpdropinsupplyreditems WHERE timestamp BETWEEN '{data_str} 08:00' AND '{data_str} 16:30' """)
+            contadorBPSMDT1 = BPSMDSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpsmdsupplyreditems WHERE timestamp BETWEEN '{data_str} 08:00' AND '{data_str} 16:30' """)
+            contadorFAT1 = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE timestamp BETWEEN '{data_str} 08:00' AND '{data_str} 16:30' """)
+
+            print("Segundo turno")
+            contadorBPT2 = BPDropinSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpdropinsupplyreditems WHERE timestamp BETWEEN '{data_str} 16:30' AND '{dia_seguinte_str} 01:00"' """)
+            contadorBPSMDT2 = BPSMDSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpsmdsupplyreditems WHERE timestamp BETWEEN '{data_str} 16:30' AND '{dia_seguinte_str} 01:00"' """)
+            contadorFAT2 = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE timestamp BETWEEN '{data_str} 16:30' AND '{dia_seguinte_str} 01:00"' """)
+
+            contadorBPT3 = BPDropinSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpdropinsupplyreditems WHERE timestamp BETWEEN '{data_str}  01:00' AND '{data_str} 08:00' """)
+            contadorBPSMDT3 = BPSMDSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpsmdsupplyreditems WHERE timestamp BETWEEN '{data_str}  01:00' AND '{data_str} 08:00' """)
+            contadorFAT3 = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE timestamp BETWEEN '{data_str}  01:00' AND '{data_str} 08:00' """)
+            print("Terceiro turno",request.POST["data_report"], "|", contadorFAT3)
+        
+        else:
+            #Se nao houver request
+            print("não ha request")
+            data_report = request.POST["data_report"]
+            data_obj = datetime.datetime.strptime(data_report, "%d/%m/%Y")
+            data_str = data_obj.strftime("%m/%d/%Y")
+            dia_seguinte_obj = data_obj + datetime.timedelta(days=1)
+            dia_seguinte_str = dia_seguinte_obj.strftime("%m/%d/%Y")
+            dia_anterior = data_obj - datetime.timedelta(days=1)
+            data_anterior_formatada = dia_anterior.strftime("%m/%d/%Y")
+
+            data_atual = datetime.datetime.now()
+            data_atual_str = data_atual.strftime("%m/%d/%Y")
+            dia_seguinte_obj_novo = data_atual + datetime.timedelta(days=1)
+            dia_seguinte_str_novo = dia_seguinte_obj_novo.strftime("%m/%d/%Y")
+
+            print("Primeiro turno")
+            contadorBPT1 = BPDropinSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpdropinsupplyreditems WHERE timestamp BETWEEN '{data_atual_str} 08:00' AND '{data_atual_str} 16:30' """)
+            contadorBPSMDT1 = BPSMDSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpsmdsupplyreditems WHERE timestamp BETWEEN '{data_atual_str} 08:00' AND '{data_atual_str} 16:30' """)
+            contadorFAT1 = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE timestamp BETWEEN '{data_atual_str} 08:00' AND '{data_atual_str} 16:30' """)
+
+            print("Segundo turno")
+            contadorBPT2 = BPDropinSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpdropinsupplyreditems WHERE timestamp BETWEEN '{data_atual_str} 16:30' AND '{dia_seguinte_str_novo} 01:00' """)
+            contadorBPSMDT2 = BPSMDSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpsmdsupplyreditems WHERE timestamp BETWEEN '{data_atual_str} 16:30' AND '{dia_seguinte_str_novo} 01:00' """)
+            contadorFAT2 = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE timestamp BETWEEN '{data_atual_str} 16:30' AND '{dia_seguinte_str_novo} 01:00' """)
+
+            print("Terceiro turno")
+            contadorBPT3 = BPDropinSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpdropinsupplyreditems WHERE timestamp BETWEEN '{data_atual_str}  01:00' AND '{data_atual_str} 08:00' """)
+            contadorBPSMDT3 = BPSMDSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpsmdsupplyreditems WHERE timestamp BETWEEN '{data_atual_str}  01:00' AND '{data_atual_str} 08:00' """)
+            contadorFAT3 = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE timestamp BETWEEN '{data_atual_str}  01:00' AND '{data_atual_str} 08:00' """)
+
+
+        table += (
+            '<tr><td style="padding:0 15px 0 15px;">'
+        + "FA Supply"
+        + '</td><td style="padding:0 15px 0 15px;">'
+        + str(len(contadorFAT1)) # site
+        + '</td><td style="padding:0 15px 0 15px;">'
+        + str(len(contadorFAT2)) # due_date
+        + '</td><td style="padding:0 15px 0 15px;">'
+        + str(len(contadorFAT3)) # item_number
+        + '</td>'
+        + "</td></tr>"
+        )
+
+        table += (
+            '<tr><td style="padding:0 15px 0 15px;">'
+        + "BPDropin Supply"
+        + '</td><td style="padding:0 15px 0 15px;">'
+        + str(len(contadorBPT1)) # site
+        + '</td><td style="padding:0 15px 0 15px;">'
+        + str(len(contadorBPT2)) # due_date
+        + '</td><td style="padding:0 15px 0 15px;">'
+        + str(len(contadorBPT3)) # item_number
+        + '</td>'
+        + "</td></tr>"
+        )
+
+        table += (
+            '<tr><td style="padding:0 15px 0 15px;">'
+        + "BPSMD Supply"
+        + '</td><td style="padding:0 15px 0 15px;">'
+        + str(len(contadorBPSMDT1)) # site
+        + '</td><td style="padding:0 15px 0 15px;">'
+        + str(len(contadorBPSMDT2)) # due_date
+        + '</td><td style="padding:0 15px 0 15px;">'
+        + str(len(contadorBPSMDT3)) # item_number
+        + '</td>'
+        + "</td></tr>"
+        )
+
+        table += "</tbody></table>"
+
+        
+        subject, from_email, to = (
+            "Receiving Supply Report: " + hoje.strftime("%d-%m-%Y"),
+            "noreply@visteon.com",
+            ["pmarti30@visteon.com"],
+        ) 
+        
+        msg = EmailMultiAlternatives(subject, table, from_email, to)
+        msg.attach_alternative(table, "text/html")
+        #print("Mensagem a ser enviada no mail", nextDay.strftime("%d-%m-%Y"))
+        print(2/0)
+        msg.send()
+        return JsonResponse({"message": "OK"})
+    except:
+        #se nao for possivel enviar a informacao por email ele cria um excel e faz download
+        # data_report = request.POST["data_report"]
+        # data_obj = datetime.strptime(data_report, "%d/%m/%Y")
+        # dia_seguinte_obj = data_obj + timedelta(days=1)
+        # dia_seguinte_str = dia_seguinte_obj.strftime("%d/%m/%Y")
+            try:
+                data_report = request.POST["data_report"]
+                data_obj = datetime.datetime.strptime(data_report, "%d/%m/%Y")
+                dia_seguinte_obj = data_obj + datetime.timedelta(days=1)
+                dia_seguinte_str = dia_seguinte_obj.strftime("%d/%m/%Y")
+
+                data_report = request.POST["data_report"]
+                data_obj = datetime.datetime.strptime(data_report, "%d/%m/%Y")
+                data_str = data_obj.strftime("%d/%m/%Y")
+
+                print("Primeiro turno")
+                contadorBPT1 = BPDropinSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpdropinsupplyreditems WHERE timestamp BETWEEN '{data_str} 08:00' AND '{data_str} 16:30' """)
+                contadorBPSMDT1 = BPSMDSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpsmdsupplyreditems WHERE timestamp BETWEEN '{data_str} 08:00' AND '{data_str} 16:30' """)
+                contadorFAT1 = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE timestamp BETWEEN '{data_str} 08:00' AND '{data_str} 16:30' """)
+
+                print("Segundo turno")
+                contadorBPT2 = BPDropinSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpdropinsupplyreditems WHERE timestamp BETWEEN '{data_str} 16:30' AND '{dia_seguinte_str} 01:00' """)
+                contadorBPSMDT2 = BPSMDSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpsmdsupplyreditems WHERE timestamp BETWEEN '{data_str} 16:30' AND '{dia_seguinte_str} 01:00' """)
+                contadorFAT2 = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE timestamp BETWEEN '{data_str} 16:30' AND '{dia_seguinte_str} 01:00' """)
+
+                print("Terceiro turno", contadorBPT3, "|", data_obj)
+                contadorBPT3 = BPDropinSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpdropinsupplyreditems WHERE timestamp BETWEEN '{data_str}  01:00' AND '{data_str} 08:00' """)
+                contadorBPSMDT3 = BPSMDSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpsmdsupplyreditems WHERE timestamp BETWEEN '{data_str}  01:00' AND '{data_str} 08:00' """)
+                contadorFAT3 = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE timestamp BETWEEN '{data_str}  01:00' AND '{data_str} 08:00' """)
+                # nome do file workbookReportMNFG
+                style = easyxf('pattern: pattern solid, fore_colour red;')
+                wbProduction = Workbook()
+                sheetProduction = wbProduction.add_sheet("Sheet 1")
+                row = 0
+                col = 0
+                
+                sheetProduction.write(row, col, "Vermelhos MNFG",style)
+                sheetProduction.write(row, col + 1, "")
+                sheetProduction.write(row, col + 2, "")
+                sheetProduction.write(row, col + 3, "")
+                
+                row += 1
+
+                sheetProduction.write(row, col, "")
+                sheetProduction.write(row, col + 1, "Turno 1")
+                sheetProduction.write(row, col + 2, "Turno 2")
+                sheetProduction.write(row, col + 3, "Turno 4")
+
+                row += 1
+
+                sheetProduction.write(row, col,"FA")
+                sheetProduction.write(row, col + 1,len(contadorFAT1))
+                sheetProduction.write(row, col + 2,len(contadorFAT2))
+                sheetProduction.write(row, col + 3,len(contadorFAT3))
+
+                row += 1
+
+                sheetProduction.write(row, col , "BPSMD")
+                sheetProduction.write(row, col + 1,len(contadorBPSMDT1))
+                sheetProduction.write(row, col + 2,len(contadorBPSMDT2))
+                sheetProduction.write(row, col + 3,len(contadorBPSMDT3))
+
+                row += 1
+
+                sheetProduction.write(row, col , "BPDropin")
+                sheetProduction.write(row, col + 1,len(contadorBPT1))
+                sheetProduction.write(row, col + 2,len(contadorBPT2))
+                sheetProduction.write(row, col + 3,len(contadorBPT3))
+
+                wbProduction.save("..\\visteon\\media\\receiving\\MNFG\\workbookReportMNFG.xls")
+                return JsonResponse({"message": "Excel"})
+            except:
+                data_atual = datetime.datetime.now()
+                data_formatada_atual = data_atual.strftime("%m/%d/%Y")
+
+                data_ontem = data_atual - datetime.timedelta(days=1)
+                data_formatada_ontem = data_ontem.strftime("%m/%d/%Y")
+
+                print("Primeiro turno",data_formatada_atual,data_formatada_ontem)
+
+                contadorBPT1 = BPDropinSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpdropinsupplyreditems WHERE timestamp BETWEEN '{data_formatada_ontem} 08:00' AND '{data_formatada_ontem} 16:30' """)
+                contadorBPSMDT1 = BPSMDSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpsmdsupplyreditems WHERE timestamp BETWEEN '{data_formatada_ontem} 08:00' AND '{data_formatada_ontem} 16:30' """)
+                contadorFAT1 = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE timestamp BETWEEN '{data_formatada_ontem} 08:00' AND '{data_formatada_ontem} 16:30' """)
+
+                print("Segundo turno",contadorBPT1)
+                contadorBPT2 = BPDropinSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpdropinsupplyreditems WHERE timestamp BETWEEN '{data_formatada_ontem} 16:30' AND '{data_formatada_atual} 01:00' """)
+                contadorBPSMDT2 = BPSMDSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpsmdsupplyreditems WHERE timestamp BETWEEN '{data_formatada_ontem} 16:30' AND '{data_formatada_atual} 01:00' """)
+                contadorFAT2 = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE timestamp BETWEEN '{data_formatada_ontem} 16:30' AND '{data_formatada_atual} 01:00' """)
+
+                print("Terceiro turno",contadorBPT2)
+                contadorBPT3 = BPDropinSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpdropinsupplyreditems WHERE timestamp BETWEEN '{data_formatada_ontem}  01:00' AND '{data_formatada_ontem} 08:00' """)
+                contadorBPSMDT3 = BPSMDSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpsmdsupplyreditems WHERE timestamp BETWEEN '{data_formatada_ontem}  01:00' AND '{data_formatada_ontem} 08:00' """)
+                contadorFAT3 = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE timestamp BETWEEN '{data_formatada_ontem}  01:00' AND '{data_formatada_ontem} 08:00' """)
+                table += (
+                    '<tr><td style="padding:0 15px 0 15px;">'
+                + "FA Supply"
+                + '</td><td style="padding:0 15px 0 15px;">'
+                + str(len(contadorFAT1)) # site
+                + '</td><td style="padding:0 15px 0 15px;">'
+                + str(len(contadorFAT2)) # due_date
+                + '</td><td style="padding:0 15px 0 15px;">'
+                + str(len(contadorFAT3)) # item_number
+                + '</td>'
+                + "</td></tr>"
+                )
+
+                table += (
+                    '<tr><td style="padding:0 15px 0 15px;">'
+                + "BPDropin Supply"
+                + '</td><td style="padding:0 15px 0 15px;">'
+                + str(len(contadorBPT1)) # site
+                + '</td><td style="padding:0 15px 0 15px;">'
+                + str(len(contadorBPT2)) # due_date
+                + '</td><td style="padding:0 15px 0 15px;">'
+                + str(len(contadorBPT3)) # item_number
+                + '</td>'
+                + "</td></tr>"
+                )
+
+                table += (
+                    '<tr><td style="padding:0 15px 0 15px;">'
+                + "BPSMD Supply"
+                + '</td><td style="padding:0 15px 0 15px;">'
+                + str(len(contadorBPSMDT1)) # site
+                + '</td><td style="padding:0 15px 0 15px;">'
+                + str(len(contadorBPSMDT2)) # due_date
+                + '</td><td style="padding:0 15px 0 15px;">'
+                + str(len(contadorBPSMDT3)) # item_number
+                + '</td>'
+                + "</td></tr>"
+                )
+
+                table += "</tbody></table>"
+
+                
+                subject, from_email, to = (
+                    "Receiving Supply Report: " + hoje.strftime("%d-%m-%Y"),
+                    "noreply@visteon.com",
+                    ["pmarti30@visteon.com"],
+                ) 
+                
+                msg = EmailMultiAlternatives(subject, table, from_email, to)
+                msg.attach_alternative(table, "text/html")
+                print("Mensagem a ser enviada no mail")
+                #print(2/0)
+                msg.send()
+                return JsonResponse({"message": "OK"})
+        
+    return JsonResponse({"message": "OK"})
+    return redirect("crossdocking:configurationsEmailDiario")
+
+
+
+def adiciona_val_vermelhos_automatico_Supply(*var):
+    from datetime import datetime, timedelta
+    dia = date.today() - timedelta(days=10)
+    dadosQAD = WtskMstr.objects.filter(
+        wtsk_create_date__gt=dia.strftime("%Y-%m-%d")
+    ).exclude(wtsk_to_loc="kardex")
+    area_b = AreaB.objects.all()
+    area_a = AreaA.objects.all()
+    kardex = Kardex.objects.all()
+     
+    MNFGSupplyItems.objects.all().delete()
+    for i in dadosQAD:
+        now = datetime.now()
+        hora_str = i.wtsk_create_time
+        hora_atual = now.strftime("%H%M%S")
+        data_str = i.wtsk_create_date
+        dataQad = datetime.strptime(str(data_str), '%Y-%m-%d %H:%M:%S')
+
+        data_atual = datetime.now()
+        data_atual_formatada = data_atual.strftime("%Y-%m-%d 00:00:00")
+
+        fa_supply_red_items = FASupplyRedItems.objects.filter(taskID = i.wtsk_event_id)
+        bpDropin_supply_red_items = BPDropinSupplyRedItems.objects.filter(taskID = i.wtsk_event_id)
+        bpSmd_supply_red_items = BPSMDSupplyRedItems.objects.filter(taskID = i.wtsk_event_id)
+        
+        MNFGSupplyItems(
+            wtsk_id = i.wtsk_id,
+            wtsk_event_id = i.wtsk_event_id,
+            wtsk_wave_id = i.wtsk_wave_id,
+            wtsk_task_type = i.wtsk_task_type,
+            wtsk_from_part = i.wtsk_from_part,
+            wtsk_from_stor_zone = i.wtsk_from_stor_zone,
+            wtsk_to_loc = i.wtsk_to_loc,
+            wtsk_qty_exp = i.wtsk_qty_exp,
+            wtsk_create_date = i.wtsk_create_date,
+            wtsk_create_time = i.wtsk_create_time,
+            timestamp = now.strftime("%m/%d/%Y %H:%M"),  #%Y/%m/%d %H:%M"
+        ).save()
+        print("GUARDOU NOVO MNFG")
+    
+        """ AREA A """
+        try:
+            #print(2/0)
+            for faItems in area_b:
+
+                if i.wtsk_from_stor_zone == faItems.storageZone:
+                    try: 
+                        FASupplyRedItems.objects.get(taskID = i.wtsk_id)
+                        
+                    except:
+                        hora_atual = now.strftime("%H%M%S")
+                        a = i.wtsk_create_time
+                        b = str(now.strftime("%H%M%S"))
+                        time_a = datetime.strptime(a, "%H%M%S").time()
+                        time_b = datetime.strptime(b, "%H%M%S").time()
+                        if (datetime.combine(datetime.min, time_b) - datetime.combine(datetime.min, time_a)).total_seconds() > 7200 or  str(dataQad) != str(data_atual_formatada):
+                            print("é para adicionar faItems")
+                            FASupplyRedItems(
+                        taskID = i.wtsk_id,
+                        waveID = i.wtsk_wave_id,
+                        taskType = i.wtsk_task_type,
+                        fromPart = i.wtsk_from_part,
+                        fromStorageZone = i.wtsk_from_stor_zone,
+                        toLocation = i.wtsk_to_loc,
+                        wtsk_create_time = i.wtsk_from_stor_zone,
+                        createdDate = i.wtsk_create_date,
+                        createdTime = i.wtsk_create_time,
+                        timestamp = now.strftime("%m/%d/%Y %H:%M"),  #%Y/%m/%d %H:%M"
+                    ).save()
+                    print("NOVO RED FA")
+                            
+        except Exception as e:
+            print("DEU ERRO NO FA",str(e))
+            
+            #HistoricoErros.objects.all().delete()
+            val = HistoricoErros(timestamp=datetime.now().strftime("%Y-%m-%d %H:%M:%S"), pagina ="MNFG", erro = "Funcao não conseguiu guardar nenhum valor FA").save()
+            break
+            #Esta tabela serve apenas para guardar historico de erros, esta pensada para servir todas as paginas do projeto
+            """ AREA B """
+
+        try :
+            for bpDropItems in area_a:
+                if i.wtsk_from_stor_zone == bpDropItems.storageZone:
+                    try: 
+                        BPDropinSupplyRedItems.objects.get(taskID = i.wtsk_id) 
+                        
+                    except:
+                        hora_atual = now.strftime("%H%M%S")
+                        a = i.wtsk_create_time
+                        b = str(now.strftime("%H%M%S"))
+                        time_a = datetime.strptime(a, "%H%M%S").time()
+                        time_b = datetime.strptime(b, "%H%M%S").time()  
+                        if (datetime.combine(datetime.min, time_b) - datetime.combine(datetime.min, time_a)).total_seconds() > 7200 or  str(dataQad) != str(data_atual_formatada):
+                            bpDropin_supply_red_items = BPDropinSupplyRedItems(
+                        taskID = i.wtsk_id,
+                        waveID = i.wtsk_wave_id,
+                        taskType = i.wtsk_task_type,
+                        fromPart = i.wtsk_from_part,
+                        fromStorageZone = i.wtsk_from_stor_zone,
+                        toLocation = i.wtsk_to_loc,
+                        createdDate = i.wtsk_create_date,
+                        createdTime = i.wtsk_create_time,
+                        timestamp = now.strftime("%m/%d/%Y %H:%M"), 
+                    ).save()
+                    print("NOVO RED BPDROPIN")
+        except:
+            val = HistoricoErros(timestamp=datetime.now().strftime("%Y-%m-%d %H:%M:%S"), pagina ="MNFG", erro = "Funcao não conseguiu guardar nenhum valor MNFG").save()
+            break
+        
+            """ AREA KARDEX """
+        try:
+            for kardexItems in kardex:
+                if i.wtsk_from_stor_zone == kardexItems.storageZone:
+
+                    try: 
+                         
+
+                        BPSMDSupplyRedItems.objects.get(taskID = i.wtsk_id)
+                        #print("entrou no BPSMDSupplyRedItems")
+                    except:
+                        hora_atual = now.strftime("%H%M%S")
+                        a = i.wtsk_create_time
+                        b = str(now.strftime("%H%M%S"))
+                        #print("entrou no try2")
+                        time_a = datetime.strptime(a, "%H%M%S").time()
+                        time_b = datetime.strptime(b, "%H%M%S").time()
+                        if (datetime.combine(datetime.min, time_b) - datetime.combine(datetime.min, time_a)).total_seconds() > 7200 or  str(dataQad) != str(data_atual_formatada):
+                            print("Guardou no BPSMDSupplyRedItems")
+                            BPSMDSupplyRedItems(
+                        taskID = i.wtsk_id,
+                        waveID = i.wtsk_wave_id,
+                        taskType = i.wtsk_task_type,
+                        fromPart = i.wtsk_from_part,
+                        fromStorageZone = i.wtsk_from_stor_zone,
+                        toLocation = i.wtsk_to_loc,
+                        createdDate = i.wtsk_create_date,
+                        createdTime = i.wtsk_create_time,
+                        timestamp = now.strftime("%m/%d/%Y %H:%M")
+                    ).save()
+                    print("NOVO RED BPSMD")
+        except:
+            val = HistoricoErros(timestamp=datetime.now().strftime("%Y-%m-%d %H:%M:%S"), pagina ="MNFG", erro = "Funcao não conseguiu guardar nenhum valor BPSMD").save()
+            break
+    return JsonResponse({"message": "OK"})
+
+
+
+#deixa de ser usado
+def adiciona_val_para_mediaSupply(request):
+    import datetime
+    #receiving_fasupplyreditems / receiving_bpsmdsupplyreditems / receiving_bpdropinsupplyreditems
+    #print("ENTROU--> ",request.POST)
+
+    if request.POST["table"] == "receiving_fasupplyreditems":
+        fa_supply_red_items = FASupplyRedItems.objects.filter(taskID = request.POST["task_id"])
+        if  fa_supply_red_items:
+            print("FaSupply REPETIDO")
+        else:
+            print("emNFG_supply_red_items Não está empty")
+            fa_supply_red_items = FASupplyRedItems(
+                taskID = request.POST["task_id"],
+                waveID = request.POST["wave_id"],
+                taskType = request.POST["task_type"],
+                fromPart = request.POST["from_part"],
+                fromStorageZone = request.POST["from_storage_zone"],
+                toLocation = request.POST["to_location"],
+                #quantity_expected = request.POST["qty_expected"],
+                createdDate = request.POST["created_date"],
+                createdTime = request.POST["created_time"],
+                timestamp = datetime.datetime.now().strftime("%m/%d/%Y %H:%M"),  #%Y/%m/%d %H:%M"
+            ).save()
+            print("VAI GAURDAR NOVO mNFG")
+    elif request.POST["table"] == "receiving_bpsmdsupplyreditems":
+        bpsmd_supply_red_items = BPSMDSupplyRedItems.objects.filter(taskID = request.POST["task_id"])
+
+        if  bpsmd_supply_red_items:
+            print("BPSMDSupply REPETIDO")
+        else:
+            bpsmd_supply_red_items = BPSMDSupplyRedItems(
+                taskID = request.POST["task_id"],
+                waveID = request.POST["wave_id"],
+                taskType = request.POST["task_type"],
+                fromPart = request.POST["from_part"],
+                fromStorageZone = request.POST["from_storage_zone"],
+                toLocation = request.POST["to_location"],
+                #quantity_expected = request.POST["qty_expected"], 
+                createdDate = request.POST["created_date"],
+                createdTime = request.POST["created_time"], 
+                timestamp = datetime.datetime.now().strftime("%m/%d/%Y %H:%M")
+            ).save()
+            print("Guardou BPSMDSupply")
+    else:
+        bpDropin_supply_items = BPDropinSupplyRedItems.objects.filter(taskID = request.POST["task_id"])
+        if  bpDropin_supply_items:
+            print("BPDropinSupplyRedItems Repetido")
+        
+        else:
+            print("emNFG_supply_red_items Não está empty")
+            bpDropin_supply_red_items = BPDropinSupplyRedItems(
+                taskID = request.POST["task_id"],
+                waveID = request.POST["wave_id"],
+                taskType = request.POST["task_type"],
+                fromPart = request.POST["from_part"],
+                fromStorageZone = request.POST["from_storage_zone"],
+                toLocation = request.POST["to_location"],
+                #quantity_expected = request.POST["qty_expected"],
+                createdDate = request.POST["created_date"],
+                createdTime = request.POST["created_time"],
+                timestamp = datetime.datetime.now().strftime("%m/%d/%Y %H:%M"), 
+            ).save()
+            print("VAI GAURDAR NOVO BPDropinSupplyRedItems")
+    return JsonResponse({"message": "OK"})
+
+
+
+#não vai ser usado
+def adiciona_val_mediaBPSMDSupply(request):
+    import datetime
+    contador = 0
+    contadorNovo = 0
+    
+    
+    bpsmd_supply_red_items = BPSMDSupplyRedItems.objects.filter(taskID = request.POST["task_id"])
+
+    data_de_hoje = f"{datetime.datetime.now().date()}" 
+
+    if  bpsmd_supply_red_items:
+        print("Já tem esta linha")
+        #se tiver algo lá dentro corre este bloc        
+    else:
+        BPSMDSupplyRedItems(
+            taskID = request.POST["task_id"],
+            waveID = request.POST["wave_id"],
+            taskType = request.POST["task_type"],
+            fromPart = request.POST["from_part"],
+            fromStorageZone = request.POST["from_storage_zone"],
+            toLocation = request.POST["to_location"],
+            #quantity_expected = request.POST["qty_expected"], 
+            createdDate = request.POST["created_date"],
+            createdTime = request.POST["created_time"], 
+            timestamp = datetime.datetime.now().strftime("%m/%d/%Y %H:%M")
+        ).save()
+        
+       
+    print("Fim da itera")
+    return JsonResponse({"message": "OK"})
+
+
+
+#não vai ser usado
+def adiciona_val_mediaBPDropinSupply(request):
+    import datetime
+    mNFG_supply_red_items = BPDropinSupplyRedItems.objects.filter(taskID = request.POST["task_id"])
+
+      
+    if  mNFG_supply_red_items:
+        print("Já tem esta linha lá dentro, não vai fazer nada")
+      
+    else:
+        print("emNFG_supply_red_items Não está empty")
+        mNFG_supply_red_items = BPDropinSupplyRedItems(
+            taskID = request.POST["task_id"],
+            waveID = request.POST["wave_id"],
+            taskType = request.POST["task_type"],
+            fromPart = request.POST["from_part"],
+            fromStorageZone = request.POST["from_storage_zone"],
+            toLocation = request.POST["to_location"],
+            #quantity_expected = request.POST["qty_expected"],
+            createdDate = request.POST["created_date"],
+            createdTime = request.POST["created_time"],
+            timestamp = datetime.datetime.now().strftime("%m/%d/%Y %H:%M"), 
+        )
+        print("VAI GAURDAR NOVO mNFG")
+
+        mNFG_supply_red_items.save()
+
+    return JsonResponse({"message": "OK"})
+
+
+#não vai ser usado
+def media_Supply_Fa(request):
+    #aqui tens de receber duas datas 
+    import calendar
+    import datetime
+    #mNFG_supply_red_items = MNFGSupplyRedItems.objects.raw(f"""SELECT COUNT(*) FROM shippers_MNFGSupplyRedItems WHERE timestamp BETWEEN  '{request.POST["month"]}' AND '{request.POST["month"]}'""")
+    #em cima são retornados o numero de vermelhos ocorridos num determinado mês
+    print("REQ -->", request.POST)
+ 
+    start_date = datetime.datetime.strptime(request.POST["start_date"].replace("-", "/"), '%m/%d/%Y, %I:%M:%S %p')
+    start_date_formatted = start_date.strftime('%m/%d/%Y').replace('/', '/')
+
+    end_date = datetime.datetime.strptime(request.POST["end_date"].replace("-", "/"), '%m/%d/%Y, %I:%M:%S %p')
+    end_date_formatted = end_date.strftime('%m/%d/%Y').replace('/', '/')
+ 
+    print("Datas -->",request.POST["start_date"] ,start_date )
+    resultados = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE receiving_fasupplyreditems.timestamp BETWEEN '{start_date_formatted}' AND '{end_date_formatted}' """)
+   
+
+
+    contador = len(list(resultados)) #SELECT * FROM receiving_fasupplyreditems WHERE receiving_fasupplyreditems.timestamp BETWEEN '2/1/2023, 12:00:00 PM' AND '2/28/2023, 12:00:00 PM'
+    print("RESULT QUERY-->", len(resultados),resultados)
+    
+    difference = end_date - start_date
+    number_of_days = difference.days
+    media = contador / number_of_days 
+    print("Num Dias -->", number_of_days, "|MEDIA->", round(media,2), "|Contador->",contador)
+
+    return JsonResponse({"message": "OK", "media" : round(media,2)})
+
+#não vai ser usado
+def media_bp_Dropin_Supply(request):
+    #aqui tens de receber duas datas 
+    import calendar
+    import datetime
+    #mNFG_supply_red_items = MNFGSupplyRedItems.objects.raw(f"""SELECT COUNT(*) FROM shippers_MNFGSupplyRedItems WHERE timestamp BETWEEN  '{request.POST["month"]}' AND '{request.POST["month"]}'""")
+    #em cima são retornados o numero de vermelhos ocorridos num determinado mês
+    start_date = datetime.datetime.strptime(request.POST["start_date"].replace("-", "/"), '%m/%d/%Y, %I:%M:%S %p')
+    start_date_formatted = start_date.strftime('%m/%d/%Y').replace('/', '/')
+
+    end_date = datetime.datetime.strptime(request.POST["end_date"].replace("-", "/"), '%m/%d/%Y, %I:%M:%S %p')
+    end_date_formatted = end_date.strftime('%m/%d/%Y').replace('/', '/')
+ 
+
+    resultados = BPDropinSupplyRedItems.objects.raw(f"""SELECT id FROM receiving_bpdropinsupplyreditems WHERE timestamp BETWEEN '{start_date_formatted}' AND '{end_date_formatted}' """)
+    contador = len(list(resultados))
+    
+    difference = end_date - start_date
+    number_of_days = difference.days
+    media = contador / number_of_days 
+    print("Num Dias -->", number_of_days, "|MEDIA->", round(media,2), "|Contador->",contador)
+
+    return JsonResponse({"message": "OK", "media" : round(media,2)})
+
+
+#não vai ser usado
+def media_bpsmdSupply(request):
+    #aqui tens de receber duas datas 
+    import calendar
+    import datetime
+     
+    print("REQ -->", request.POST)
+
+    start_date = datetime.datetime.strptime(request.POST["start_date"].replace("-", "/"), '%m/%d/%Y, %I:%M:%S %p')
+    start_date_formatted = start_date.strftime('%m/%d/%Y').replace('/', '/')
+
+    end_date = datetime.datetime.strptime(request.POST["end_date"].replace("-", "/"), '%m/%d/%Y, %I:%M:%S %p')
+    end_date_formatted = end_date.strftime('%m/%d/%Y').replace('/', '/')
+
+    resultados = BPSMDSupplyRedItems.objects.raw(f"""SELECT * from receiving_bpsmdsupplyreditems WHERE timestamp BETWEEN '{start_date_formatted}' AND '{end_date_formatted}' """)
+
+    contador = len(list(resultados))
+        
+    difference = end_date - start_date
+    number_of_days = difference.days
+    media = contador / number_of_days 
+    print("Num Dias -->", number_of_days, "|MEDIA->", media, "|Contador->",contador)
+
+    return JsonResponse({"message": "OK", "media" : round(media,2)})
+    
+    
+def count_days_in_range(start_date, end_date):
+    start = date(*[int(x) for x in start_date.split('-')])
+    end = date(*[int(x) for x in end_date.split('-')])
+    return (end - start).days + 1
+
+def mediaTurnosEcontadores(request):
+    import datetime
+    print(request.POST," (/&/) ", datetime.datetime.strptime(request.POST["start_date"].replace("-", "/"), '%m/%d/%Y, %H:%M:%S %p'))#ver o que dá quando selecionas apenas um dia
+    start_date = datetime.datetime.strptime(request.POST["start_date"].replace("-", "/"), '%m/%d/%Y, %H:%M:%S %p')
+    start_date2 = datetime.datetime.strptime(request.POST["start_date"].replace("-", "/"), '%m/%d/%Y, %H:%M:%S %p')
+    start_date_formatted = start_date.strftime('%m/%d/%Y').replace('/', '/')
+    end_date = datetime.datetime.strptime(request.POST["end_date"].replace("-", "/"), '%m/%d/%Y, %H:%M:%S %p')
+    end_date2 = datetime.datetime.strptime(request.POST["end_date"].replace("-", "/"), '%m/%d/%Y, %H:%M:%S %p')
+    end_date_formatted = end_date.strftime('%m/%d/%Y').replace('/', '/')
+    end_date_nextDay = datetime.datetime.strptime(request.POST["end_date"].replace("-", "/"), '%m/%d/%Y, %H:%M:%S %p') +  datetime.timedelta(days=1) 
+    days = []
+
+    if request.POST["start_date"] == request.POST["end_date"] == "":
+        days.append(start_date.date().strftime('%m/%d/%Y')) #precisas do dia seguinte para o segundo turno
+    else:
+        while start_date <= end_date:
+            days.append(start_date.date().strftime('%m/%d/%Y'))
+            start_date += datetime.timedelta(days=1)
+    days.append(end_date_nextDay.strftime("%m/%d/%Y"))
+
+    listaFaT1 = 0
+    listaFaT2 = 0
+    listaFaT3 = 0
+
+    listaBPDropinT1 = 0
+    listaBPDropinT2 = 0
+    listaBPDropinT3 = 0
+
+    listaBPSMDT1 = 0
+    listaBPSMDT2 = 0
+    listaBPSMDT3 = 0
+    for i in range(len(days)-1):
+        
+      
+        resultadosBPSMDT1 = BPSMDSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpsmdsupplyreditems WHERE timestamp BETWEEN '{days[i]} 08:00' AND '{days[i]} 16:30' """)
+        resultadosBPSMDT2 = BPSMDSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpsmdsupplyreditems WHERE timestamp BETWEEN '{days[i]} 16:30' AND '{days[i+1]} 01:00' """)
+        resultadosBPSMDT3 = BPSMDSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpsmdsupplyreditems WHERE timestamp BETWEEN '{days[i]} 01:00' AND '{days[i]} 08:00' """)
+
+        resultadosFAT1 = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE timestamp BETWEEN '{days[i]} 08:00' AND '{ days[i]} 16:30' """)
+        resultadosFAT2 = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE timestamp BETWEEN '{days[i]} 16:30' AND '{days[i+1]} 01:00' """)
+        resultadosFAT3 = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE timestamp BETWEEN '{ days[i]} 01:00' AND '{ days[i]} 08:00' """)
+
+        resultadosBPDropinT1 = BPDropinSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpdropinsupplyreditems WHERE timestamp BETWEEN '{days[i]} 08:00' AND '{days[i]} 16:30' """)
+        resultadosBPDropinT2 = BPDropinSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpdropinsupplyreditems WHERE timestamp BETWEEN '{days[i]} 16:30' AND '{days[i+1]} 01:00' """)
+        resultadosBPDropinT3 = BPDropinSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpdropinsupplyreditems WHERE timestamp BETWEEN '{days[i]} 01:00' AND '{days[i]} 08:00' """)
+
+        listaFaT1 += len(list(resultadosFAT1)) 
+        listaFaT2 += len(list(resultadosFAT2)) 
+        listaFaT3 += len(list(resultadosFAT3)) 
+
+        listaBPDropinT1 += len(list(resultadosBPDropinT1)) 
+        listaBPDropinT2 += len(list(resultadosBPDropinT2)) 
+        listaBPDropinT3 += len(list(resultadosBPDropinT3)) 
+
+        listaBPSMDT1 += len(list(resultadosBPSMDT1))
+        listaBPSMDT2 += len(list(resultadosBPSMDT2))
+        listaBPSMDT3 += len(list(resultadosBPSMDT3))
+
+    number_of_days=1
+    difference = end_date2 - start_date2 + datetime.timedelta(days=1)
+    if difference.days <= 0:
+        number_of_days==1
+    else:
+        number_of_days = difference.days
+        
+    mediaFAT1 = listaFaT1 / number_of_days
+    mediaFAT2 = listaFaT2 / number_of_days
+    mediaFAT3 = listaFaT3 / number_of_days 
+
+    mediaBPSMDT1 = listaBPSMDT1 / number_of_days 
+    mediaBPSMDT2 = listaBPSMDT2 / number_of_days 
+    mediaBPSMDT3 = listaBPSMDT3 / number_of_days 
+
+    mediaBPDropinT1 = listaBPDropinT1 / number_of_days 
+    mediaBPDropinT2 = listaBPDropinT2 / number_of_days 
+    mediaBPDropinT3 = listaBPDropinT3 / number_of_days 
+    print("Num Dias -->", number_of_days, "|MEDIA->", mediaFAT1, "|Contador->",listaFaT1, "DIF->",difference,"|" , end_date2 , start_date2)
+
+    
+    return JsonResponse({
+        "message": "OK", 
+        #Medias
+        "mediaFAT1" : round(mediaFAT1,2),
+        "mediaFAT2" : round(mediaFAT2,2),
+        "mediaFAT3" : round(mediaFAT3,2),
+
+        "mediaBPSMDT1" : round(mediaBPSMDT1,2),
+        "mediaBPSMDT2" : round(mediaBPSMDT2,2),
+        "mediaBPSMDT3" : round(mediaBPSMDT3,2),
+
+        "mediaBPDropinT1" : round(mediaBPDropinT1,2),
+        "mediaBPDropinT2" : round(mediaBPDropinT2,2),
+        "mediaBPDropinT3" : round(mediaBPDropinT3,2),
+
+        #Contadores
+        "contadorFAT1" : listaFaT1,
+        "contadorFAT2" : listaFaT2,
+        "contadorFAT3" : listaFaT3,
+
+        "contadorBpsmdT1" : listaBPSMDT1,
+        "contadorBpsmdT2" : listaBPSMDT2,
+        "contadorBpsmdT3" : listaBPSMDT3,
+
+        "contadorBpDropT1" : listaBPDropinT1,
+        "contadorBpDropT2" : listaBPDropinT2,
+        "contadorBpDropT3" : listaBPDropinT3,
+            })
+    
+    return JsonResponse({"message": "OK", "contadorFA" : len(contadorFA), "contadorBpsmd" : len(contadorBpsmd), "contadorBpDrop" : len(contadorBpDrop)})
+
+
+
+#não vai ser usado
+def mediaTurnos(request):
+    import datetime
+    #BD tables ----> receiving_fasupplyreditems / receiving_bpsmdsupplyreditems / receiving_bpdropinsupplyreditems
+    print(request.POST)#ver o que dá quando selecionas apenas um dia
+    start_date = datetime.datetime.strptime(request.POST["start_date"].replace("-", "/"), '%m/%d/%Y, %H:%M:%S %p')
+    start_date2 = datetime.datetime.strptime(request.POST["start_date"].replace("-", "/"), '%m/%d/%Y, %H:%M:%S %p')
+    start_date_formatted = start_date.strftime('%m/%d/%Y').replace('/', '/')
+    end_date = datetime.datetime.strptime(request.POST["end_date"].replace("-", "/"), '%m/%d/%Y, %H:%M:%S %p')
+    end_date2 = datetime.datetime.strptime(request.POST["end_date"].replace("-", "/"), '%m/%d/%Y, %H:%M:%S %p')
+    end_date_formatted = end_date.strftime('%m/%d/%Y').replace('/', '/')
+    end_date_nextDay = datetime.datetime.strptime(request.POST["end_date"].replace("-", "/"), '%m/%d/%Y, %H:%M:%S %p') +  datetime.timedelta(days=1) 
+    days = []
+
+    if request.POST["start_date"] == request.POST["end_date"] == "":
+        days.append(start_date.date().strftime('%m/%d/%Y')) #precisas do dia seguinte para o segundo turno
+    else:
+        while start_date <= end_date:
+            days.append(start_date.date().strftime('%m/%d/%Y'))
+            start_date += datetime.timedelta(days=1)
+    days.append(end_date_nextDay.strftime("%m/%d/%Y"))
+
+        
+    hora_inicio=""
+    hora_fim=""
+    #este codigo não está a funcionar bem
+    listaFa = 0
+    listaBPDropin = 0
+    listaBPSMD = 0
+    print("DIAS-->",days)
+    for i in range(len(days)-1):
+        
+      
+        #print("entrou no BPSMDSupplyRedItems",hora_inicio, hora_fim)
+        if request.POST["turno"] == "1":
+            hora_inicio="08:00"
+            hora_fim="16:30"
+            resultadosBPSMD = BPSMDSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpsmdsupplyreditems WHERE timestamp BETWEEN '{days[i]} {hora_inicio}' AND '{days[i]} {hora_fim}' """)
+            resultadosFA = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE timestamp BETWEEN '{ days[i]} {hora_inicio}' AND '{ days[i]} {hora_fim}' """)
+            resultadosBPDropin = BPDropinSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpdropinsupplyreditems WHERE timestamp BETWEEN '{days[i]} {hora_inicio}' AND '{days[i]} {hora_fim}' """)
+
+        elif request.POST["turno"] == "2":
+            hora_inicio="16:30"
+            hora_fim="01:00"
+            resultadosBPSMD = BPSMDSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpsmdsupplyreditems WHERE timestamp BETWEEN '{days[i]} {hora_inicio}' AND '{days[i+1]} {hora_fim}' """)
+            resultadosBPDropin = BPDropinSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpdropinsupplyreditems WHERE timestamp BETWEEN '{days[i]} {hora_inicio}' AND '{days[i+1]} {hora_fim}' """)
+            resultadosFA = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE timestamp BETWEEN '{ days[i]} {hora_inicio}' AND '{days[i+1]} {hora_fim}' """)
+        
+        else:
+            hora_inicio="01:00"
+            hora_fim="08:00"
+            resultadosBPSMD = BPSMDSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpsmdsupplyreditems WHERE timestamp BETWEEN '{days[i]} {hora_inicio}' AND '{days[i]} {hora_fim}' """)
+            resultadosBPDropin = BPDropinSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpdropinsupplyreditems WHERE timestamp BETWEEN '{days[i]} {hora_inicio}' AND '{days[i]} {hora_fim}' """)
+            resultadosFA = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE timestamp BETWEEN '{ days[i]} {hora_inicio}' AND '{ days[i]} {hora_fim}' """)
+
+        listaFa += len(list(resultadosFA)) 
+        listaBPDropin += len(list(resultadosBPDropin)) 
+        listaBPSMD += len(list(resultadosBPSMD))
+    print("listas->",listaFa,listaBPDropin,listaBPSMD) 
+
+    contadorFA = listaFa
+    contadorBPSMD = listaBPSMD
+    contadorBPDropin = listaBPDropin
+    number_of_days=1
+    difference = end_date2 - start_date2 + datetime.timedelta(days=1)
+    if difference.days <= 0:
+        number_of_days==1
+    else:
+        number_of_days = difference.days
+    mediaFA = contadorFA / number_of_days 
+    mediaBPSMD = contadorBPSMD / number_of_days 
+    mediaBPDropin = contadorBPDropin / number_of_days 
+    print("Num Dias -->", number_of_days, "|MEDIA->", mediaBPDropin, "|Contador->",contadorBPDropin, "DIF->",difference,"|" ,difference , end_date2 , start_date2)
+
+        # elif request.POST["table"] == "receiving_bpdropinsupplyreditems":
+        #     print("entrou no BPDropinSupplyRedItems",hora_inicio, hora_fim)
+        #     if request.POST["turno"] == "1":
+        #         hora_inicio="08:00"
+        #         hora_fim="16:30"
+        #         resultados = BPDropinSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpdropinsupplyreditems WHERE timestamp BETWEEN '{days[i]} {hora_inicio}' AND '{days[i]} {hora_fim}' """)
+        #     elif request.POST["turno"] == "2":
+        #         hora_inicio="16:30"
+        #         hora_fim="01:00"
+        #         resultados = BPDropinSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpdropinsupplyreditems WHERE timestamp BETWEEN '{days[i]} {hora_inicio}' AND '{days[i+1]} {hora_fim}' """)
+        #     else:
+        #         hora_inicio="01:00"
+        #         hora_fim="08:00"
+        #         resultados = BPDropinSupplyRedItems.objects.raw(f"""SELECT * FROM receiving_bpdropinsupplyreditems WHERE timestamp BETWEEN '{days[i]} {hora_inicio}' AND '{days[i+1]} {hora_fim}' """)
+
+        #     teste += len(list(resultados)) 
+        
+        # else:
+        #     print("entrou no FASupplyRedItems",hora_inicio, hora_fim)
+        #     if request.POST["turno"] == "1":
+        #         hora_inicio="08:00"
+        #         hora_fim="16:30"
+        #         resultados = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE timestamp BETWEEN '{ days[i]} {hora_inicio}' AND '{ days[i]} {hora_fim}' """)
+        #     elif request.POST["turno"] == "2":
+        #         hora_inicio="16:30"
+        #         hora_fim="01:00"
+        #         resultados = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE timestamp BETWEEN '{ days[i]} {hora_inicio}' AND '{ days[i+1]} {hora_fim}' """)
+        #     else:
+        #         hora_inicio="01:00"
+        #         hora_fim="08:00"
+        #         resultados = FASupplyRedItems.objects.raw(f"""SELECT * FROM receiving_fasupplyreditems WHERE timestamp BETWEEN '{ days[i]} {hora_inicio}' AND '{ days[i]} {hora_fim}' """)
+
+        #     teste += len(list(resultados)) 
+        
+
+    return JsonResponse({"message": "OK", "mediaFA" : round(mediaFA,2), "mediaBPSMD" : round(mediaBPSMD,2), "mediaBPDropin" : round(mediaBPDropin,2)})
+
+
+
+
+
+
+#vai ter de ser refeita para futuras alterações, apenas guarda o resto que vem do request fas paginas fa/ bpDroping/ bpsmd
+def addCommentsToReport(request):
+    # receiving_fasupplyreditems / receiving_bpsmdsupplyreditems / receiving_bpdropinsupplyreditems
+    if request.POST["table"] == "receiving_fasupplyreditems":
+        FaSupplyReportRedItems(report = request.POST["report"], timestamp = datetime.now().strftime("%Y-%m-%d"), turno=request.POST["turno"]).save()
+    
+    elif request.POST["table"] == "receiving_bpdropinsupplyreditems":
+        BPDropinSupplyReportRedItems(report = request.POST["report"], timestamp = datetime.now().strftime("%Y-%m-%d"), turno=request.POST["turno"]).save()
+    else:
+        BPSMDSupplyReportRedItems(report = request.POST["report"], timestamp = datetime.now().strftime("%Y-%m-%d"), turno=request.POST["turno"]).save()
+
+    return JsonResponse({"message": "OK"})
+
+
+def getNOK(request):
+    #apanhar todas as pos
+    ReceivingPosicao1SubItems.items.all()
+    ReceivingPosicao2SubItems.items.all()
+    ReceivingPosicao3SubItems.items.all()
+    ReceivingPosicao4SubItems.items.all()
+    ReceivingPosicao5SubItems.items.all()
+    ReceivingPosicao6SubItems.items.all()
+    ReceivingPosicao7SubItems.items.all()
+    ReceivingPosicao8SubItems.items.all()
+    
+    #apanhar todas as pos dos subitems
+

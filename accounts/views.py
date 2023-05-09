@@ -15,13 +15,15 @@ def login(request):
         )
         if user is not None:
             auth.login(request, user)
-            return redirect("main:main")
+            next_redirect = request.POST.get("next", "main:main")
+            print(next_redirect)
+            return redirect(next_redirect)
         else:
             return render(
                 request, "accounts/login.html", {"erro": "Invalid username or password"}
             )
     else:
-        return render(request, "accounts/login.html")
+        return render(request, "accounts/login.html", { "nextRedirect": request.GET.get("next", "main:main") })
 
 
 def sign(request):

@@ -132,6 +132,7 @@
                             <option value="portariaReadOnly/tracking/security/confirmation">Portaria Read Only,
                                 Tracking, Security, Confirmation
                             </option>
+                            <option value="TrackingAdmin">Shippers Tracking</option>
                             <option value="none">Remove access to all Shipping pages</option>
                         </select>
                     </div>
@@ -143,12 +144,120 @@
             </div>
         </div>
     </form>
+    <div style="position: absolute; margin-top: -35% ;">
+        <button type="button" class="btn btn-secondary mb-3"  id="estatisticas">Temporizador Email</button>
+    </div>
+    
+
+
+    <div class="modal fade" id="modalEstatisticas" data-backdrop="false" tabindex="-1" role="dialog"
+    aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+       <div class="modal-content">
+          <div class="modal-header">
+            <!-- modal onde vai ser adicionado nova relação -->
+            <h3 class="modal-title" id="myModalLabel"><b>Definição de temporizador para email de atraso na Portaria</b></h3>
+            <input type="hidden" id="rowIdUpdate" name="rowIdUpdate" value="{{ ref.id }}">
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <table class="table table-borderless mb-n1">
+              <thead></thead>
+              <tbody>
+                <div class="form-inline">
+                <tr>
+                  <td scope="row" style="color: black;width: 1%;">
+                    <h6><b>1º Ciclo:</b></h6>
+                    </td>
+                    <td>
+                        <input value="{{ tempo1 }}" style="margin-left: 1%" type="number" min="0" name="numHoras1" id="numHoras1" />
+                      </td>
+                </tr>
+                <tr>
+                  <td><h6><b>2º Ciclo:</b></h6></td>
+                  
+                   
+                    <td><input value="{{ tempo2 }}" style="margin-left: 1%" type="number" min="0" name="numHoras2" id="numHoras2" /> </td>
+                </tr>
+              </tbody>
+            </table>
+         
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">
+              Close
+            </button>
+            <button
+              type="submit"
+              class="btn btn-primary"    
+              id="btnguardaHora"      
+            >
+              Save
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 {% endblock %}
 
 {% block javascript %}
     <script>
         $(document).ready(function () {
+       
+            $(document).on('click', '#estatisticas', function () {
+                var myModal = new bootstrap.Modal(document.getElementById('modalEstatisticas'))
+                myModal.show()  
+                console.log("ENTROU NO POPUP")
+            });
 
+            $(document).on('click', '#btnguardaHora', function () {
+                const DefaultMixinCss = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-primary',
+                    cancelButton: 'btn btn-danger'
+                },
+                buttonsStyling: false})
+
+                var numHoras1 = $("#numHoras1").val();
+                var numHoras2 = $("#numHoras2").val();
+                console.log("estas aquerer guardar",numHoras1, numHoras2)
+                var myModal = document.getElementById('modalEstatisticas')
+                
+
+                if(numHoras1 < 0 || numHoras2 < 0){
+                    DefaultMixinCss.fire({
+                title: 'All entrys must be valid minutes',
+                showCancelButton: false,
+                confirmButtonText: 'Yes',
+                })
+                     return false
+                }
+                
+
+                this.disabled= true
+                $.ajax({
+                    type: 'POST',
+                    url: '/shippers/definicaoTempoEmailAtraso/',
+                    data: {
+                        csrfmiddlewaretoken: "{{ csrf_token }}",
+                        numHoras1: $("#numHoras1").val(),
+                        numHoras2: $("#numHoras2").val()
+                    },
+                    success: function () {
+                        window.location.reload()
+                        console.log("fez o pedido com sucesso")
+                    }
+                })
+            });
+       
         })
+        
     </script>
 {% endblock %}

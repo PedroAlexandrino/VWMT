@@ -1,1 +1,9 @@
-TESTE!
+– 1 (Major) – controle de compatibilidade. Informa que existem funcionalidades/códigos incompatíveis com as versões anteriores.
+
+– 0 (Minor) – controle de funcionalidade. Informa que novas funcionalidades foram adicionadas ao código.
+
+– 0 (Patch) – controle de correção de bugs. Informa que um ou mais erros foram identificados e corrigidos.
+
+1ºturno - 8h - 16h30
+2º turno - 16h30 - 1h
+4ºturno - 1h - 8h

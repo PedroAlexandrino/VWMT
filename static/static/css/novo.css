@@ -1,0 +1,18 @@
+#novo {
+    position: relative;
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    background-size: cover !important;
+    background-color: #0c83e2;
+}
+
+#novo::before {
+    content: "";
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+    background-color: rgba(250,250,250,0.85);
+}

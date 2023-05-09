@@ -37,7 +37,7 @@
                 <th>Description</th>
                 <th style="text-align: center">Qty on Hand - WHOUT</th>
                 <th style="text-align: center">Qt</th>
-                <th style="text-align: center">Qty on Hand - not WHOUT<p style="font-size: 10px">(Not WHOUT, not QUALITY and serialized)</p></th>
+                <th style="text-align: center">Qty on Hand - not WHOUT<p style="font-size: 10px">(Not WHOUT, not QUALITY, Serialized, PLC and PWB)</p></th>
                 <th style="text-align: center">Qt</th>
                 <th class="column_left" style="text-align: center">Unit Cost</th>
                 <th style="text-align: center">Total Cost<p style="font-size: 10px">(WHOUT)</p></th>
@@ -53,11 +53,11 @@
                     <td>{{ val.descricao }}</td>
                     <td style="text-align: center">{{ val.qtyOnHand }}</td>
                     <td style="text-align: center">{{ val.serialsWHOUT }}</td>
-                    <td style="text-align: center">{{ val.qtyOnHandNotWHOUT }}</td>
+                    <td style="text-align: center">{{ val.qtyOnHandNotWHOUT }}</td> 
                     <td style="text-align: center">{{ val.serialsNotWHOUT }}</td>
                     <td class="column_left" style="text-align: center">{{ val.unitCost }}</td>
                     <td style="text-align: center">{{ val.totalCost }}</td>
-                    <td class="column_left" style="text-align: center">{{ val.consumptionValue }}</td>
+                    <td class="column_left" style="text-align: center">{{ val.consumptionValue }}</td> <!-- PAra alterar -->
                     <td style="text-align: center">{{ val.consumptionValueDiaSeguinte }}</td>
                     <td style="text-align: center">{{ val.consumptionValueDiaAposDiaSeguinte }}</td>
                 </tr>
@@ -96,6 +96,10 @@
                 </button>
             </div>
         </div>
+    </div>
+
+    <div style="position: absolute;">
+        <button type="button" class="btn btn-secondary mb-3"  id="estatisticas">Estatísticas</button>
     </div>
 {% endblock %}
 

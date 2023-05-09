@@ -8,6 +8,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import EmailMultiAlternatives
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User, Group
+from django.core.files.storage import default_storage
 
 import openpyxl
 from xlwt import Workbook
@@ -18,10 +19,16 @@ from receiving.models import (
     ICDR,
     ICDRBackup,
 )
+from django.http import (
+    HttpResponse,
+    HttpResponseBadRequest,
+    HttpResponseNotFound,
+    Http404,
+)
 from shippers.models import Gateway, GatewayBackup
 from .models import *
 from qad_ee.models import WoMstr
-
+from xlwt import Workbook
 
 @login_required()
 @user_passes_test(lambda u: u.groups.filter(name="crossdocking").exists())
@@ -31,7 +38,8 @@ def prodlineFilter(request):
     ).replace(day=15)
 
     elements = ProdlineTableHistory.objects
-    print(elements.all())
+    #elements = EmailDiarioSchedule.objects
+    #print(elements.all())
     todayItems = ProdlineTable.objects
     return render(
         request,
@@ -203,49 +211,70 @@ def updateComentShipping(request):
 
 def schedulePlanning(request):
     if request.method == "POST":
+        print("Request->", request.POST)
         prodlines = Prodlines.objects
         path = request.POST.get("textPath")
         path1 = request.POST.get("textPath1")
-        print("PATH1-> ", path1)
-        print("PATH-> ", path)
-
+        
         list = []
         # BUG func que verifica se o file é aberto com pontos ou _
-        def defineBook():
-            try:
-                workbook = openpyxl.load_workbook(path)
-                return workbook
-            except:
-                workbook = openpyxl.load_workbook(path1)
-                return workbook
-
+        workbook = EmailDiarioSchedule.objects.raw(f""" SELECT * FROM crossdocking_emaildiarioschedule WHERE due_date BETWEEN '{request.POST["requestDay"]} 00:00:00' AND '{request.POST["requestDay"]} 23:59:59' """)
+        #print("querry", workbook)
         try:
-            workbook = defineBook()
-            try:
-
-                worksheet = workbook["Schedule Data"]
-                for element in worksheet:
-                    for prod in prodlines.all():
-                        if prod.nome == element[0].value:
-                            elem = {
-                                "line": element[0].value,
-                                "site": element[1].value,
-                                "dueDate": str(element[2].value),
-                                "itemNumber": element[3].value,
-                                "description": element[4].value,
-                                "toComplete": str(element[5].value),
-                            }
-                            list.append(elem)
+            workbook = EmailDiarioSchedule.objects.raw(f""" SELECT * FROM crossdocking_emaildiarioschedule WHERE due_date BETWEEN '{request.POST["requestDay"]} 00:00:00' AND '{request.POST["requestDay"]} 23:59:59' """)
+            print("Tamanho dos dados Da BD--->", len(workbook))
+            if len(workbook) == 0:
                 todayItems = ProdlineTable.objects
                 elements = ProdlineTableHistory.objects
                 return render(
                     request,
                     "crossdocking/prodlinesFilter.html",
-                    {"dadosDia": todayItems, "lista": list, "elements": elements},
+                    {
+                        "dadosDia": todayItems,
+                        "erro5": "No Data found",
+                        "elements": elements,
+                    },
                 )
+            try:
+
+                worksheet =  EmailDiarioSchedule.objects.raw(f""" SELECT * FROM crossdocking_emaildiarioschedule WHERE due_date BETWEEN '{request.POST["requestDay"]} 00:00:00' AND '{request.POST["requestDay"]} 23:59:59' """)
+                for element in worksheet:
+                    for prod in prodlines.all():
+                        print("Tas ai",prod.nome ,"|", element.line )
+
+                        if prod.nome == element.line:
+                            print("dados->",element)
+                            elem = {
+                                "line": element.line,
+                                "site": element.site,
+                                "dueDate": str(element.due_date),
+                                "itemNumber": element.item_number,
+                                "description": element.description ,
+                                "toComplete": str(element.to_complete),
+                            }
+                            list.append(elem)
+                        print("tamanho da lista", len(list))
+                todayItems = ProdlineTable.objects
+                elements = ProdlineTableHistory.objects
+                if len(list) == 0:
+                     return render(
+                        request,
+                        "crossdocking/prodlinesFilter.html",
+                        {
+                            "dadosDia": todayItems,
+                            "erro5": "No Data to present",
+                            "elements": elements,
+                        },
+                    )
+                else:
+                    return render(
+                        request,
+                        "crossdocking/prodlinesFilter.html",
+                        {"dadosDia": todayItems, "lista": list, "elements": elements},
+                    )
             except:
                 try:
-                    worksheet = workbook["Sheet5"]
+                    worksheet = EmailDiarioSchedule.objects.raw(f""" SELECT * FROM crossdocking_emaildiarioschedule WHERE due_date BETWEEN '{request.POST["requestDay"]} 00:00:00' AND '{request.POST["requestDay"]} 23:59:59' """)
                     for element in worksheet:
                         for prod in prodlines.all():
                             if prod.nome == element[0].value:
@@ -273,7 +302,7 @@ def schedulePlanning(request):
                         "crossdocking/prodlinesFilter.html",
                         {
                             "dadosDia": todayItems,
-                            "erro5": "Worksheet name not found. Should be: Schedule Data or Sheet1",
+                            "erro5": "No Data found",
                             "elements": elements,
                         },
                     )
@@ -286,7 +315,7 @@ def schedulePlanning(request):
                 "crossdocking/prodlinesFilter.html",
                 {
                     "dadosDia": todayItems,
-                    "erro5": "File not exists",
+                    "erro5": "Data not exists",
                     "elements": elements,
                 },
             )
@@ -394,7 +423,7 @@ def enviaEmail(request, user):
     if mes == "12":
         mes = "Dezembro"
     mensagem = ""
-
+    #BUG FILESYS
     textPath = (
         "//PAVPD002/E_Proj/sharedir/MP&L/Schedule/"
         + actualDay.strftime("%Y")
@@ -478,7 +507,6 @@ def enviaEmail(request, user):
             "pmarti30@visteon.com",
         ],
     )
-    # ADICIONAR EM CIMA O MAIL pmarti30@visteon.com
 
     msg = EmailMultiAlternatives(subject, table, from_email, to)
     msg.attach_alternative(table, "text/html")
@@ -524,6 +552,7 @@ def enviaEmailShipping(request, user):
     if mes == "12":
         mes = "Dezembro"
     mensagem = ""
+    #BUG FILESYS
     textPath = (
         "//PAVPD002/E_Proj/sharedir/MP&L/Schedule/"
         + actualDay.strftime("%Y")
@@ -657,6 +686,7 @@ def enviaEmailShipping(request, user):
     msg.send()
 
 
+
 def enviarEmailSchedule():
     """  ["pmarti30@visteon.com",'npires2@visteon.com',
                      'abrandao@visteon.com','sanasta1@visteon.com',
@@ -681,9 +711,9 @@ def enviarEmailSchedule():
     elementosDiaSeguinte = ProdlineTable.objects
     actualDay = datetime.datetime.today() - datetime.timedelta(days=2)
     nextDay = datetime.datetime.today() + datetime.timedelta(days=1)
-    if nextDay.strftime("%A") == "Saturday":
+    if nextDay.strftime("%A") == "Saturday" or nextDay.strftime("%A") == "sábado": #sábado
         nextDay = datetime.datetime.today() + datetime.timedelta(days=3)
-    if nextDay.strftime("%A") == "Sunday":
+    if nextDay.strftime("%A") == "Sunday" or nextDay.strftime("%A") == "domingo": #domingo
         nextDay = datetime.datetime.today() + datetime.timedelta(days=2)
     month = nextDay.strftime("%B")
     mes = nextDay.strftime("%m")
@@ -701,27 +731,29 @@ def enviarEmailSchedule():
     textPath3 = f"//PAVPD002/E_Proj/sharedir/MP&L/Schedule/{nextDay.year}/{month} {nextDay.year}/Daily_Schedule_{fmt_num3}.xlsx"
     def defineBook():
         try:
-            workbook = openpyxl.load_workbook(textPath) 
-            return workbook
+            workbook = openpyxl.load_workbook(textPath)
+            print("Fez o textPath")
         except:
             try: 
              workbook = openpyxl.load_workbook(textPath1)
+             print("Fez o textPath 1")
             except:
                 try:
                     workbook = openpyxl.load_workbook(textPath2)
-                    return workbook
+                    print("Fez o textPath 2")
                 except:
                     workbook = openpyxl.load_workbook(textPath3)
-                    return workbook
+                    print("Fez o textPath 3")
+        return workbook
 
     # textPath = '//PAVPD002/E_Proj/sharedir/MP&L/Schedule/2021/Novembro 2021/#Daily_Schedule_03.11.2021.xlsx'
 
     table = '</br><table class="display"><thead style="background-color: lightgray"><tr><th>Line</th><th>Site</th><th>Due Date</th><th>Item Number</th><th>Description</th><th>To Complete</th><th>Receiving</th><th>Comentário Receiving</th><th>Shipping</th><th>Comentário Shipping</th></tr></thead><tbody>'
     print("ENTROU")
     if (
-        (timeNow < timeEnd and timeNow > timeBefore)
-        and (actualDay.strftime("%A") != "Saturday")
-        and (actualDay.strftime("%A") != "Sunday")
+        (timeNow > timeEnd and timeNow > timeBefore)
+        and (actualDay.strftime("%A") != "Saturday" ) #sábado
+        and (actualDay.strftime("%A") != "Sunday" ) #domingo
     ):
         table = '</br><table class="display"><thead style="background-color: lightgray"><tr><th>Line</th><th>Site</th><th>Due Date</th><th>Item Number</th><th>Description</th><th>To Complete</th></tr></thead><tbody>'
         try:
@@ -766,17 +798,13 @@ def enviarEmailSchedule():
                 subject, from_email, to = (
                     "Wh Production " + nextDay.strftime("%d-%m-%Y"),
                     "noreply@visteon.com",
-                    ["pmarti30@visteon.com "],
+                    ["pmarti30@visteon.com"],
                     
                 ) 
-                """ ,'npires2@visteon.com',
-                     'abrandao@visteon.com','sanasta1@visteon.com',
-                    'rsalgue2@visteon.com', 'nlopes8@visteon.com',
-                    'abilro1@visteon.com', 'jrodri80@visteon.com',
-                    'evenanc1@visteon.com' """
+                """  """
                 msg = EmailMultiAlternatives(subject, table, from_email, to)
                 msg.attach_alternative(table, "text/html")
-                print(msg + " Mensagem a ser enviada no mail")
+                print(" Mensagem a ser enviada no mail")
                 msg.send()
             except:
                 try:
@@ -817,6 +845,7 @@ def enviarEmailSchedule():
                     )
                     msg = EmailMultiAlternatives(subject, table, from_email, to)
                     msg.attach_alternative(table, "text/html")
+                    print("vai mandar o email")
                     msg.send()
                 except KeyError:
                     mensagem = (
@@ -831,6 +860,7 @@ def enviarEmailSchedule():
                     )
                     msg = EmailMultiAlternatives(subject, mensagem, from_email, to)
                     msg.attach_alternative(mensagem, "text/html")
+                    print("vai mandar o email")
                     msg.send()
         except FileNotFoundError:
             mensagem = "</br> File not found. </br></br>" + textPath + ""
@@ -846,8 +876,8 @@ def enviarEmailSchedule():
     elif (
         (timeNow < timeEnd2 and timeNow > timeBefore2)
         and (not ProdlineTable.objects.filter(allOkReceiving=True).exists())
-        and (actualDay.strftime("%A") != "Saturday")
-        and (actualDay.strftime("%A") != "Sunday")
+        and (actualDay.strftime("%A") != "Saturday" and actualDay.strftime("%A") != "sábado" )
+        and (actualDay.strftime("%A") != "Sunday" and actualDay.strftime("%A") != "domingo")
         and (elementosDiaSeguinte.count() > 0)
     ):
 
@@ -1067,6 +1097,427 @@ def enviarEmailSchedule():
         msg.send()
 
 
+# def enviarEmailSchedule():
+#     """  ["pmarti30@visteon.com",'npires2@visteon.com',
+#                      'abrandao@visteon.com','sanasta1@visteon.com',
+#                     'rsalgue2@visteon.com', 'nlopes8@visteon.com',
+#                     'abilro1@visteon.com', 'jrodri80@visteon.com',
+#                     'evenanc1@visteon.com'] """
+#     import locale
+#     locale.setlocale(locale.LC_ALL, "pt-PT")
+#     timeNow = datetime.datetime.now()
+#     timeEnd = timeNow.replace(hour=8, minute=10)
+#     timeBefore = timeNow.replace(hour=7, minute=55)
+#     timeEnd2 = timeNow.replace(hour=16, minute=10)
+#     timeBefore2 = timeNow.replace(hour=15, minute=55)
+#     timeEnd3 = timeNow.replace(hour=22, minute=10)
+#     timeBefore3 = timeNow.replace(hour=21, minute=55)
+
+#     dadosQAD = WoMstr.objects.values(
+#         "wo_due_date", "wo_part", "wo_qty_exp_complete", "wo_qty_comp"
+#     )
+
+
+
+#     prodline = Prodlines.objects
+#     elementosDiaSeguinte = ProdlineTable.objects
+#     actualDay = datetime.datetime.today() - datetime.timedelta(days=2)
+#     nextDay = datetime.datetime.today() + datetime.timedelta(days=1)
+#     if nextDay.strftime("%A") == "Saturday":
+#         nextDay = datetime.datetime.today() + datetime.timedelta(days=3)
+#     if nextDay.strftime("%A") == "Sunday":
+#         nextDay = datetime.datetime.today() + datetime.timedelta(days=2)
+#     month = nextDay.strftime("%B")
+#     mes = nextDay.strftime("%m")
+#     fmt_num = nextDay.strftime("%d.%m.%Y")
+#     mensagem = ""
+#     print("DADOS PARA EMAIL->", "/",actualDay, " 2022-12-06")
+#     #BUG FILESYS
+#     textPath = f"//PAVPD002/E_Proj/sharedir/MP&L/Schedule/{nextDay.year}/{month} {nextDay.year}/Daily_Schedule_{fmt_num}.xlsx"  # + nextDay.strftime(
+#     #'%Y') + "/" + mes + " " + nextDay.strftime('%Y') + "/Daily_Schedule_" + nextDay.strftime(
+#     #'%d.%m.%Y') + ".xlsx"
+#     #print(textPath + " :TEXTPATH")
+#     fmt_num1 = nextDay.strftime("%d_%m_%Y")
+#     fmt_num2 = nextDay.strftime("%d-%m-%Y")
+#     fmt_num3 = nextDay.strftime("%d/%m/%Y")
+#     #BUG FILESYS
+#     textPath1 = f"//PAVPD002/E_Proj/sharedir/MP&L/Schedule/{nextDay.year}/{month} {nextDay.year}/Daily_Schedule_{fmt_num1}.xlsx"
+#     textPath2 = f"//PAVPD002/E_Proj/sharedir/MP&L/Schedule/{nextDay.year}/{month} {nextDay.year}/Daily_Schedule_{fmt_num2}.xlsx"
+#     textPath3 = f"//PAVPD002/E_Proj/sharedir/MP&L/Schedule/{nextDay.year}/{month} {nextDay.year}/Daily_Schedule_{fmt_num3}.xlsx"
+#     a = 0
+#     def defineBook():
+#         try:
+#             workbook = openpyxl.load_workbook(textPath) 
+#             a = 1
+#         except:
+#             try: 
+#              workbook = openpyxl.load_workbook(textPath1)
+#              a = 2
+#             except:
+#                 try:
+#                     workbook = openpyxl.load_workbook(textPath2)
+#                     a = 3
+#                 except:
+#                     workbook = openpyxl.load_workbook(textPath3)
+#                     a = 4
+#         print("WorkBook-->", workbook, "A->", a)
+#         return workbook
+
+#     # textPath = '//PAVPD002/E_Proj/sharedir/MP&L/Schedule/2021/Novembro 2021/#Daily_Schedule_03.11.2021.xlsx'
+
+#     table = '</br><table class="display"><thead style="background-color: lightgray"><tr><th>Line</th><th>Site</th><th>Due Date</th><th>Item Number</th><th>Description</th><th>To Complete</th><th>Receiving</th><th>Comentário Receiving</th><th>Shipping</th><th>Comentário Shipping</th></tr></thead><tbody>'
+#     print("ENTROU")
+#     if (
+#         (timeNow > timeEnd and timeNow > timeBefore)
+#         and (actualDay.strftime("%A") != "Saturday")
+#         and (actualDay.strftime("%A") != "Sunday")
+#     ):
+#         table = '</br><table class="display"><thead style="background-color: lightgray"><tr><th>Line</th><th>Site</th><th>Due Date</th><th>Item Number</th><th>Description</th><th>To Complete</th></tr></thead><tbody>'
+#         try:
+#             workbook = defineBook()
+#             sheet_num = ""
+#             for sheet in workbook:
+#                 # print(sheet.title)
+#                 # print("CELL 1 --> ",sheet.cell(1,1).value)
+#                 if sheet.cell(1, 1)._value == "Line":
+#                     sheet_num = sheet.title
+#                     print(sheet_num)
+#             try:
+#                 worksheet = workbook["Schedule Data"]
+#                 for element in worksheet:
+#                     for prod in prodline.all():
+#                         if prod.nome == element[0].value:
+#                             table += (
+#                                 '<tr><td style="padding:0 15px 0 15px;">'
+#                                 + element[0].value
+#                                 + '</td><td style="padding:0 15px 0 15px;">'
+#                                 + element[1].value
+#                                 + '</td><td style="padding:0 15px 0 15px;">'
+#                                 + str(element[2].value)
+#                                 + '</td><td style="padding:0 15px 0 15px;">'
+#                                 + element[3].value
+#                                 + '</td><td style="padding:0 15px 0 15px;">'
+#                                 + element[4].value
+#                                 + '</td><td style="padding:0 15px 0 15px;">'
+#                                 + str(element[5].value)
+#                                 + "</td></tr>"
+#                             )
+
+#                 table += "</tbody></table>"
+#                 table += "</br></br><b>Prodlines</b></br>"
+#                 for prod in prodline.all():
+#                     table += prod.nome + "</br>"
+
+#                 table += (
+#                     "</b></b></br><b>Ficheiro diário de Schedule em: </b>" + textPath
+#                 )
+
+#                 subject, from_email, to = (
+#                     "Wh Production " + nextDay.strftime("%d-%m-%Y"),
+#                     "noreply@visteon.com",
+#                     ["pmarti30@visteon.com"] ,
+                    
+#                 ) 
+#                 """ ,'npires2@visteon.com',
+#                      'abrandao@visteon.com','sanasta1@visteon.com',
+#                     'rsalgue2@visteon.com', 'nlopes8@visteon.com',
+#                     'abilro1@visteon.com', 'jrodri80@visteon.com',
+#                     'evenanc1@visteon.com' """
+#                 msg = EmailMultiAlternatives(subject, table, from_email, to)
+#                 msg.attach_alternative(table, "text/html")
+#                 print( " A enviar mail")
+#                 msg.send()
+#             except:
+#                 try:
+#                     worksheet = workbook[sheet_num]
+#                     for element in worksheet:
+#                         for prod in prodline.all():
+#                             if prod.nome == element[0].value:
+#                                 table += (
+#                                     '<tr><td style="padding:0 15px 0 15px;">'
+#                                     + element[0].value
+#                                     + '</td><td style="padding:0 15px 0 15px;">'
+#                                     + element[1].value
+#                                     + '</td><td style="padding:0 15px 0 15px;">'
+#                                     + str(element[2].value)
+#                                     + '</td><td style="padding:0 15px 0 15px;">'
+#                                     + element[3].value
+#                                     + '</td><td style="padding:0 15px 0 15px;">'
+#                                     + element[4].value
+#                                     + '</td><td style="padding:0 15px 0 15px;">'
+#                                     + str(element[5].value)
+#                                     + "</td></tr>"
+#                                 )
+
+#                     table += "</tbody></table>"
+#                     table += "</br></br><b>Prodlines</b></br>"
+#                     for prod in prodline.all():
+#                         table += prod.nome + "</br>"
+
+#                     table += (
+#                         "</b></b></br><b>Ficheiro diário de Schedule em: </b>"
+#                         + textPath
+#                     )
+
+#                     subject, from_email, to = (
+#                         "Wh Production " + nextDay.strftime("%d-%m-%Y"),
+#                         "noreply@visteon.com",
+#                        ["pmarti30@visteon.com"] ,
+#                     )
+#                     msg = EmailMultiAlternatives(subject, table, from_email, to)
+#                     msg.attach_alternative(table, "text/html")
+#                     msg.send()
+#                 except KeyError:
+#                     mensagem = (
+#                         "</br>Worksheet name not found. Should be: Schedule Data or Sheet1 </br>"
+#                         + textPath
+#                         + ""
+#                     )
+#                     subject, from_email, to = (
+#                         "Wh Production " + nextDay.strftime("%d-%m-%Y"),
+#                         "noreply@visteon.com",
+#                         ["pmarti30@visteon.com"],
+#                     )
+#                     msg = EmailMultiAlternatives(subject, mensagem, from_email, to)
+#                     msg.attach_alternative(mensagem, "text/html")
+#                     msg.send()
+#         except FileNotFoundError:
+#             mensagem = "</br> File not found. </br></br>" + textPath + ""
+#             subject, from_email, to = (
+#                 "Wh Production " + nextDay.strftime("%d-%m-%Y"),
+#                 "noreply@visteon.com",
+#                 ["pmarti30@visteon.com"],
+#             )
+#             msg = EmailMultiAlternatives(subject, mensagem, from_email, to)
+#             msg.attach_alternative(mensagem, "text/html")
+#             msg.send()
+
+#     elif (
+#         (timeNow < timeEnd2 and timeNow > timeBefore2)
+#         and (not ProdlineTable.objects.filter(allOkReceiving=True).exists())
+#         and (actualDay.strftime("%A") != "Saturday")
+#         and (actualDay.strftime("%A") != "Sunday")
+#         and (elementosDiaSeguinte.count() > 0)
+#     ):
+
+#         valueSubmitReceiving = ""
+#         valueSubmitShipping = ""
+
+#         #BUG FILESYS
+#         textPath = (
+#             "//PAVPD002/E_Proj/sharedir/MP&L/Schedule/"
+#             + actualDay.strftime("%Y")
+#             + "/"
+#             + mes
+#             + " "
+#             + actualDay.strftime("%Y")
+#             + "/Daily_Schedule_"
+#             + actualDay.strftime("%d.%m.%Y")
+#             + ".xlsx"
+#         )
+
+#         for elem in elementosDiaSeguinte.all():
+#             valueReceiving = ""
+#             valueShipping = ""
+
+#             if elem.comentarioShipping == None:
+#                 elem.comentarioShipping = " "
+#             if elem.comentarioReceiving == None:
+#                 elem.comentarioReceiving = " "
+#             if elem.shipping == True:
+#                 valueShipping = "X"
+#             if elem.receiving == True:
+#                 valueReceiving = "X"
+#             if elem.allOkShipping == True:
+#                 valueSubmitShipping = "X"
+#             if elem.allOkReceiving == True:
+#                 valueSubmitReceiving = "X"
+#             table += (
+#                 '<tr style="background-color: red"><td style="padding:0 15px 0 15px; background-color: red">'
+#                 + elem.line
+#                 + '</td><td style="padding:0 15px 0 15px;">'
+#                 + elem.site
+#                 + '</td><td style="padding:0 15px 0 15px;">'
+#                 + elem.due_date
+#                 + '</td><td style="padding:0 15px 0 15px;">'
+#                 + elem.item_number
+#                 + '</td><td style="padding:0 15px 0 15px;">'
+#                 + elem.description
+#                 + '</td><td style="padding:0 15px 0 15px;">'
+#                 + elem.to_complete
+#                 + '</td><td style="text-align: center; padding:0 15px 0 15px;">'
+#                 + valueReceiving
+#                 + '</td><td style="padding:0 15px 0 15px;">'
+#                 + str(elem.comentarioReceiving)
+#                 + '</td><td style="text-align: center; padding:0 15px 0 15px;">'
+#                 + valueShipping
+#                 + '</td><td style="padding:0 15px 0 15px;">'
+#                 + str(elem.comentarioShipping)
+#                 + "</td></tr>"
+#             )
+
+#         table += (
+#             '<tr><td colspan="6" style="text-align: right"><b>Submit</b></td><td style="text-align: center; padding:0 15px 0 15px;">'
+#             + valueSubmitReceiving
+#             + '</td><td style="text-align: right"><b>Submit</b></td><td style="text-align: center; padding:0 15px 0 15px;">'
+#             + valueSubmitShipping
+#             + "</td><td></td></tr>"
+#         )
+#         table += "</tbody></table>"
+#         table += "</br></br><b>Prodlines</b></br>"
+#         for prod in prodline.all():
+#             table += prod.nome + "</br>"
+
+#         table += "</b></b></br><b>Ficheiro diário de Schedule em: </b>" + textPath
+
+#         subject, from_email, to = (
+#             "Wh Production " + actualDay.strftime("%d-%m-%Y"),
+#             "noreply@visteon.com",
+#             ["pmarti30@visteon.com"],
+#         )
+#         msg = EmailMultiAlternatives(subject, table, from_email, to)
+#         msg.attach_alternative(table, "text/html")
+#         msg.send()
+
+#     elif (
+#         (timeNow < timeEnd3 and timeNow > timeBefore3)
+#         and (
+#             not ProdlineTable.objects.filter(allOkReceiving=True).exists()
+#             or not ProdlineTable.objects.filter(allOkShipping=True).exists()
+#         )
+#         and (actualDay.strftime("%A") != "Saturday")
+#         and (actualDay.strftime("%A") != "Sunday")
+#         and (elementosDiaSeguinte.count() > 0)
+#     ):
+
+#         valueSubmitReceiving = ""
+#         valueSubmitShipping = ""
+
+#         #BUG FILESYS
+#         textPath = (
+#             "//PAVPD002/E_Proj/sharedir/MP&L/Schedule/"
+#             + actualDay.strftime("%Y")
+#             + "/"
+#             + mes
+#             + " "
+#             + actualDay.strftime("%Y")
+#             + "/Daily_Schedule_"
+#             + actualDay.strftime("%d.%m.%Y")
+#             + ".xlsx"
+#         )
+
+#         for elem in elementosDiaSeguinte.all():
+#             valueReceiving = ""
+#             valueShipping = ""
+
+#             if elem.comentarioShipping == None:
+#                 elem.comentarioShipping = " "
+#             if elem.comentarioReceiving == None:
+#                 elem.comentarioReceiving = " "
+#             if elem.shipping == True:
+#                 valueShipping = "X"
+#             if elem.receiving == True:
+#                 valueReceiving = "X"
+#             if elem.allOkShipping == True:
+#                 valueSubmitShipping = "X"
+#             if elem.allOkReceiving == True:
+#                 valueSubmitReceiving = "X"
+#             table += (
+#                 '<tr style="background-color: red"><td style="padding:0 15px 0 15px; background-color: red">'
+#                 + elem.line
+#                 + '</td><td style="padding:0 15px 0 15px;">'
+#                 + elem.site
+#                 + '</td><td style="padding:0 15px 0 15px;">'
+#                 + elem.due_date
+#                 + '</td><td style="padding:0 15px 0 15px;">'
+#                 + elem.item_number
+#                 + '</td><td style="padding:0 15px 0 15px;">'
+#                 + elem.description
+#                 + '</td><td style="padding:0 15px 0 15px;">'
+#                 + elem.to_complete
+#                 + '</td><td style="text-align: center; padding:0 15px 0 15px;">'
+#                 + valueReceiving
+#                 + '</td><td style="padding:0 15px 0 15px;">'
+#                 + str(elem.comentarioReceiving)
+#                 + '</td><td style="text-align: center; padding:0 15px 0 15px;">'
+#                 + valueShipping
+#                 + '</td><td style="padding:0 15px 0 15px;">'
+#                 + str(elem.comentarioShipping)
+#                 + "</td></tr>"
+#             )
+
+#         table += (
+#             '<tr><td colspan="6" style="text-align: right"><b>Submit</b></td><td style="text-align: center; padding:0 15px 0 15px;">'
+#             + valueSubmitReceiving
+#             + '</td><td style="text-align: right"><b>Submit</b></td><td style="text-align: center; padding:0 15px 0 15px;">'
+#             + valueSubmitShipping
+#             + "</td><td></td></tr>"
+#         )
+#         table += "</tbody></table>"
+
+#         table += '</b></br></br><table class="display"><thead style="background-color: lightgray"><tr><th>Line</th><th>Site</th><th>Due Date</th><th>Item Number</th><th>Qty to Complete</th><th>Actual Qty Completed</th></tr></thead><tbody>'
+
+#         for elem3 in elementosDiaSeguinte.all():
+#             elem2 = dadosQAD.filter(
+#                 wo_due_date=elem3.due_date, wo_part=elem3.item_number
+#             )
+#             for elem1 in elem2.all():
+#                 if (
+#                     str(elem1["wo_qty_exp_complete"])[:-11]
+#                     != str(elem1["wo_qty_comp"])[:-11]
+#                 ):
+#                     table += (
+#                         '<tr style="background-color: red">'
+#                         '<td style="padding:0 15px 0 15px;">'
+#                         + elem3.line
+#                         + '</td><td style="padding:0 15px 0 15px;">'
+#                         + elem3.site
+#                         + '</td><td style="padding:0 15px 0 15px;">'
+#                         + str(elem1["wo_due_date"])
+#                         + '</td><td style="padding:0 15px 0 15px;">'
+#                         + elem1["wo_part"]
+#                         + '</td><td style="padding:0 15px 0 15px;">'
+#                         + str(elem1["wo_qty_exp_complete"])[:-11]
+#                         + '</td><td style="padding:0 15px 0 15px;">'
+#                         + str(elem1["wo_qty_comp"])[:-11]
+#                         + "</td></tr>"
+#                     )
+#                 else:
+#                     table += (
+#                         '<tr style="background-color: whitesmoke">'
+#                         '<td style="padding:0 15px 0 15px;">'
+#                         + elem3.line
+#                         + '</td><td style="padding:0 15px 0 15px;">'
+#                         + elem3.site
+#                         + '</td><td style="padding:0 15px 0 15px;">'
+#                         + str(elem1["wo_due_date"])
+#                         + '</td><td style="padding:0 15px 0 15px;">'
+#                         + elem1["wo_part"]
+#                         + '</td><td style="padding:0 15px 0 15px;">'
+#                         + str(elem1["wo_qty_exp_complete"])[:-11]
+#                         + '</td><td style="padding:0 15px 0 15px;">'
+#                         + str(elem1["wo_qty_comp"])[:-11]
+#                         + "</td></tr>"
+#                     )
+
+#         table += "</tbody></table>"
+
+#         table += "</br></br><b>Prodlines</b></br>"
+#         for prod in prodline.all():
+#             table += prod.nome + "</br>"
+
+#         table += "</b></b></br><b>Ficheiro diário de Schedule em: </b>" + textPath
+
+#         subject, from_email, to = (
+#             "Wh Production " + actualDay.strftime("%d-%m-%Y"),
+#             "noreply@visteon.com",
+#             ["pmarti30@visteon.com"],
+#         )
+#         msg = EmailMultiAlternatives(subject, table, from_email, to)
+#         msg.attach_alternative(table, "text/html")
+#         msg.send()
+
+
 def enviarEmailSchedule1():
     print("ENTROU")
     timeNow = datetime.datetime.now()
@@ -1114,6 +1565,7 @@ def enviarEmailSchedule1():
     if mes == "12":
         mes = "Dezembro"
     mensagem = ""
+    #BUG FILESYS
     textPath = (
         "//PAVPD002/E_Proj/sharedir/MP&L/Schedule/"
         + nextDay.strftime("%Y")
@@ -1214,7 +1666,6 @@ def enviarEmailSchedule1():
                     )
                     msg = EmailMultiAlternatives(subject, table, from_email, to)
                     msg.attach_alternative(table, "text/html")
-                    print("ENVIOU, enviarEmailSchedule()")
                     msg.send()
                 except KeyError:
                     mensagem = (
@@ -1229,7 +1680,6 @@ def enviarEmailSchedule1():
                     )
                     msg = EmailMultiAlternatives(subject, mensagem, from_email, to)
                     msg.attach_alternative(mensagem, "text/html")
-                    print("ENVIOU, enviarEmailSchedule() KEYERROR")
                     msg.send()
         except FileNotFoundError:
             mensagem = "</br> File not found. </br></br>" + textPath + ""
@@ -1240,7 +1690,6 @@ def enviarEmailSchedule1():
             )
             msg = EmailMultiAlternatives(subject, mensagem, from_email, to)
             msg.attach_alternative(mensagem, "text/html")
-            print("ENVIOU, enviarEmailSchedule() FileNOTFound")
             msg.send()
 
     elif (
@@ -1253,6 +1702,7 @@ def enviarEmailSchedule1():
         valueSubmitReceiving = ""
         valueSubmitShipping = ""
 
+        #BUG FILESYS
         textPath = (
             "//PAVPD002/E_Proj/sharedir/MP&L/Schedule/"
             + actualDay.strftime("%Y")
@@ -1342,7 +1792,7 @@ def enviarEmailSchedule1():
 
         valueSubmitReceiving = ""
         valueSubmitShipping = ""
-
+        #BUG FILESYS
         textPath = (
             "//PAVPD002/E_Proj/sharedir/MP&L/Schedule/"
             + actualDay.strftime("%Y")
@@ -1506,7 +1956,7 @@ def updateSchedule():
             mes = "Novembro"
         if mes == "12":
             mes = "Dezembro"
-
+        #BUG FILESYS
         textPath = (
             "//PAVPD002/E_Proj/sharedir/MP&L/Schedule/"
             + day.strftime("%Y")
@@ -1550,7 +2000,11 @@ def updateSchedule():
         # limpa a tabela provisória
 
         ProdlineTable.objects.filter().delete()
-
+        """ --------------------------///////////////----------------------------------------------------///////////////-------------------------- """
+        #Cria um ficheiro Excell é preciso confirmar se os dados que vão para a bd são os mesmos que vão para o ficheiro
+        # Esta func está a guardar em 2 bds, 
+        """ --------------------------///////////////----------------------------------------------------///////////////-------------------------- """
+        #penso que ele faz backup na bd e num ficheiro que se encontra no path
         workbook = openpyxl.load_workbook(textPath)
         try:
             worksheet = workbook["Schedule Data"]
@@ -1612,19 +2066,11 @@ def updateLineRequestDia1():
         datetime.datetime.today().replace(day=1) - datetime.timedelta(days=32)
     ).strftime("%Y")
 
-    wbLineRequest = Workbook()
-    sheetLineRequest = wbLineRequest.add_sheet("Sheet 1")
+
 
     row2 = 0
     col2 = 0
 
-    sheetLineRequest.write(row2, col2, "Request Date")
-    sheetLineRequest.write(row2, col2 + 1, "Part-Number")
-    sheetLineRequest.write(row2, col2 + 2, "Line")
-    sheetLineRequest.write(row2, col2 + 3, "Require")
-    sheetLineRequest.write(row2, col2 + 4, "Receiver")
-    sheetLineRequest.write(row2, col2 + 5, "Request Justification")
-    sheetLineRequest.write(row2, col2 + 6, "Comment")
 
     row2 += 1
     # datetime3 = datetime.datetime.strptime(elem.horaPedido, '%Y-%m-%d %H:%M:%S')
@@ -1652,24 +2098,11 @@ def updateLineRequestDia1():
             )
             novoRequest.save()
 
-            sheetLineRequest.write(row2, col2, elem.horaPedido)
-            sheetLineRequest.write(row2, col2 + 1, elem.partNumber)
-            sheetLineRequest.write(row2, col2 + 2, elem.linha)
-            sheetLineRequest.write(row2, col2 + 3, elem.requisitante)
-            sheetLineRequest.write(row2, col2 + 4, elem.receiver)
-            sheetLineRequest.write(row2, col2 + 5, elem.justificacao)
-            sheetLineRequest.write(row2, col2 + 6, elem.comentario)
-
+     
             row2 += 1
 
-            # W:\sharedir\MP&L\Warehouse\VWMT\History\Line_Request      NAO TENHO PERMS
-            # W:\\sharedir\\MP&L\\Warehouse\\PWMS\\History\\Line_Request\\workbook_   ANTIGO
-    wbLineRequest.save(
-        "W:\sharedir\MP&L\Warehouse\VWMT\History\Line_Request\\workbook_"
-        + prev2MonthName
-        + prev2MonthYear
-        + ".xls"
-    )
+
+
 
 
 def updatePortariaDia1():
@@ -1686,27 +2119,11 @@ def updatePortariaDia1():
     ).strftime("%Y")
 
     wbPortaria = Workbook()
-    sheetPortaria = wbPortaria.add_sheet("Sheet 1")
+   
 
     row = 0
     col = 0
 
-    sheetPortaria.write(row, col, "Data/hora chegada")
-    sheetPortaria.write(row, col + 1, "Condutor")
-    sheetPortaria.write(row, col + 2, "ID")
-    sheetPortaria.write(row, col + 3, "Contacto")
-    sheetPortaria.write(row, col + 4, "Empresa")
-    sheetPortaria.write(row, col + 5, "1ª Matricula")
-    sheetPortaria.write(row, col + 6, "2ª Matricula")
-    sheetPortaria.write(row, col + 7, "Carga/Descarga")
-    sheetPortaria.write(row, col + 8, "Doca")
-    sheetPortaria.write(row, col + 9, "Destino carga")
-    sheetPortaria.write(row, col + 10, "Tipo de Viatura")
-    sheetPortaria.write(row, col + 11, "Data/Hora entrada")
-    sheetPortaria.write(row, col + 12, "Abandono")
-    sheetPortaria.write(row, col + 13, "Comentarios entrada")
-    sheetPortaria.write(row, col + 14, "Data/Hora saida")
-    sheetPortaria.write(row, col + 15, "Comentarios saida")
 
     row += 1
     # BUG formatação OK
@@ -1740,36 +2157,7 @@ def updatePortariaDia1():
             )
             eleme.save()
 
-            sheetPortaria.write(row, col, elem.dataHoraChegada)
-            sheetPortaria.write(row, col + 1, elem.condutor)
-            sheetPortaria.write(row, col + 2, elem.ident)
-            sheetPortaria.write(row, col + 3, elem.contacto)
-            sheetPortaria.write(row, col + 4, elem.empresa)
-            sheetPortaria.write(row, col + 5, elem.primeiraMatricula)
-            sheetPortaria.write(row, col + 6, elem.segundaMatricula)
-            sheetPortaria.write(row, col + 7, elem.cargaDescarga)
-            sheetPortaria.write(row, col + 8, elem.doca)
-            sheetPortaria.write(row, col + 9, elem.destinoCarga)
-            sheetPortaria.write(row, col + 10, elem.tipoViatura)
-            sheetPortaria.write(row, col + 11, elem.dataHoraEntrada)
-            sheetPortaria.write(row, col + 12, abandono)
-            sheetPortaria.write(row, col + 13, elem.comentEntrada)
-            sheetPortaria.write(row, col + 14, elem.dataHoraSaida)
-            sheetPortaria.write(row, col + 15, elem.comentSaida)
-            row += 1
-
-            # elem.delete()
-            # W:\sharedir\MP&L\Warehouse\VWMT\History\Portaria
-            # W:\\sharedir\\MP&L\\Warehouse\\PWMS\\History\\Portaria\\workbook_  --> ANTIGO
-            print("A guardar no ficheiro")
-
-    wbPortaria.save(
-        "W:\sharedir\MP&L\Warehouse\VWMT\History\Portaria\\workbook_"
-        + prev2MonthName
-        + prev2MonthYear
-        + ".xls"
-    )
-
+           
 
 def updatePortariaDia15():
     portaria = Gateway.objects
@@ -1782,28 +2170,10 @@ def updatePortariaDia15():
         datetime.datetime.today().replace(day=1) - datetime.timedelta(days=32)
     ).strftime("%Y")
 
-    wbPortaria = Workbook()
-    sheetPortaria = wbPortaria.add_sheet("Sheet 1")
 
     row = 0
     col = 0
 
-    sheetPortaria.write(row, col, "Data/hora chegada")
-    sheetPortaria.write(row, col + 1, "Condutor")
-    sheetPortaria.write(row, col + 2, "ID")
-    sheetPortaria.write(row, col + 3, "Contacto")
-    sheetPortaria.write(row, col + 4, "Empresa")
-    sheetPortaria.write(row, col + 5, "1ª Matricula")
-    sheetPortaria.write(row, col + 6, "2ª Matricula")
-    sheetPortaria.write(row, col + 7, "Carga/Descarga")
-    sheetPortaria.write(row, col + 8, "Doca")
-    sheetPortaria.write(row, col + 9, "Destino carga")
-    sheetPortaria.write(row, col + 10, "Tipo de Viatura")
-    sheetPortaria.write(row, col + 11, "Data/Hora entrada")
-    sheetPortaria.write(row, col + 12, "Abandono")
-    sheetPortaria.write(row, col + 13, "Comentarios entrada")
-    sheetPortaria.write(row, col + 14, "Data/Hora saida")
-    sheetPortaria.write(row, col + 15, "Comentarios saida")
 
     row += 1
     # BUG data desformatada
@@ -1835,35 +2205,6 @@ def updatePortariaDia15():
             )
             eleme.save()
 
-            sheetPortaria.write(row, col, elem.dataHoraChegada)
-            sheetPortaria.write(row, col + 1, elem.condutor)
-            sheetPortaria.write(row, col + 2, elem.ident)
-            sheetPortaria.write(row, col + 3, elem.contacto)
-            sheetPortaria.write(row, col + 4, elem.empresa)
-            sheetPortaria.write(row, col + 5, elem.primeiraMatricula)
-            sheetPortaria.write(row, col + 6, elem.segundaMatricula)
-            sheetPortaria.write(row, col + 7, elem.cargaDescarga)
-            sheetPortaria.write(row, col + 8, elem.doca)
-            sheetPortaria.write(row, col + 9, elem.destinoCarga)
-            sheetPortaria.write(row, col + 10, elem.tipoViatura)
-            sheetPortaria.write(row, col + 11, elem.dataHoraEntrada)
-            sheetPortaria.write(row, col + 12, abandono)
-            sheetPortaria.write(row, col + 13, elem.comentEntrada)
-            sheetPortaria.write(row, col + 14, elem.dataHoraSaida)
-            sheetPortaria.write(row, col + 15, elem.comentSaida)
-            row += 1
-
-            # elem.delete()
-            # W:\sharedir\MP&L\Warehouse\VWMT\History\Portaria
-            # W:\\sharedir\\MP&L\\Warehouse\\PWMS\\History\\Portaria\\workbook_   --> ANTIGO
-
-    wbPortaria.save(
-        "W:\sharedir\MP&L\Warehouse\VWMT\History\Portaria\\workbook_"
-        + prev2MonthName
-        + prev2MonthYear
-        + ".xls"
-    )
-
 
 def updateProductionDia1():
     prodline = ProdlineTableHistory.objects
@@ -1878,28 +2219,11 @@ def updateProductionDia1():
         datetime.datetime.today().replace(day=1) - datetime.timedelta(days=32)
     ).strftime("%Y")
 
-    wbProduction = Workbook()
-    sheetProduction = wbProduction.add_sheet("Sheet 1")
 
     row = 0
     col = 0
 
-    # -------------------------------------------------
-    # Esta func também tem problemas de formataçao, no if dentro do for, erro pk formatações incompativeis
-    # -------------------------------------------------
 
-    sheetProduction.write(row, col, "Line")
-    sheetProduction.write(row, col + 1, "Site")
-    sheetProduction.write(row, col + 2, "Due Date")
-    sheetProduction.write(row, col + 3, "Item Number")
-    sheetProduction.write(row, col + 4, "Description")
-    sheetProduction.write(row, col + 5, "To Complete")
-    sheetProduction.write(row, col + 6, "Receiving")
-    sheetProduction.write(row, col + 7, "Submit Receiving")
-    sheetProduction.write(row, col + 8, "Comentario Receiving")
-    sheetProduction.write(row, col + 9, "Shipping")
-    sheetProduction.write(row, col + 10, "Submit Shipping")
-    sheetProduction.write(row, col + 11, "Comentario Shipping")
 
     row += 1
     for elem in prodline.all():
@@ -1930,30 +2254,7 @@ def updateProductionDia1():
             )
             eleme.save()
 
-            sheetProduction.write(row, col, elem.line)
-            sheetProduction.write(row, col + 1, elem.site)
-            sheetProduction.write(row, col + 2, elem.due_date)
-            sheetProduction.write(row, col + 3, elem.item_number)
-            sheetProduction.write(row, col + 4, elem.description)
-            sheetProduction.write(row, col + 5, elem.to_complete)
-            sheetProduction.write(row, col + 6, elem.receiving)
-            sheetProduction.write(row, col + 7, elem.allOkReceiving)
-            sheetProduction.write(row, col + 8, elem.comentarioReceiving)
-            sheetProduction.write(row, col + 9, elem.shipping)
-            sheetProduction.write(row, col + 10, elem.allOkShipping)
-            sheetProduction.write(row, col + 11, elem.comentarioShipping)
-            row += 1
 
-            # elem.delete()
-            # W:\sharedir\MP&L\Warehouse\VWMT\History\Production
-            # W:\\sharedir\\MP&L\\Warehouse\\PWMS\\History\\Production --> ANTIGO
-            # NAO TENHO PERMS PARA ACEDER E ALTERAR ESTE WBPRODUCTION PATH
-    wbProduction.save(
-        "W:\\sharedir\MP&L\Warehouse\VWMT\History\Production\\workbook_"
-        + prev2MonthName
-        + prev2MonthYear
-        + ".xls"
-    )
 
 
 def updateICDRDia1():
@@ -1967,33 +2268,8 @@ def updateICDRDia1():
         datetime.datetime.today().replace(day=1) - datetime.timedelta(days=32)
     ).strftime("%Y")
 
-    wbICDR = Workbook()
-    sheetICDR = wbICDR.add_sheet("Sheet 1")
-
     row = 0
     col = 0
-
-    sheetICDR.write(row, col, "DATA ABERTURA")
-    sheetICDR.write(row, col + 1, "AGEING (DIAS)")
-    sheetICDR.write(row, col + 2, "Nº/ANO")
-    sheetICDR.write(row, col + 3, "FORNECEDOR")
-    sheetICDR.write(row, col + 4, "PARTNUMBER")
-    sheetICDR.write(row, col + 5, "QUANTIDADE")
-    sheetICDR.write(row, col + 6, "MOTIVO")
-    sheetICDR.write(row, col + 7, "ALFANDEGA (SIM/NAO)")
-    sheetICDR.write(row, col + 8, "RESPONSAVEL (NOME/DEPARATAMENTO)")
-    sheetICDR.write(row, col + 9, "COMENTARIOS (ABERTURA)")
-    sheetICDR.write(row, col + 10, "UN COST")
-    sheetICDR.write(row, col + 11, "TOTAL COST")
-    sheetICDR.write(row, col + 12, "RCT UNP")
-    sheetICDR.write(row, col + 13, "CYCLE COUNT")
-    sheetICDR.write(row, col + 14, "CONSUMO")
-    sheetICDR.write(row, col + 15, "QAD (PO Nº)")
-    sheetICDR.write(row, col + 16, "COMENTARIOS")
-    sheetICDR.write(row, col + 17, "DATA FECHO")
-    sheetICDR.write(row, col + 18, "CYCLE COUNT")
-    sheetICDR.write(row, col + 19, "DATA CC")
-    sheetICDR.write(row, col + 20, "AUDIT CHECK")
 
     row += 1
     # BUG confirmar formatação
@@ -2026,34 +2302,408 @@ def updateICDRDia1():
             elemeBackup.auditCheck = elem.auditCheck
             elemeBackup.save()
 
-            sheetICDR.write(row, col, elem.aberturaICDR)
-            sheetICDR.write(row, col + 1, elem.ageing)
-            sheetICDR.write(row, col + 2, elem.nAno)
-            sheetICDR.write(row, col + 3, elem.fornecedor)
-            sheetICDR.write(row, col + 4, elem.partnumber)
-            sheetICDR.write(row, col + 5, elem.quantidade)
-            sheetICDR.write(row, col + 6, elem.tipo)
-            sheetICDR.write(row, col + 7, elem.simNao)
-            sheetICDR.write(row, col + 8, elem.responsavel + "/" + elem.departamento)
-            sheetICDR.write(row, col + 9, elem.comentarioFecho)
-            sheetICDR.write(row, col + 10, elem.unCost)
-            sheetICDR.write(row, col + 11, elem.totalCost)
-            sheetICDR.write(row, col + 12, elem.rctUnpCheck)
-            sheetICDR.write(row, col + 13, elem.cycleCountCheck)
-            sheetICDR.write(row, col + 14, elem.consumption)
-            sheetICDR.write(row, col + 15, elem.po)
-            sheetICDR.write(row, col + 16, elem.comentarioFechoICDR)
-            sheetICDR.write(row, col + 17, elem.date)
-            sheetICDR.write(row, col + 18, elem.cycleCount)
-            sheetICDR.write(row, col + 19, elem.dataCycleCount)
-            sheetICDR.write(row, col + 20, elem.auditCheck)
-            row += 1
-            # elem.delete()
-            # W:\sharedir\MP&L\Warehouse\VWMT\History\ICDR
-            # W:\\sharedir\\MP&L\\Warehouse\\PWMS\\History\\ICDR  --> ANTIGO
-    wbICDR.save(
-        "W:\sharedir\MP&L\Warehouse\VWMT\History\ICDR\\workbook_"
-        + prev2MonthName
-        + prev2MonthYear
-        + ".xls"
+
+
+def configurationsEmailDiario(request):
+     return render(request, "crossdocking/configurations.html")
+
+
+
+
+
+
+""" 
+def def uploadFicheiroDiarioBD(request): 
+    #tens de criar uma linha na tabela ("dadosEmailDiario") onde guardas pelo menos a data
+    ...
+ """
+
+
+#def uploadFicheiroDiarioManual(request): #A ir buscar o ficheiro e a guardar na bd
+#   from datetime import datetime
+#   from datetime import date
+#   import os
+#   meses = [ "Janeiro" , "Fevereiro" , "Março" , "Abril" , "Maio" , "Junho" , "Julho" , "Agosto" , 
+#   "Setembro" , "Outubro" , "Novembro" , "Dezembro"]
+#   datetime_object = datetime.now()
+#por o caminho da pasta de acordo com o mês e o ano (era fixe se desse para ficar uma tree como tens no sharedir, está organizado por ANO/Mes)
+#   ficheiro = request.FILES.get("ficheiro") 
+#   print("REQUEST--->",ficheiro, request.FILES["ficheiro"])
+#   #workbook = openpyxl.load_workbook(ficheiro[0])
+#   caminho = f"crossdocking\\Schedule\\{datetime_object.year}\\{meses[datetime_object.month -1 ]} {datetime_object.year}\\"
+#   print("LINK", ficheiro.name)
+#   print("mes",meses[datetime_object.month -1 ])
+#   if ficheiro is not None:
+#default_storage.save(caminho+ficheiro.name, ficheiro)
+#       print("LINK", ficheiro.name)
+#       #Caso não exista a pasta com o ano atual nesse diretorio, ele cria um novo com o ano atual
+#   if not os.path.exists(f"media\\crossdocking\\Schedule\\{datetime_object.year}\\"):
+#       print("Não existe pasta para este ano")
+#       os.makedirs(f"media\\crossdocking\\Schedule\\{datetime_object.year}\\")
+#    
+#   else :
+#       print("Já existe esta pasta deste ano vai verificar a do mes")
+#   if not os.path.exists(f"media\\crossdocking\\Schedule\\{datetime_object.year}\\{meses[datetime_object.month -1 ]} {datetime_object.year}"):
+#       os.makedirs(f"media\\crossdocking\\Schedule\\{datetime_object.year}\\{meses[datetime_object.month -1 ]} {datetime_object.year}")
+#       print("Não tinha diretoria mas já criou uma para este mês")
+#       default_storage.save(caminho + ficheiro.name, ficheiro)
+#   else:
+#       default_storage.save(caminho + ficheiro.name , ficheiro)
+#       print("Tinha diretoria mas já criou uma para este mês")
+#   bd_ficheiro = EmailDiarioInformacao(ficheiro = ficheiro, data_guardado = date.today().strftime('%Y-%m-%d'))
+#   #bd_ficheiro.save()
+#   return redirect("crossdocking:configurationsEmailDiario")
+
+
+
+def uploadFicheiroDiarioAutomatico(request): 
+    from datetime import datetime
+    from datetime import date
+    import os
+    from openpyxl import load_workbook
+
+    datetime_object = datetime.now()
+    timestampField = datetime_object.strftime("%Y-%m-%d %H:%M:%S")
+    file = request.FILES.get("ficheiro") 
+
+    workbook = load_workbook(file.open("rb"), data_only = True)
+    
+    for x in workbook.sheetnames:
+        sheet = workbook.get_sheet_by_name(x)
+
+        
+        
+        if len(list(sheet.columns)) != 7:
+            print("não pode ser este sheet!",x)
+            
+        else:
+            print("já encontrou a sheet")
+            for index, i in enumerate(sheet):
+                if index == 0: 
+                    continue
+                lineField, siteField,  dueDateField, itemNumberField, descriptionField, toCompleteField, qtyCompletedField = (
+                    i[0].value,
+                    i[1].value,
+                    i[2].value,
+                    i[3].value,
+                    i[4].value,
+                    i[5].value,
+                    i[6].value,
+                )
+                db = EmailDiarioSchedule(
+                    line=lineField,
+                    site=siteField,
+                    due_date=dueDateField,
+                    item_number=itemNumberField,
+                    to_complete=toCompleteField,
+                    description=descriptionField,
+                    qty_completed=qtyCompletedField,
+                    timeStamp = timestampField,
+                )
+                db.save()
+                print("guardou na bd")
+                print("|DADOS->",lineField, siteField, dueDateField, itemNumberField,descriptionField, toCompleteField, qtyCompletedField, timestampField)
+    
+    return redirect("crossdocking:configurationsEmailDiario")
+
+
+
+
+
+#em principio não vai ser preciso
+#ef sendFicheiroDiarioManual(request): 
+#   import datetime
+#   from datetime import datetime as dt
+#   import os
+#   meses = [ "Janeiro" , "Fevereiro" , "Março" , "Abril" , "Maio" , "Junho" , "Julho" , "Agosto" , 
+#   "Setembro" , "Outubro" , "Novembro" , "Dezembro"]
+#   datetime_object = dt.now()
+#   caminho ='media\crossdocking\Schedule\\' #por o caminho da pasta de acordo com o mês e o ano (era fixe se desse para ficar uma tree como tens no sharedir, está organizado por ANO/Mes)
+#  
+#   #se não conseguir ir buscar os dados à bd vai pelo ficheiro
+#   
+#   #ver como são os nomes dos ficheiros e pesquisar por data e não por nome e não precisas de ir á bd
+#   local = f"media\\crossdocking\\Schedule\\{datetime_object.year}\\{meses[datetime_object.month -1 ]} {datetime_object.year}\\" +  f"Daily_Schedule_{datetime_object.day}.{datetime_object.month}.{datetime_object.year}.xlsx"
+#   
+#   """  ["pmarti30@visteon.com",'npires2@visteon.com',
+#                    'abrandao@visteon.com','sanasta1@visteon.com',
+#                   'rsalgue2@visteon.com', 'nlopes8@visteon.com',
+#                   'abilro1@visteon.com', 'jrodri80@visteon.com',
+#                   'evenanc1@visteon.com'] """
+#   """  ["pmarti30@visteon.com",'npires2@visteon.com',
+#                    'abrandao@visteon.com','sanasta1@visteon.com',
+#                   'rsalgue2@visteon.com', 'nlopes8@visteon.com',
+#                   'abilro1@visteon.com', 'jrodri80@visteon.com',
+#                   'evenanc1@visteon.com'] """
+#   import locale
+#   locale.setlocale(locale.LC_ALL, "pt-PT")
+#   timeNow = datetime.datetime.now()
+#   timeEnd = timeNow.replace(hour=8, minute=10)
+#   timeBefore = timeNow.replace(hour=7, minute=55)
+#   timeEnd2 = timeNow.replace(hour=16, minute=10)
+#   timeBefore2 = timeNow.replace(hour=15, minute=55)
+#   timeEnd3 = timeNow.replace(hour=22, minute=10)
+#   timeBefore3 = timeNow.replace(hour=21, minute=55)
+#
+#   dadosQAD = WoMstr.objects.values(
+#       "wo_due_date", "wo_part", "wo_qty_exp_complete", "wo_qty_comp"
+#   )
+#
+#   prodline = Prodlines.objects
+#   elementosDiaSeguinte = ProdlineTable.objects
+#   actualDay = datetime.datetime.today() - datetime.timedelta(days=2)
+#   nextDay = datetime.datetime.today() + datetime.timedelta(days=1)
+#   if nextDay.strftime("%A") == "Saturday":
+#       nextDay = datetime.datetime.today() + datetime.timedelta(days=3)
+#   if nextDay.strftime("%A") == "Sunday":
+#       nextDay = datetime.datetime.today() + datetime.timedelta(days=2)
+#   month = nextDay.strftime("%B")
+#   mes = nextDay.strftime("%m")
+#   fmt_num = nextDay.strftime("%d.%m.%Y")
+#   mensagem = ""
+#  
+#   #'%Y') + "/" + mes + " " + nextDay.strftime('%Y') + "/Daily_Schedule_" + nextDay.strftime(
+#   #'%d.%m.%Y') + ".xlsx"
+#   fmt_num1 = nextDay.strftime("%d_%m_%Y")
+#   fmt_num2 = nextDay.strftime("%d-%m-%Y")
+#   fmt_num3 = nextDay.strftime("%d/%m/%Y")
+#   local = f"media\\crossdocking\\Schedule\\{datetime_object.year}\\{meses[datetime_object.month -1 ]} {datetime_object.year}\\" +  f"Daily_Schedule_{datetime_object.day+1}.{datetime_object.month}.{datetime_object.year}.xlsx"
+#   textPath = local
+#   #BUG FILESYS
+#
+#
+#   # textPath = '//PAVPD002/E_Proj/sharedir/MP&L/Schedule/2021/Novembro 2021/#Daily_Schedule_03.11.2021.xlsx'
+#
+#   table = '</br><table class="display"><thead style="background-color: lightgray"><tr><th>Line</th><th>Site</th><th>Due Date</th><th>Item Number</th><th>Description</th><th>To Complete</th><th>Receiving</th><th>Comentário Receiving</th><th>Shipping</th><th>Comentário Shipping</th></tr></thead><tbody>'
+#   print("ENTROU")
+#   
+#   if (
+#       (timeNow > timeEnd and timeNow > timeBefore)
+#       and (actualDay.strftime("%A") != "Saturday")
+#       and (actualDay.strftime("%A") != "Sunday")
+#    
+#   ):
+#       table = '</br><table class="display"><thead style="background-color: lightgray"><tr><th>Line</th><th>Site</th><th>Due Date</th><th>Item Number</th><th>Description</th><th>To Complete</th></tr></thead><tbody>'
+#       dados_bd_schedule = EmailDiarioSchedule_view.objects
+#       print("VAR--->>", dados_bd_schedule.all(), type(dados_bd_schedule))
+#       if dados_bd_schedule.all():
+#           
+#           for element in dados_bd_schedule.all(): #in View db
+#               print("elemento --)",element.line)
+#               for prod in prodline.all():
+#                   if prod.nome == element.line:
+#                       table += (
+#                           '<tr><td style="padding:0 15px 0 15px;">'
+#                           + element.line
+#                           + '</td><td style="padding:0 15px 0 15px;">'
+#                           + element.site
+#                           + '</td><td style="padding:0 15px 0 15px;">'
+#                           + str(element.due_date)
+#                           + '</td><td style="padding:0 15px 0 15px;">'
+#                           + element.item_number
+#                           + '</td><td style="padding:0 15px 0 15px;">'
+#                           + element.description
+#                           + '</td><td style="padding:0 15px 0 15px;">'
+#                           + str(element.to_complete) 
+#                           + '</td><td style="padding:0 15px 0 15px;">'
+#                       
+#                       )
+#                       """ + str(element.qty_completed)
+#                           + "</td></tr>" """
+#           table += "</tbody></table>"
+#           table += "</br></br><b>Prodlines</b></br>"
+#           for prod in prodline.all():
+#               table += prod.nome + "</br>"
+#
+#           table += (
+#               "</b></b></br><b>Ficheiro diário de Schedule em: </b>" + textPath
+#           )
+#
+#           subject, from_email, to = (
+#               "Wh Production " + nextDay.strftime("%d-%m-%Y"),
+#               "noreply@visteon.com",
+#               ["pmarti30@visteon.com "],
+#               
+#           ) 
+#           """ ,'npires2@visteon.com',
+#                   'abrandao@visteon.com','sanasta1@visteon.com',
+#               'rsalgue2@visteon.com', 'nlopes8@visteon.com',
+#               'abilro1@visteon.com', 'jrodri80@visteon.com',
+#               'evenanc1@visteon.com' """
+#           msg = EmailMultiAlternatives(subject, table, from_email, to)
+#           msg.attach_alternative(table, "text/html")
+#           print(" Mensagem a ser enviada no mail")
+#           msg.send()
+#       else:
+#           print("Estas no else")
+#           mensagem = "</br> Data not found. </br></br>" + "W:\sharedir\MP&L\Schedule" + ""
+#           subject, from_email, to = (
+#               "Wh Production " + nextDay.strftime("%d-%m-%Y"),
+#               "noreply@visteon.com",
+#               ["pmarti30@visteon.com"],   
+#           )
+#           msg = EmailMultiAlternatives(subject, mensagem, from_email, to)
+#           msg.attach_alternative(mensagem, "text/html")
+#           msg.send()
+#
+#   return redirect("crossdocking:configurationsEmailDiario")
+#   
+
+
+
+""" ------------------------///////////-----------------------------//////////////////////  """
+""" ------------------------///////////-----------------------------//////////////////////   """
+def sendFicheiroDiarioAutomatico(*request): 
+    #Esta func é para correr todos os dias às 8 caso não encontre dados na bd manda um email a dizer que não deu para encontrar dados para o dia seguinte 
+    #Adicionar a opção que caso não encontre dados da bd que os procure pelo file (SQUE NÂO É PRECISO).
+    #Ver como seria feito nos fds ( com a opção de por ele a corre apenas em dias uteis, de segunda a sexta)
+    #Ver como seria com os dados do QAD a virem corretamente
+    
+    import datetime
+    from datetime import datetime as dt
+    import os
+    meses = [ "January" , "February " , "March " ,  "April " , "May " , "June " , "July " , "August " , 
+    "September" , "October " , "November " , "December"]
+    datetime_object = dt.now()
+    caminho ='media\crossdocking\Schedule\\' #por o caminho da pasta de acordo com o mês e o ano (era fixe se desse para ficar uma tree como tens no sharedir, está organizado por ANO/Mes)
+    
+    local = f"media\\crossdocking\\Schedule\\{datetime_object.year}\\{meses[datetime_object.month -1 ]} {datetime_object.year}\\" +  f"Daily_Schedule_{datetime_object.day}.{datetime_object.month}.{datetime_object.year}.xlsx"
+    
+    """  ["pmarti30@visteon.com",'npires2@visteon.com',
+                     'abrandao@visteon.com','sanasta1@visteon.com',
+                    'rsalgue2@visteon.com', 'nlopes8@visteon.com',
+                    'abilro1@visteon.com', 'jrodri80@visteon.com',
+                    'evenanc1@visteon.com'] """
+    """  ["pmarti30@visteon.com",'npires2@visteon.com',
+                     'abrandao@visteon.com','sanasta1@visteon.com',
+                    'rsalgue2@visteon.com', 'nlopes8@visteon.com',
+                    'abilro1@visteon.com', 'jrodri80@visteon.com',
+                    'evenanc1@visteon.com'] """
+    import locale
+    timeNow = datetime.datetime.now()
+    
+    print("FUNC EMAIL AUTOMATICO")
+    dadosQAD = WoMstr.objects.values(
+        "wo_due_date", "wo_part", "wo_qty_exp_complete", "wo_qty_comp"
     )
+    elementos_data_base = EmailDiarioSchedule_view.objects
+    prodline = Prodlines.objects
+    elementosDiaSeguinte = ProdlineTable.objects
+    actualDay = datetime.datetime.today() - datetime.timedelta(days=2)
+    nextDay = datetime.datetime.today() + datetime.timedelta(days=1)
+    if nextDay.strftime("%A") == "Saturday":
+        nextDay = datetime.datetime.today() + datetime.timedelta(days=3)
+    if nextDay.strftime("%A") == "Sunday":
+        nextDay = datetime.datetime.today() + datetime.timedelta(days=2)
+    month = nextDay.strftime("%B")
+    mes = nextDay.strftime("%m")
+    fmt_num = nextDay.strftime("%d.%m.%Y")
+    mensagem = ""
+   
+    #'%Y') + "/" + mes + " " + nextDay.strftime('%Y') + "/Daily_Schedule_" + nextDay.strftime(
+    #'%d.%m.%Y') + ".xlsx"
+    
+
+     
+    if nextDay.strftime("%A") == "Saturday" or nextDay.strftime("%A") != "Sunday":
+        local = f"media\\crossdocking\\Schedule\\{datetime_object.year}\\{meses[datetime_object.month -1 ]} {datetime_object.year}\\" +  f"Daily_Schedule_{datetime_object.day+1}.{datetime_object.month}.{datetime_object.year}.xlsx"
+        textPath = local
+
+        #table = '</br><table class="display"><thead style="background-color: lightgray"><tr><th>Line</th><th>Site</th><th>Due Date</th><th>Item Number</th><th>Description</th><th>To Complete</th><th>Receiving</th><th>Comentário Receiving</th><th>Shipping</th><th>Comentário Shipping</th></tr></thead><tbody>'
+        
+        table = '</br><table class="display"><thead style="background-color: lightgray"><tr><th>Line</th><th>Site</th><th>Due Date</th><th>Item Number</th><th>Description</th><th>To Complete</th></tr></thead><tbody>'
+                
+        print("TEste", elementos_data_base.count())
+        if elementos_data_base.count() !=0:
+            for element in elementos_data_base.all():
+
+                for prod in prodline.all():
+                    if prod.nome == element.line:
+                        table += (
+                            '<tr><td style="padding:0 15px 0 15px;">'
+                        + element.line # line
+                        + '</td><td style="padding:0 15px 0 15px;">'
+                        + element.site # site
+                        + '</td><td style="padding:0 15px 0 15px;">'
+                        + str(element.due_date) # due_date
+                        + '</td><td style="padding:0 15px 0 15px;">'
+                        + element.item_number # item_number
+                        + '</td><td style="padding:0 15px 0 15px;">'
+                        + element.description # to_complete
+                        + '</td><td style="padding:0 15px 0 15px;">'
+                        + str(element.to_complete) # description
+                        + "</td></tr>"
+                        )
+
+            table += "</tbody></table>"
+            table += "</br></br><b>Prodlines</b></br>"
+            for prod in prodline.all():
+                table += prod.nome + "</br>"
+
+            table += (
+                "</b></b></br><b>Ficheiro diário de Schedule em: </b>" + f"media\\crossdocking\\Schedule\\{datetime_object.year}\\{meses[datetime_object.month -1 ]} {datetime_object.year}\\" +  f"Daily_Schedule_{nextDay.strftime('%d')}.{datetime_object.month}.{datetime_object.year}.xlsx" + ""
+            )
+
+            subject, from_email, to = (
+                "Wh Production " + nextDay.strftime("%d-%m-%Y"),
+                "noreply@visteon.com",
+                ["pmarti30@visteon.com",'npires2@visteon.com',
+                    'abrandao@visteon.com','sanasta1@visteon.com',
+                'rsalgue2@visteon.com', 'nlopes8@visteon.com',
+                'abilro1@visteon.com', 'jrodri80@visteon.com',
+                'evenanc1@visteon.com'],
+                
+            ) 
+            """ ,'npires2@visteon.com',
+                    'abrandao@visteon.com','sanasta1@visteon.com',
+                'rsalgue2@visteon.com', 'nlopes8@visteon.com',
+                'abilro1@visteon.com', 'jrodri80@visteon.com',
+                'evenanc1@visteon.com' """
+            msg = EmailMultiAlternatives(subject, table, from_email, to)
+            msg.attach_alternative(table, "text/html")
+            print("Mensagem a ser enviada no mail", nextDay.strftime("%d-%m-%Y"))
+            msg.send()
+            return redirect("crossdocking:configurationsEmailDiario")
+        
+        else: #A view não tem dados, quer dizer que ainda não foi importado o ficheiro para o dia seguinte
+            
+            mensagem = "</br> No data found in data base. </br></br>" + f"media\\crossdocking\\Schedule\\{datetime_object.year}\\{meses[datetime_object.month -1 ]} {datetime_object.year}\\" +  f"Daily_Schedule_{nextDay}.{datetime_object.month}.{datetime_object.year}.xlsx" + ""
+            subject, from_email, to = (
+                "Wh Production " + nextDay.strftime("%d-%m-%Y"),
+                "noreply@visteon.com",
+                 ["pmarti30@visteon.com"],
+            )
+            msg = EmailMultiAlternatives(subject, mensagem, from_email, to)
+            msg.attach_alternative(mensagem, "text/html")
+            #msg.send()
+        print("Não é para madar email, é fim-de-seman")
+        return redirect("crossdocking:configurationsEmailDiario")
+   
+   #function for login 
+
+
+def render_karbox(request):
+     return render(request,"crossdocking/karbox.html")
+
+#FALTA ADICIONAR ao ficheiro URLS.py
+
+def add_karbox(request):
+    ref = Karbox()
+    ref.pn
+    return render(request,"crossdocking/karbox.html")
+
+def delete_karbox(request):
+    Karbox(pn = request.POST["pn"], descricao = request.POST["descricao"], qty = request.POST["qty"])
+    return render(request,"crossdocking/karbox.html")
+
+# SUB ITEMS OPERATIONS
+def add_subItem(request):
+    KarboxSubItem(pn = request.POST["pn"], descricao = request.POST["descricao"], qty = request.POST["qty"]).save()
+    return render(request,"crossdocking/karbox.html")
+
+def delete_subItem(request):
+    Karbox(pn = request.POST["pn"], descricao = request.POST["descricao"], qty = request.POST["qty"])
+    return render(request,"crossdocking/karbox.html")
+
+def importKarbox(request):
+    return render(request,"crossdocking/karbox.html")

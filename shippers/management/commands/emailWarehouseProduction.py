@@ -63,6 +63,7 @@ class Command(BaseCommand):
         if mes == "12":
             mes = "Dezembro"
         mensagem = ""
+        #BUG FILESYS
         textPath = (
             "//PAVPD002/E_Proj/sharedir/MP&L/Schedule/"
             + nextDay.strftime("%Y")
@@ -241,7 +242,7 @@ class Command(BaseCommand):
 
             valueSubmitReceiving = ""
             valueSubmitShipping = ""
-
+            #BUG FILESYS
             textPath = (
                 "//PAVPD002/E_Proj/sharedir/MP&L/Schedule/"
                 + actualDay.strftime("%Y")
@@ -340,7 +341,7 @@ class Command(BaseCommand):
 
             valueSubmitReceiving = ""
             valueSubmitShipping = ""
-
+            #BUG FILESYS
             textPath = (
                 "//PAVPD002/E_Proj/sharedir/MP&L/Schedule/"
                 + actualDay.strftime("%Y")

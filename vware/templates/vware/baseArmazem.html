@@ -17,7 +17,6 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" href="{% static 'favicon3.png' %}" type="image/x-icon"/>
-    <link href="https://fonts.googleapis.com/css?family=Nunito+Sans:300,400,600,700,800" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="{% static 'plugins/bootstrap-4.5.2/css/bootstrap.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'plugins/icons/fontawesome-free-5.14.0/css/all.min.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'plugins/icons/icon-kit/dist/css/iconkit.min.css' %}">
@@ -63,6 +62,8 @@
           href="{% static 'plugins/bootstrap4-toggle-3.6.1/css/bootstrap4-toggle.css' %}">
 
     <link rel="stylesheet" type="text/css" href="{% static 'css/foto.css' %}">
+    
+   
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
@@ -124,10 +125,7 @@
 </head>
 
 <body class="d-flex flex-column background2">
-<!--[if lt IE 8]>
-<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade
-    your browser</a> to improve your experience.</p>
-<![endif]-->
+
 <div class="wrapper nav-collapsed menu-collapsed">
     <header class="header-top" header-theme="light">
         <div class="container-fluid">
@@ -235,28 +233,8 @@
                             </div>
                           
                             
-                            <div class="submenu-content ml-lg-n5">
-                                <a href="{% url 'pManagement:supplyPackage' %}" class="menu-item">Supply Package</a>
-                            </div>
-                            <div class="submenu-content ml-n5">
-                                <a href="{% url 'pManagement:clienteProduto' %}" class="menu-item">Cliente Produto
-                                    </a>   </div>
-                            <div class="submenu-content ml-lg-n5">
-                                <a href="{% url 'pManagement:stockPackage' %}" class="menu-item">Stock Package</a>
-                            </div>
-                           
-                            <!-- <div class="submenu-content ml-n4">
-                                <a href="{% url 'pManagement:returnablePacking' %}" class="menu-item">Returnable
-                                    package</a>
-                            </div>
-                            <div class="submenu-content ml-n4">
-                                <a href="{% url 'pManagement:expendablePacking' %}" class="menu-item">Expendable
-                                    package</a>
-                            </div> -->
-                            <div class="submenu-content ml-lg-n5">
-                                <a href="{% url 'pManagement:configurations' %}" class="menu-item">Configurations</a>
-                            </div> 
-                           
+                            
+                         
                            
                         </div>
                         <div class="nav-item has-sub">
@@ -307,6 +285,9 @@
                             <div class="submenu-content ml-n5">
                                 <a href="{% url 'receiving:tenda' %}" class="menu-item">Tenda</a>
                             </div>
+                            <div class="submenu-content ml-n5">
+                                <a href="{% url 'receiving:tendaMecflow' %}" class="menu-item">Tenda MECFLOW</a>
+                            </div>
                         </div>
                         <div class="nav-item has-sub">
                             <a><i class="fas fa-shipping-fast ml-n1"></i><span
@@ -316,6 +297,9 @@
                             </div>
                             <div class="submenu-content ml-n5">
                                 <a href="{% url 'shippers:portaria' %}" class="menu-item ml-lg-4">Portaria</a>
+                            </div>
+                            <div class="submenu-content ml-n5">
+                                <a href="{% url 'shippers:shippersTrackingPage' %}" class="menu-item ml-lg-4">Shippers Tracking</a>
                             </div>
                             <div class="submenu-content ml-lg-n4">
                                 <a href="{% url 'shippers:configurations' %}" class="menu-item ml-lg-4">Configurations</a>
@@ -342,6 +326,12 @@
                             <div class="submenu-content ml-n5">
                                 <a href="{% url 'crossdocking:configurations' %}" class="menu-item ml-lg-4">Configuration</a>
                             </div>
+                            <div class="submenu-content ml-n5">
+                                <a href="{% url 'crossdocking:configurationsEmailDiario' %}" class="menu-item ml-lg-4">Configuration Email</a>
+                            </div>
+                            <div class="submenu-content ml-n5">
+                                <a href="{% url 'crossdocking:render_karbox' %}" class="menu-item ml-lg-4">Karbox</a>
+                            </div>
                         </div>
                         <div class="nav-item has-sub">
                             <a><i class="fas fa-tools "></i><span
@@ -350,6 +340,18 @@
                                 <a href="#" class="menu-item">Equipamentos</a>
                             </div>
                         </div>
+                <!-- ESTA PARTE DO CODIGO ESCONDE A CAFETARIA DO SUBMENU -->
+                {% if user.is_staff %}
+                
+                        <div class="nav-item has-sub">
+                            <a><i class="fas fa-coffee "></i><span
+                                    style="font-weight: bolder;">Cafetaria</span></a>
+                                <div class="submenu-content ml-n5">
+                                    <a href="{% url 'inqueritos:cafetaria' %}" class="menu-item ml-lg-4">Cafetaria</a>
+                                </div>
+                        </div>
+                {% endif %}
+                <!--  -->
                     </nav>
                 </div>
             </div>

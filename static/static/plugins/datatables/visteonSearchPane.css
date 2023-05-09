@@ -1,0 +1,53 @@
+div.dtsp-verticalContainer{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-content: flex-start;
+    align-items: flex-start;
+}
+ 
+div.dtsp-verticalContainer div.dtsp-verticalPanes,
+div.dtsp-verticalContainer div.dtsp-dataTable{
+    width: 50%;
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: 0;
+}
+ 
+div.dtsp-verticalContainer div.dtsp-verticalPanes{
+    flex-grow: 1;
+    flex-shrink: 0;
+    flex-basis: 10%;
+}
+ 
+div.dtsp-title {
+    margin-right: 0px !important;
+    margin-top: 13px !important;
+}
+ 
+input.dtsp-search {
+    min-width: 0px !important;
+    padding-left: 0px !important;
+    margin: 0px !important;
+}
+ 
+div.dtsp-verticalContainer div.dtsp-verticalPanes div.dtsp-searchPanes{
+    flex-direction: column;
+    flex-basis: 0px;
+}
+ 
+div.dtsp-verticalContainer div.dtsp-verticalPanes div.dtsp-searchPanes div.dtsp-searchPane{
+    flex-basis: 0px;
+}
+ 
+div.dtsp-verticalContainer div.dtsp-dataTable{
+    flex-grow: 1;
+    flex-shrink: 0;
+    flex-basis: 70%;
+}
+
+tr.group,
+tr.group:hover {
+    background-color: #ddd !important;
+}

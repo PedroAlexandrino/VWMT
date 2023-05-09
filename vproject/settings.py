@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     "inqueritos",
     "receiving.apps.ReceivingConfig",
     "qad_ee",
+    "django_tables2",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -103,26 +104,55 @@ WSGI_APPLICATION = "vproject.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
+#db portatil
 
-DATABASES = {
-    "default": {
-        "ENGINE": "sql_server.pyodbc",
-        "NAME": "visteon2",
-        "USER": "Aroque1",
-        "PASSWORD": "Django1django",
-        "HOST": "PTD6NJ8CT1\SQLEXPRESS",
-        "OPTIONS": {"driver": "ODBC Driver 13 for SQL Server"},
-    },
-    "qad_ee": {
-        "ENGINE": "sql_server.pyodbc",
-        "NAME": "QAD_EE",
-        "USER": "pwms_read",
-        "PASSWORD": "Pass@4321",
-        "HOST": "GLCDV262\PRO2",
-        "OPTIONS": {"driver": "ODBC Driver 13 for SQL Server"},
-    },
-}
+USE_LOCAL_DATABASE = True
 
+if USE_LOCAL_DATABASE:
+    DATABASES = {
+        "default": {
+            "ENGINE": "mssql",
+            "NAME": "visteon2",
+            "USER": "Aroque1",
+            "PASSWORD": "Django1django",
+            "HOST": "PTD6NJ8CT1\SQLEXPRESS",
+            "OPTIONS": {"driver": "ODBC Driver 17 for SQL Server"},
+        },
+        "qad_ee": {
+            "ENGINE": "mssql",
+            "NAME": "QAD_EE",
+            "USER": "pwms_read",
+            "PASSWORD": "Pass@4321",
+            "HOST": "GLCDV262\PRO2",
+            "OPTIONS": {"driver": "ODBC Driver 17 for SQL Server"},
+        },
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'mssql',
+            'NAME': 'visteon2',
+            #'USER': 'Aroque1',
+            #'PASSWORD': 'Django1django',
+            #'HOST': 'PTD5RNN992\PWMS',
+            'USER': 'vwmt',
+            'PASSWORD': 'vwmt4palmela',
+            'HOST': '10.216.180.197\VWMT',        
+            'OPTIONS': {
+                'driver': 'ODBC Driver 17 for SQL Server'
+            },
+        },
+        'qad_ee': {
+            'ENGINE': 'mssql',
+            'NAME': 'QAD_EE',
+            'USER': 'pwms_read',
+            'PASSWORD': 'Pass@4321',
+            'HOST': 'GLCDV262\PRO2',
+            'OPTIONS': {
+                'driver': 'ODBC Driver 17 for SQL Server'
+            },
+        }
+    }
 
 DATABASE_ROUTERS = [
     "routers.db_routers.DefaultRouter",

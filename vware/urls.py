@@ -2,8 +2,8 @@ from . import views
 from django.conf.urls.static import static
 from django.views.static import serve
 from django.conf import settings
-from django.conf.urls import url
-from django.urls import path
+from django.urls import re_path as url
+from django.urls import path, re_path
 from .decorators import MetaRoutes
 
 
@@ -35,7 +35,7 @@ urlpatterns = [
     #   path('receivingOperation/', views.receivingOperation, name='receivingOperation'),
     #   path('nonProductionOperation/', views.nonProductionOperation, name='nonProductionOperation'),
     #   path('armazem/tabelaParent/', views.armazem_tabelaParent, name='armazem_tabelaParent'),
-    url(r"^download/(?P<path>.*)$", serve, {"document_root": settings.MEDIA_ROOT}),
+    re_path(r"^download/(?P<path>.*)$", serve, {"document_root": settings.MEDIA_ROOT}),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 print(f"Foram adicionadas {len(MetaRoutes.routes)} rotas")

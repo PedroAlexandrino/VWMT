@@ -109,7 +109,7 @@
                             data-toggle="modal"
                             data-target="#addKardex" id="adicionarKardex">Add new
                     </button>
-                    </br>
+                    </br>redLine
                     <div id="removeButton">
                         <button class="btn btn-outline-dark mt-1"
                                 style="height: 16px; width: 70px; margin-left: -18px"
@@ -121,6 +121,9 @@
                 </tfoot>
             </table>
         </div>
+
+   
+
         <form method="POST" enctype="multipart/form-data" action="{% url 'receiving:updateTimers' %}">
             {% csrf_token %}
             <div style="width: 30%; height: 25%; top: 70%; left: 35%; position: absolute; border: 3px solid transparent;">
@@ -305,26 +308,129 @@
         </div>
     </form>
 
+
+
+    <div class="modal fade"  id="modalReportsMNFG" style="pointer-events: none; padding-left: 20%; display: block;" data-keyboard='false' 
+    data-backdrop="static"  role="dialog" aria-labelledby="myModalLabel">
+<div class="modal-dialog" role="document"  >
+   <div class="modal-content" style="width: 120%; height: 135%; margin-left: -30%;">
+       <div class="modal-header">
+           <h3 class="modal-title" id="myModalLabel"><b>REPORT MNFG:</b></h3>
+       </div>   
+       <div class="modal-body" style="margin-bottom: -10%;">
+           <div class="containerPrincipal" style="width: 20%; height: 10%;margin-bottom: 2%;">
+                <div style="margin-left: 100%;margin-top: -25%"> 
+                    <div id="calendar" ></div>
+                </div>
+                
+
+                
+           </div>
+           <div class="modal-footer" style = "margin-bottom: 10%" >
+            <button type="button" id="closeModal" class="btn btn-primary" data-dismiss="modal">Sair</button>
+            <button type="button" id="saveModal"  class="btn btn-primary"data-dismiss="modal">Ok</button>
+        </div>
+       
+       </div>
+    </div>
+</div>
+</div>
+
+<button type="button" id="btnReport"  class="btn btn-primary" style="margin-left: 5%; margin-bottom: 4%;">Report MNFG:</button>
+<!-- <button id="sendReport-btn" style="width: 20%; height: 20%;margin-left:75%;margin-top: -20%"  class="btn btn-primary">Report MNFG</button> -->
+
+
 {% endblock %}
 
 {% block javascript %}
-
+</script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/confetti.css">
     <script>
         $(document).ready(function () {
-            var tableAreaA = $('#areaA').DataTable({
-                "searching": false,
-                "info": false,
-                "paging": false,
-                "ordering": false,
-                "scrollCollapse": true,
-                "scrollY": "420px",
-                "select": {
-                    style: 'os',
-                    items: 'cell'
-                },
-            });
+            $("#btnReport").click(function(){
+                var today = new Date();
+                
+                $('#modalReportsMNFG').modal('show');
+            })
+        
+        var selectedDates = [];
+        var today = new Date()
+        var datePicker =  flatpickr("#calendar", {
+            inline: true,
+            dateFormat: "m/d/Y",
+            mode: "single",
+            defaultDate: [today, today],
+        });
 
-            $('#areaA tbody').on('click', 'tr', function () {
+        $("#saveModal").click(function(){
+            var start_date = datePicker.selectedDates[0];
+            const options = { day: 'numeric', month: 'numeric', year: 'numeric' };
+            const formattedDate = new Intl.DateTimeFormat('pt-BR', options).format(start_date);
+            console.log("DATA FORMATADA-->",formattedDate, start_date); 
+            $.ajax({
+                    type: "POST",
+                    url: '/receiving/sendRelatorioDiarioSupply/',
+                    data: {csrfmiddlewaretoken: "{{ csrf_token }}", 
+                    data_report : formattedDate , start_date : start_date},
+                    success: function(response) {
+                        console.log("RESPOSTA.--)", response)
+                        if (response.message === "Excel"){
+                        alert("report foi criado em excel")
+                        var element = document.createElement('a');
+                            //Ainda por fazer
+                            element.setAttribute('href', '/media/receiving/MNFG/workbookReportMNFG.xls');
+                            element.setAttribute('download', 'workbookReportMNFG.xls');
+
+                            element.style.display = 'none';
+                            document.body.appendChild(element);
+
+                            element.click();
+
+                            document.body.removeChild(element);
+                        }else{
+                            alert("report foi criado seguiu para email")
+                        }
+                    },
+                })
+        })
+        $("#sendReport-btn").click(function(){
+                console.log("Clicas-te no btn refresh")
+            Swal.fire({
+                    icon: 'error',
+                    title: 'A enviar o report diario dos contadores MNFG',
+                    showConfirmButton: true
+                    });
+            $.ajax({
+                type: "POST",
+                url: '/receiving/sendRelatorioDiarioSupply/',
+                data: {csrfmiddlewaretoken: "{{ csrf_token }}",
+                success: function(response) {
+                    console.log("RESPOSTA -->",response)
+                    console.log("e para fazer refresh")
+                    // temporizador 12s para dar tempo para popular as tabelas
+                //location.reload()
+                //window.location.reload()
+                
+                }, }
+            })
+        })
+
+
+        var tableAreaA = $('#areaA').DataTable({
+            "searching": false,
+            "info": false,
+            "paging": false,
+            "ordering": false,
+            "scrollCollapse": true,
+            "scrollY": "420px",
+            "select": {
+                style: 'os',
+                items: 'cell'
+            },
+        });
+
+        $('#areaA tbody').on('click', 'tr', function () {
                 var storageZone = tableAreaA.row($(this)).data();
                 var modalInfo = "Want to delete " + storageZone + "?";
                 $('#infoAreaA').html(modalInfo);
@@ -347,6 +453,7 @@
                     items: 'cell'
                 },
             });
+
             $('#areaB tbody').on('click', 'tr', function () {
                 var storageZone = tableAreaB.row($(this)).data();
                 var modalInfo = "Want to delete " + storageZone + "?";

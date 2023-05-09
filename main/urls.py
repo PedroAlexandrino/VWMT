@@ -2,9 +2,7 @@ from . import views
 from django.conf.urls.static import static
 from django.views.static import serve
 from django.conf import settings
-from django.conf.urls import url
-from django.urls import path
-from django.contrib import admin
+from django.urls import path, re_path
 
 # tentar ir ao main pelo decorator
 app_name = "main"
@@ -12,7 +10,9 @@ app_name = "main"
 
 urlpatterns = [
     path("", views.home, name="main"),
-    url(r"^download/(?P<path>.*)$", serve, {"document_root": settings.MEDIA_ROOT}),
+    path("updatesJson/", views.updatesJson, name="updatesJson"),
+    path("addUpdate/", views.addUpdate, name="addUpdate"),
+    re_path(r"^download/(?P<path>.*)$", serve, {"document_root": settings.MEDIA_ROOT}),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:

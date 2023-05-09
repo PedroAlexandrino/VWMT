@@ -1,0 +1,74 @@
+-> Limpar o ficheiro Base Armazem para dares import de tudo por ali (calendario da portaria/shipersTracking)
+    - deixar uma versão com imports online de backup e uma de imports locais
+
+
+
+-> incluir os campos que foram definidos com o nuno para fazer entrar subitems (ser_serial_id, oid_ser_mstr_parent, oid_ser_mstr, ser_stage, ser_part)
+
+
+falta por uma tabela no sub items para que apareca o titulo apenas uma vez
+    - está uma verção antiga comentada (falta testar novo codigo)
+
+
+
+Verificar se os verdes estão a funcionar
+-por o schedhuler para o populate_shippersTracking
+- verificar a questão do vehicle_id ficar a amarelo (este mecanismo vai ser aplicado numa pagina especial)
+- continuar a pagina de pvTable, ver quais são as metricas e como ficaria a tabela
+
+
+
+to do(5/4/2023)
+acabar os verdes
+    - é para verificares se a ship_date é infeior ao timestamp é para por verde 
+    (apenas as linhas que venam com o ship_date para o proprio dia( porque o timestamp vai ser o daquele dia) é que ficam sem ser verde) (Done/ falta validação)
+
+tratar a questão dos sub-items
+    - tratar da bd (many to may field) (está no sublime)
+    - tratar do request para ir buscar todos os valores relacionados com o abs_id que eu lhe envio (está a ir buscar com um get e as vezes da erro)
+    - tratar da view que devolve os dados para mostrar nos subItems
+
+
+Tratar de fazer as migrations para teres o campo manyToManyField(*) 
+
+
+
+-criar flag para campos que tenham sub items para quando for clicado no botao plus abrir so os que tem sub items 
+
+to do (8/5):
+- enviar mail diario (done)
+- verificar codigo dos sub-items (done) FALTA CONFIRMAR FOMATO DA TABELA DOS Sub-Items
+- trocar cores dos servidores   (mais softs) (done?)
+    -> Shippers tracking 
+    -> MNFG
+    -> Fa Supply
+    -> Bp Dropin
+    -> BpSMD 
+
+-> Avançar para as paginas que vão ser pvTable
+    -> Ver como vão ser as metricas (audio last-one)
+    -> ver se o boss quer com calendario ou vá acrescentnado dados sob o mes atual
+
+-> verificar Paginas MNFG dos servers parece que tem dado erros 
+-> limpar calendarizações 
+
+-> para email diario dos schedules podes verificar se existem dados na bd antes de enviar o email/enviar email a dizer que não tem dados
+
+-> Se estiver tudo ok passar para o servidor as alterações para os sub-items com calendarização talvez de 10-15m
+
+
+para novos 2 campos na tabela dos shippers tracking 
+    - criar os campos na bd
+    - criar func que vai precorrer todos os sub-items deste abs_id, somar e guardar total_seconds
+    -> Ver com o boss a questão do valor "0E-10" para o contador do abs_ship_qty
+
+
+-> ver questão dos NONE da shippersTracking
+-> ver questão dos verdes
+
+acabar de passar codigo para abrir sub_items(shippers_1.0)
+
+passar 2 campos novos para a bd (NOME_BD) ::MIGRATIONS::
+estes campos vão guardar as somas destes campos (abs_qty/abs_ship_qty) dos sub_items e passar este somatorio para a tabela containerPrincipal (setSomatoriosShippersTracking())
+    -> sum_abs_qty
+    -> sum_abs_ship_qty 

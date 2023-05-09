@@ -2,24 +2,31 @@ from . import views
 from django.conf.urls.static import static
 from django.views.static import serve
 from django.conf import settings
-from django.conf.urls import url
-from django.urls import path
+from django.urls import path, re_path
 
 app_name = "receiving"
 
 urlpatterns = [
     # TENDA
-    path("tenda/", views.tenda, name="tenda"),
+    path("tenda/", views.tenda, name="tenda"), 
+    path("downladExcelTenda/", views.downladExcelTenda, name="downladExcelTenda"),
     path("updateTenda/", views.updateTenda, name="updateTenda"),
     path("uploadTendaCosts/", views.uploadTendaCosts, name="uploadTendaCosts"),
-    # LINE REQUEST
+    #TendaMECFLOW
+    path("tendaMecflow/", views.tendaMECFLOW, name="tendaMecflow"), 
+    path("uploadTendaMECFLOWCosts/", views.uploadTendaCostsMECFLOW, name="uploadTendaMECFLOWCosts"), 
+    # LINE 
     path("lineRequest/", views.lineRequest, name="lineRequest"),
     path(
         "uploadDataLineRequest/",
         views.uploadDataLineRequest,
-        name="uploadDataLineRequest",
+        name="uploadDataLineRequest"
     ),
+    
+    path("getNokSmart/", views.getNokSmart, name="getNokSmart"),
+    path("testeSchedule/", views.testeSchedule, name="testeSchedule"),
     path("configurations/", views.configurations, name="configurations"),
+    path("getErros/", views.getErros, name="getErros"),
     path("createLine/", views.createLine, name="createLine"),
     path("deleteLine/", views.deleteLine, name="deleteLine"),
     path("deleteJustification/", views.deleteJustification, name="deleteJustification"),
@@ -29,6 +36,18 @@ urlpatterns = [
     path("configurationMNFG/", views.configurationMNFG, name="configurationMNFG"),
     path("faSupply/", views.faSupply, name="faSupply"),
     path("uploadTaskBrowse/", views.uploadTaskBrowse, name="uploadTaskBrowse"),
+
+    path("media_Supply_Fa/", views.media_Supply_Fa, name="media_Supply_Fa"),
+    path("media_bp_Dropin_Supply/", views.media_bp_Dropin_Supply, name="media_bp_Dropin_Supply"),
+    path("media_bpsmdSupply/", views.media_bpsmdSupply, name="media_bpsmdSupply"),
+    path("mostraContadores/", views.mostraContadores, name="mostraContadores"),
+    path("mediaTurnosEcontadores/", views.mediaTurnosEcontadores, name="mediaTurnosEcontadores"), 
+    path("getVermelhosSupply/", views.getVermelhosSupply, name="getVermelhosSupply"),
+    path("alteraEstadoAlertaSupply/", views.alteraEstadoAlertaSupply, name="alteraEstadoAlertaSupply"),
+    path("getEstadoAlertaSupply/", views.getEstadoAlertaSupply, name="getEstadoAlertaSupply"),
+    path("sendRelatorioDiarioSupply/", views.sendRelatorioDiarioSupply, name="sendRelatorioDiarioSupply"),
+
+    
     # path('getTaskBrowse/', views.getTaskBrowse, name='getTaskBrowse'),
     path("bpDropinSupply/", views.bpDropinSupply, name="bpDropinSupply"),
     path("bpSMDSupply/", views.bpSMDSupply, name="bpSMDSupply"),
@@ -104,7 +123,7 @@ urlpatterns = [
         "submitDataInicioTurno4/",
         views.submitDataInicioTurno4,
         name="submitDataInicioTurno4",
-    ),
+    ),path("adiciona_val_vermelhos_automatico_Supply/",views.adiciona_val_vermelhos_automatico_Supply, name="adiciona_val_vermelhos_automatico_Supply",),
     path(
         "submitDataFinalTurno5/",
         views.submitDataFinalTurno5,
@@ -230,7 +249,14 @@ urlpatterns = [
     path("reportLineRequest/", views.reportLineRequest, name="reportLineRequest"),
     path("reportTPM/", views.reportTPM, name="reportTPM"),
     path("reportMNFGSupply/", views.reportMNFGSupply, name="reportMNFGSupply"),
-    url(r"^download/(?P<path>.*)$", serve, {"document_root": settings.MEDIA_ROOT}),
+    # MEDIAS mNFGSupply
+    path("adiciona_val_para_mediaSupply/", views.adiciona_val_para_mediaSupply, name="adiciona_val_para_mediaSupply"), 
+    path("adiciona_val_mediaBPSMDSupply/", views.adiciona_val_mediaBPSMDSupply, name="adiciona_val_mediaBPSMDSupply"), 
+    path("adiciona_val_mediaBPDropinSupply/", views.adiciona_val_mediaBPDropinSupply, name="adiciona_val_mediaBPDropinSupply"), 
+    path("mediaTurnos/", views.mediaTurnos, name="mediaTurnos"), 
+    path("addCommentsToReport/", views.addCommentsToReport, name="addCommentsToReport"), 
+
+    re_path(r"^download/(?P<path>.*)$", serve, {"document_root": settings.MEDIA_ROOT}),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:

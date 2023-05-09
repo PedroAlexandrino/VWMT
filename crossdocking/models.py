@@ -87,3 +87,79 @@ class ProdlineHistoryAllTime(models.Model):
     # TO STRING METHOD
     def __str__(self):
         return f"{self.day + ' ' + self.line}"
+
+
+class EmailDiarioInformacao(models.Model):
+    ficheiro = models.FileField(null=True, upload_to="ConfigurationsEmail/")
+    data_guardado = models.CharField(max_length=20, null=True, blank=True)
+    
+    def __str__(self):
+        return f"{self.ficheiro}"
+
+
+
+class EmailDiarioSchedule(models.Model):
+    line = models.CharField(max_length=50, null=True)
+    site = models.CharField(max_length=50, null=True)
+    due_date = models.CharField(max_length=50, null=True)
+    item_number = models.CharField(max_length=50, null=True)
+    to_complete = models.CharField(max_length=50, null=True)
+    description = models.CharField(max_length=200, null=True)
+    qty_completed = models.CharField(max_length=50, null=True)
+    timeStamp = models.CharField(max_length=200, null=True)
+
+    def __str__(self):
+        return f"{self.line}"
+
+
+
+class EmailDiarioSchedule_view(models.Model):
+    line = models.CharField(max_length=50, null=True)
+    site = models.CharField(max_length=50, null=True)
+    due_date = models.CharField(max_length=50, null=True)
+    item_number = models.CharField(max_length=50, null=True)
+    to_complete = models.CharField(max_length=50, null=True)
+    description = models.CharField(max_length=200, null=True)
+    qty_completed = models.CharField(max_length=50, null=True)
+    timeStamp = models.CharField(max_length=200, null=True)
+
+    class Meta:
+        managed = False
+        db_table ="informacao_email_schedule"
+
+    # TO STRING METHOD
+    def __str__(self):
+        return f"{self.line}"
+
+class KarboxSubItem(models.Model):
+    pn = models.CharField(max_length=50, null=True)
+    nmr_carro = models.CharField(max_length=50, null=True) 
+    serial_number = models.CharField(max_length=50, null=True) 
+    class Meta:
+        managed = False
+    # TO STRING METHOD
+    def __str__(self):
+        return f"{self.pn}"
+
+
+class Karbox(models.Model):
+    pn = models.CharField(max_length=50, null=True)
+    nmr_carro = models.CharField(max_length=50, null=True) 
+    serial_number = models.CharField(max_length=50, null=True) 
+    subItem = models.ManyToManyField(KarboxSubItem) #models.ForeignKey(KarboxSubItem, on_delete=models.CASCADE)
+    #N TENHO CERTEZA
+    estado = models.CharField(max_length=50, null=True)
+    class Meta:
+        managed = False
+    # TO STRING METHOD
+    def __str__(self):
+        return f"{self.pn}"
+    
+
+
+
+
+
+
+
+        

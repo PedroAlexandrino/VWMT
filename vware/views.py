@@ -250,6 +250,7 @@ def qpsPacking(request):
     if request.method == "GET":
         oemCliente = request.GET["oemCliente"]
 
+        #BUG FILESYS
         caminho = (
             "//PAVPD002/E_Proj/sharedir/MP&L/PROCEDIMENTOS/Packaging/QPS EMBALAGEM/"
             + oemCliente
@@ -263,6 +264,7 @@ def qpsPacking(request):
 @route("qpsShipping/", name="qpsShipping")
 def qpsShipping(request):
     if request.method == "GET":
+        #BUG FILESYS
         caminho = "//PAVPD002/E_Proj/sharedir/MP&L/PROCEDIMENTOS/Shipping/QPS Shipping"
 
         files = os.listdir(caminho)
@@ -271,8 +273,8 @@ def qpsShipping(request):
 
 
 @route("configurationShippingOperation/", name="configurationShippingOperation")
-@login_required()
-@user_passes_test(lambda u: u.groups.filter(name="admin").exists())
+# @login_required()
+# @user_passes_test(lambda u: u.groups.filter(name="admin").exists())
 def configurationShippingOperation(request):
     if request.method == "POST":
         file_form = FileModelForm(request.POST, request.FILES)
@@ -291,77 +293,77 @@ def configurationShippingOperation(request):
         if file_form.is_valid():
             if request.FILES.getlist("one"):
                 ShippingOperation.objects.exclude(one="").delete()
-                caminho = "C:/visteon/media/shipping/one"
+                caminho = "visteon/media/shipping//one"
                 if os.path.exists(caminho):
                     for entry in os.listdir(caminho):
                         if os.path.isfile(os.path.join(caminho, entry)):
                             os.remove(caminho + "/" + entry)
             if request.FILES.getlist("two"):
                 ShippingOperation.objects.exclude(two="").delete()
-                caminho = "C:/visteon/media/shipping/two"
+                caminho = "visteon/media/shipping/two"
                 if os.path.exists(caminho):
                     for entry in os.listdir(caminho):
                         if os.path.isfile(os.path.join(caminho, entry)):
                             os.remove(caminho + "/" + entry)
             if request.FILES.getlist("three"):
                 ShippingOperation.objects.exclude(three="").delete()
-                caminho = "C:/visteon/media/shipping/three"
+                caminho = "visteon/media/shipping/three"
                 if os.path.exists(caminho):
                     for entry in os.listdir(caminho):
                         if os.path.isfile(os.path.join(caminho, entry)):
                             os.remove(caminho + "/" + entry)
             if request.FILES.getlist("four"):
                 ShippingOperation.objects.exclude(four="").delete()
-                caminho = "C:/visteon/media/shipping/four"
+                caminho = "visteon/media/shipping/four"
                 if os.path.exists(caminho):
                     for entry in os.listdir(caminho):
                         if os.path.isfile(os.path.join(caminho, entry)):
                             os.remove(caminho + "/" + entry)
             if request.FILES.getlist("five"):
                 ShippingOperation.objects.exclude(five="").delete()
-                caminho = "C:/visteon/media/shipping/five"
+                caminho = "visteon/media/shipping/five"
                 if os.path.exists(caminho):
                     for entry in os.listdir(caminho):
                         if os.path.isfile(os.path.join(caminho, entry)):
                             os.remove(caminho + "/" + entry)
             if request.FILES.getlist("six"):
                 ShippingOperation.objects.exclude(six="").delete()
-                caminho = "C:/visteon/media/shipping/six"
+                caminho = "visteon/media/shipping/six"
                 if os.path.exists(caminho):
                     for entry in os.listdir(caminho):
                         if os.path.isfile(os.path.join(caminho, entry)):
                             os.remove(caminho + "/" + entry)
             if request.FILES.getlist("seven"):
                 ShippingOperation.objects.exclude(seven="").delete()
-                caminho = "C:/visteon/media/shipping/seven"
+                caminho = "visteon/media/shipping/seven"
                 if os.path.exists(caminho):
                     for entry in os.listdir(caminho):
                         if os.path.isfile(os.path.join(caminho, entry)):
                             os.remove(caminho + "/" + entry)
             if request.FILES.getlist("eight"):
                 ShippingOperation.objects.exclude(eight="").delete()
-                caminho = "C:/visteon/media/shipping/eight"
+                caminho = "visteon/media/shipping/eight"
                 if os.path.exists(caminho):
                     for entry in os.listdir(caminho):
                         if os.path.isfile(os.path.join(caminho, entry)):
                             os.remove(caminho + "/" + entry)
             if request.FILES.getlist("checklist"):
                 ShippingOperation.objects.exclude(checklist="").delete()
-                caminho = "C:/visteon/media/shipping/checklist"
+                caminho = "visteon/media/shipping/checklist"
                 if os.path.exists(caminho):
                     for entry in os.listdir(caminho):
                         if os.path.isfile(os.path.join(caminho, entry)):
                             os.remove(caminho + "/" + entry)
             if request.FILES.getlist("other"):
                 ShippingOperation.objects.exclude(others="").delete()
-                caminho = "C:/visteon/media/shipping/others"
+                caminho = "visteon/media/shipping/others"
                 if os.path.exists(caminho):
                     for entry in os.listdir(caminho):
                         if os.path.isfile(os.path.join(caminho, entry)):
                             os.remove(caminho + "/" + entry)
             if request.FILES.getlist("requestShipper"):
                 ShippingOperation.objects.exclude(requestShippers="").delete()
-                caminho = "C:/visteon/media/shipping/requestShipper"
+                caminho = "visteon/media/shipping/requestShipper"
                 if os.path.exists(caminho):
                     for entry in os.listdir(caminho):
                         if os.path.isfile(os.path.join(caminho, entry)):
@@ -435,63 +437,63 @@ def configurationReceivingOperation(request):
         if file_form.is_valid():
             if request.FILES.getlist("one"):
                 ReceivingOperation.objects.exclude(one="").delete()
-                caminho = "C:/visteon/media/receiving/one"
+                caminho = "visteon/media/receiving/one"
                 if os.path.exists(caminho):
                     for entry in os.listdir(caminho):
                         if os.path.isfile(os.path.join(caminho, entry)):
                             os.remove(caminho + "/" + entry)
             if request.FILES.getlist("two"):
                 ReceivingOperation.objects.exclude(two="").delete()
-                caminho = "C:/visteon/media/receiving/two"
+                caminho = "visteon/media/receiving/two"
                 if os.path.exists(caminho):
                     for entry in os.listdir(caminho):
                         if os.path.isfile(os.path.join(caminho, entry)):
                             os.remove(caminho + "/" + entry)
             if request.FILES.getlist("three"):
                 ReceivingOperation.objects.exclude(three="").delete()
-                caminho = "C:/visteon/media/receiving/three"
+                caminho = "visteon/media/receiving/three"
                 if os.path.exists(caminho):
                     for entry in os.listdir(caminho):
                         if os.path.isfile(os.path.join(caminho, entry)):
                             os.remove(caminho + "/" + entry)
             if request.FILES.getlist("four"):
                 ReceivingOperation.objects.exclude(four="").delete()
-                caminho = "C:/visteon/media/receiving/four"
+                caminho = "visteon/media/receiving/four"
                 if os.path.exists(caminho):
                     for entry in os.listdir(caminho):
                         if os.path.isfile(os.path.join(caminho, entry)):
                             os.remove(caminho + "/" + entry)
             if request.FILES.getlist("five"):
                 ReceivingOperation.objects.exclude(five="").delete()
-                caminho = "C:/visteon/media/receiving/five"
+                caminho = "visteon/media/receiving/five"
                 if os.path.exists(caminho):
                     for entry in os.listdir(caminho):
                         if os.path.isfile(os.path.join(caminho, entry)):
                             os.remove(caminho + "/" + entry)
             if request.FILES.getlist("six"):
                 ReceivingOperation.objects.exclude(six="").delete()
-                caminho = "C:/visteon/media/receiving/six"
+                caminho = "visteon/media/receiving/six"
                 if os.path.exists(caminho):
                     for entry in os.listdir(caminho):
                         if os.path.isfile(os.path.join(caminho, entry)):
                             os.remove(caminho + "/" + entry)
             if request.FILES.getlist("seven"):
                 ReceivingOperation.objects.exclude(seven="").delete()
-                caminho = "C:/visteon/media/receiving/seven"
+                caminho = "visteon/media/receiving/seven"
                 if os.path.exists(caminho):
                     for entry in os.listdir(caminho):
                         if os.path.isfile(os.path.join(caminho, entry)):
                             os.remove(caminho + "/" + entry)
             if request.FILES.getlist("eight"):
                 ReceivingOperation.objects.exclude(eight="").delete()
-                caminho = "C:/visteon/media/receiving/eight"
+                caminho = "visteon/media/receiving/eight"
                 if os.path.exists(caminho):
                     for entry in os.listdir(caminho):
                         if os.path.isfile(os.path.join(caminho, entry)):
                             os.remove(caminho + "/" + entry)
             if request.FILES.getlist("nine"):
                 ReceivingOperation.objects.exclude(nine="").delete()
-                caminho = "C:/visteon/media/receiving/nine"
+                caminho = "visteon/media/receiving/nine"
                 if os.path.exists(caminho):
                     for entry in os.listdir(caminho):
                         if os.path.isfile(os.path.join(caminho, entry)):
@@ -536,8 +538,8 @@ def configurationReceivingOperation(request):
 
 
 @route("configurationCrossdockingOperation/", name="configurationCrossdockingOperation")
-@login_required()
-@user_passes_test(lambda u: u.groups.filter(name="admin").exists())
+# @login_required()
+# @user_passes_test(lambda u: u.groups.filter(name="admin").exists())
 def configurationCrossdockingOperation(request):
     if request.method == "POST":
         ford = request.FILES.get("fordCrossdockingFile")  # field name in model
@@ -547,7 +549,7 @@ def configurationCrossdockingOperation(request):
 
         if ford:
             Crossdocking.objects.exclude(ford="").delete()
-            caminho = "C:/visteon/media/crossdocking/ford"
+            caminho = "visteon/media/crossdocking/ford"
             if os.path.exists(caminho):
                 for entry in os.listdir(caminho):
                     if os.path.isfile(os.path.join(caminho, entry)):
@@ -557,7 +559,7 @@ def configurationCrossdockingOperation(request):
             novoDoc.save()
         if psa:
             Crossdocking.objects.exclude(psa="").delete()
-            caminho = "C:/visteon/media/crossdocking/psa"
+            caminho = "visteon/media/crossdocking/psa"
             if os.path.exists(caminho):
                 for entry in os.listdir(caminho):
                     if os.path.isfile(os.path.join(caminho, entry)):
@@ -567,7 +569,7 @@ def configurationCrossdockingOperation(request):
             novoDoc.save()
         if scania:
             Crossdocking.objects.exclude(scania="").delete()
-            caminho = "C:/visteon/media/crossdocking/scania"
+            caminho = "visteon/media/crossdocking/scania"
             if os.path.exists(caminho):
                 for entry in os.listdir(caminho):
                     if os.path.isfile(os.path.join(caminho, entry)):
@@ -577,7 +579,7 @@ def configurationCrossdockingOperation(request):
             novoDoc.save()
         if volvo:
             Crossdocking.objects.exclude(volvo="").delete()
-            caminho = "C:/visteon/media/crossdocking/volvo"
+            caminho = "visteon/media/crossdocking/volvo"
             if os.path.exists(caminho):
                 for entry in os.listdir(caminho):
                     if os.path.isfile(os.path.join(caminho, entry)):
@@ -610,7 +612,7 @@ def configurationDocumentacao(request):
 
         if one:
             Procedimentos.objects.exclude(docOne="").delete()
-            caminho = "C:/visteon/media/procedimentos/documentacao/one"
+            caminho = "visteon/media/procedimentos/documentacao/one"
             if os.path.exists(caminho):
                 for entry in os.listdir(caminho):
                     if os.path.isfile(os.path.join(caminho, entry)):
@@ -620,7 +622,7 @@ def configurationDocumentacao(request):
             novoDoc.save()
         if two:
             Procedimentos.objects.exclude(docTwo="").delete()
-            caminho = "C:/visteon/media/procedimentos/documentacao/two"
+            caminho = "visteon/media/procedimentos/documentacao/two"
             if os.path.exists(caminho):
                 for entry in os.listdir(caminho):
                     if os.path.isfile(os.path.join(caminho, entry)):
@@ -630,7 +632,7 @@ def configurationDocumentacao(request):
             novoDoc.save()
         if three:
             Procedimentos.objects.exclude(docThree="").delete()
-            caminho = "C:/visteon/media/procedimentos/documentacao/three"
+            caminho = "visteon/media/procedimentos/documentacao/three"
             if os.path.exists(caminho):
                 for entry in os.listdir(caminho):
                     if os.path.isfile(os.path.join(caminho, entry)):
@@ -640,7 +642,7 @@ def configurationDocumentacao(request):
             novoDoc.save()
         if four:
             Procedimentos.objects.exclude(docFour="").delete()
-            caminho = "C:/visteon/media/procedimentos/documentacao/four"
+            caminho = "visteon/media/procedimentos/documentacao/four"
             if os.path.exists(caminho):
                 for entry in os.listdir(caminho):
                     if os.path.isfile(os.path.join(caminho, entry)):
@@ -650,7 +652,7 @@ def configurationDocumentacao(request):
             novoDoc.save()
         if five:
             Procedimentos.objects.exclude(docFive="").delete()
-            caminho = "C:/visteon/media/procedimentos/documentacao/five"
+            caminho = "visteon/media/procedimentos/documentacao/five"
             if os.path.exists(caminho):
                 for entry in os.listdir(caminho):
                     if os.path.isfile(os.path.join(caminho, entry)):
@@ -660,7 +662,7 @@ def configurationDocumentacao(request):
             novoDoc.save()
         if six:
             Procedimentos.objects.exclude(docSix="").delete()
-            caminho = "C:/visteon/media/procedimentos/documentacao/six"
+            caminho = "visteon/media/procedimentos/documentacao/six"
             if os.path.exists(caminho):
                 for entry in os.listdir(caminho):
                     if os.path.isfile(os.path.join(caminho, entry)):
@@ -670,7 +672,7 @@ def configurationDocumentacao(request):
             novoDoc.save()
         if seven:
             Procedimentos.objects.exclude(docSeven="").delete()
-            caminho = "C:/visteon/media/procedimentos/documentacao/seven"
+            caminho = "visteon/media/procedimentos/documentacao/seven"
             if os.path.exists(caminho):
                 for entry in os.listdir(caminho):
                     if os.path.isfile(os.path.join(caminho, entry)):
@@ -680,7 +682,7 @@ def configurationDocumentacao(request):
             novoDoc.save()
         if eight:
             Procedimentos.objects.exclude(docEight="").delete()
-            caminho = "C:/visteon/media/procedimentos/documentacao/eight"
+            caminho = "visteon/media/procedimentos/documentacao/eight"
             if os.path.exists(caminho):
                 for entry in os.listdir(caminho):
                     if os.path.isfile(os.path.join(caminho, entry)):
@@ -690,7 +692,7 @@ def configurationDocumentacao(request):
             novoDoc.save()
         if nine:
             Procedimentos.objects.exclude(docNine="").delete()
-            caminho = "C:/visteon/media/procedimentos/documentacao/nine"
+            caminho = "visteon/media/procedimentos/documentacao/nine"
             if os.path.exists(caminho):
                 for entry in os.listdir(caminho):
                     if os.path.isfile(os.path.join(caminho, entry)):
@@ -725,63 +727,63 @@ def configurationAnexos(request):
         if file_form.is_valid():
             if one:
                 Procedimentos.objects.exclude(anexoOne="").delete()
-                caminho = "C:/visteon/media/procedimentos/anexos/one"
+                caminho = "visteon/media/procedimentos/anexos/one"
                 if os.path.exists(caminho):
                     for entry in os.listdir(caminho):
                         if os.path.isfile(os.path.join(caminho, entry)):
                             os.remove(caminho + "/" + entry)
             if two:
                 Procedimentos.objects.exclude(anexoTwo="").delete()
-                caminho = "C:/visteon/media/procedimentos/anexos/two"
+                caminho = "visteon/media/procedimentos/anexos/two"
                 if os.path.exists(caminho):
                     for entry in os.listdir(caminho):
                         if os.path.isfile(os.path.join(caminho, entry)):
                             os.remove(caminho + "/" + entry)
             if three:
                 Procedimentos.objects.exclude(anexoThree="").delete()
-                caminho = "C:/visteon/media/procedimentos/anexos/three"
+                caminho = "visteon/media/procedimentos/anexos/three"
                 if os.path.exists(caminho):
                     for entry in os.listdir(caminho):
                         if os.path.isfile(os.path.join(caminho, entry)):
                             os.remove(caminho + "/" + entry)
             if four:
                 Procedimentos.objects.exclude(anexoFour="").delete()
-                caminho = "C:/visteon/media/procedimentos/anexos/four"
+                caminho = "visteon/media/procedimentos/anexos/four"
                 if os.path.exists(caminho):
                     for entry in os.listdir(caminho):
                         if os.path.isfile(os.path.join(caminho, entry)):
                             os.remove(caminho + "/" + entry)
             if five:
                 Procedimentos.objects.exclude(anexoFive="").delete()
-                caminho = "C:/visteon/media/procedimentos/anexos/five"
+                caminho = "visteon/media/procedimentos/anexos/five"
                 if os.path.exists(caminho):
                     for entry in os.listdir(caminho):
                         if os.path.isfile(os.path.join(caminho, entry)):
                             os.remove(caminho + "/" + entry)
             if six:
                 Procedimentos.objects.exclude(anexoSix="").delete()
-                caminho = "C:/visteon/media/procedimentos/anexos/six"
+                caminho = "visteon/media/procedimentos/anexos/six"
                 if os.path.exists(caminho):
                     for entry in os.listdir(caminho):
                         if os.path.isfile(os.path.join(caminho, entry)):
                             os.remove(caminho + "/" + entry)
             if seven:
                 Procedimentos.objects.exclude(anexoSeven="").delete()
-                caminho = "C:/visteon/media/procedimentos/anexos/seven"
+                caminho = "visteon/media/procedimentos/anexos/seven"
                 if os.path.exists(caminho):
                     for entry in os.listdir(caminho):
                         if os.path.isfile(os.path.join(caminho, entry)):
                             os.remove(caminho + "/" + entry)
             if eight:
                 Procedimentos.objects.exclude(anexoEight="").delete()
-                caminho = "C:/visteon/media/procedimentos/anexos/eight"
+                caminho = "visteon/media/procedimentos/anexos/eight"
                 if os.path.exists(caminho):
                     for entry in os.listdir(caminho):
                         if os.path.isfile(os.path.join(caminho, entry)):
                             os.remove(caminho + "/" + entry)
             if nine:
                 Procedimentos.objects.exclude(anexoNine="").delete()
-                caminho = "C:/visteon/media/procedimentos/anexos/eight"
+                caminho = "visteon/media/procedimentos/anexos/eight"
                 if os.path.exists(caminho):
                     for entry in os.listdir(caminho):
                         if os.path.isfile(os.path.join(caminho, entry)):
@@ -844,63 +846,63 @@ def configurationQps(request):
         if file_form.is_valid():
             if one:
                 Procedimentos.objects.exclude(qpsOne="").delete()
-                caminho = "C:/visteon/media/procedimentos/qps/one"
+                caminho = "visteon/media/procedimentos/qps/one"
                 if os.path.exists(caminho):
                     for entry in os.listdir(caminho):
                         if os.path.isfile(os.path.join(caminho, entry)):
                             os.remove(caminho + "/" + entry)
             if two:
                 Procedimentos.objects.exclude(qpsTwo="").delete()
-                caminho = "C:/visteon/media/procedimentos/qps/two"
+                caminho = "visteon/media/procedimentos/qps/two"
                 if os.path.exists(caminho):
                     for entry in os.listdir(caminho):
                         if os.path.isfile(os.path.join(caminho, entry)):
                             os.remove(caminho + "/" + entry)
             if three:
                 Procedimentos.objects.exclude(qpsThree="").delete()
-                caminho = "C:/visteon/media/procedimentos/qps/three"
+                caminho = "visteon/media/procedimentos/qps/three"
                 if os.path.exists(caminho):
                     for entry in os.listdir(caminho):
                         if os.path.isfile(os.path.join(caminho, entry)):
                             os.remove(caminho + "/" + entry)
             if four:
                 Procedimentos.objects.exclude(qpsFour="").delete()
-                caminho = "C:/visteon/media/procedimentos/qps/four"
+                caminho = "visteon/media/procedimentos/qps/four"
                 if os.path.exists(caminho):
                     for entry in os.listdir(caminho):
                         if os.path.isfile(os.path.join(caminho, entry)):
                             os.remove(caminho + "/" + entry)
             if five:
                 Procedimentos.objects.exclude(qpsFive="").delete()
-                caminho = "C:/visteon/media/procedimentos/qps/five"
+                caminho = "visteon/media/procedimentos/qps/five"
                 if os.path.exists(caminho):
                     for entry in os.listdir(caminho):
                         if os.path.isfile(os.path.join(caminho, entry)):
                             os.remove(caminho + "/" + entry)
             if six:
                 Procedimentos.objects.exclude(qpsSix="").delete()
-                caminho = "C:/visteon/media/procedimentos/qps/six"
+                caminho = "visteon/media/procedimentos/qps/six"
                 if os.path.exists(caminho):
                     for entry in os.listdir(caminho):
                         if os.path.isfile(os.path.join(caminho, entry)):
                             os.remove(caminho + "/" + entry)
             if seven:
                 Procedimentos.objects.exclude(anexoSeven="").delete()
-                caminho = "C:/visteon/media/procedimentos/qps/seven"
+                caminho = "visteon/media/procedimentos/qps/seven"
                 if os.path.exists(caminho):
                     for entry in os.listdir(caminho):
                         if os.path.isfile(os.path.join(caminho, entry)):
                             os.remove(caminho + "/" + entry)
             if eight:
                 Procedimentos.objects.exclude(qpsEight="").delete()
-                caminho = "C:/visteon/media/procedimentos/qps/eight"
+                caminho = "visteon/media/procedimentos/qps/eight"
                 if os.path.exists(caminho):
                     for entry in os.listdir(caminho):
                         if os.path.isfile(os.path.join(caminho, entry)):
                             os.remove(caminho + "/" + entry)
             if nine:
                 Procedimentos.objects.exclude(qpsNine="").delete()
-                caminho = "C:/visteon/media/procedimentos/qps/eight"
+                caminho = "visteon/media/procedimentos/qps/eight"
                 if os.path.exists(caminho):
                     for entry in os.listdir(caminho):
                         if os.path.isfile(os.path.join(caminho, entry)):
@@ -957,7 +959,7 @@ def configurationOthers(request):
 
         if one:
             Others.objects.exclude(one="").delete()
-            caminho = "C:/visteon/media/others/one"
+            caminho = "visteon/media/others/one"
             if os.path.exists(caminho):
                 for entry in os.listdir(caminho):
                     if os.path.isfile(os.path.join(caminho, entry)):
@@ -967,7 +969,7 @@ def configurationOthers(request):
             novoOther.save()
         if two:
             Others.objects.exclude(two="").delete()
-            caminho = "C:/visteon/media/others/two"
+            caminho = "visteon/media/others/two"
             if os.path.exists(caminho):
                 for entry in os.listdir(caminho):
                     if os.path.isfile(os.path.join(caminho, entry)):
@@ -977,7 +979,7 @@ def configurationOthers(request):
             novoOther.save()
         if three:
             Others.objects.exclude(three="").delete()
-            caminho = "C:/visteon/media/others/three"
+            caminho = "visteon/media/others/three"
             if os.path.exists(caminho):
                 for entry in os.listdir(caminho):
                     if os.path.isfile(os.path.join(caminho, entry)):
@@ -987,7 +989,7 @@ def configurationOthers(request):
             novoOther.save()
         if four:
             Others.objects.exclude(four="").delete()
-            caminho = "C:/visteon/media/others/four"
+            caminho = "visteon/media/others/four"
             if os.path.exists(caminho):
                 for entry in os.listdir(caminho):
                     if os.path.isfile(os.path.join(caminho, entry)):
@@ -997,7 +999,7 @@ def configurationOthers(request):
             novoOther.save()
         if five:
             Others.objects.exclude(five="").delete()
-            caminho = "C:/visteon/media/others/five"
+            caminho = "visteon/media/others/five"
             if os.path.exists(caminho):
                 for entry in os.listdir(caminho):
                     if os.path.isfile(os.path.join(caminho, entry)):

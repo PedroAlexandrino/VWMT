@@ -29,9 +29,7 @@ from django.http import HttpResponseRedirect
 from django.core.files.storage import default_storage
 
 from pManagement.models import *
-from shippers.models import(
-    TrackingPage,)
-
+ 
 from vware.models import (
     Produtos,
     StockPackage,
@@ -237,7 +235,7 @@ def updateStockPackage(request):
         )
         caminho ='StockPackage/'
         #BUG
-        #The joined path (C:/StockPackage) is located outside of the base path component (C:\Users\PMARTI30\Desktop\visteon\media)
+        #todos os path têm de ser alterados para caminho = "media\\stockPackage\\...."
         if not edit_tipo =="undefined" :
             print("CHEGOU AO IF DO TIPO NOT NULOL")
             ref.tipo = edit_tipo
@@ -374,7 +372,6 @@ def uploadStockFileStock(request):
         # elimina todos os elementos que estavam na base de dados
 
         workbook = load_workbook(file.open("rb"), data_only = True)
-        # se calhar vais ter de fazer difrente, agarras o nome do file(o path), e manipulas com isso
         sheet = workbook.get_sheet_by_name(workbook.sheetnames[0])
         db = StockPackage.objects
         db.all().delete()
@@ -1274,6 +1271,7 @@ def reportCustomerPacking(request):
         msg = EmailMultiAlternatives(subject, message, from_email, to)
         msg.attach_alternative(message, "text/html")
         msg.send()
+        return
         return redirect("pManagement:requests")
 
 
@@ -1462,7 +1460,7 @@ def supplyPackage(request):
     tipoEmbalagem = TipoEmbalagem.objects.all()
     stockPackage_items = StockPackage.objects.all()
     kits = SupplyPackage.objects.all()
-
+    #aqui em principio é para fazer medias também
     listaFinal = []
 
 
@@ -2087,7 +2085,7 @@ def atualizaTempo(request):
 def clienteProduto(request):
     return render(
         request,
-        "pManagement/clienteProduto.html",
+        "pManagement/cliente_prod_shahin.html",
         {
             "ClienteProduto": ClienteProduto.objects,
             "Produtos": Produtos.objects,
@@ -2274,6 +2272,6 @@ def deleteLinhaClienteProduto(request):
     if request.method == "POST":
         row_id = request.POST["rowIdDelete"]
         print("ID TO DELETE", row_id)
-        # StockPackage.suplyPackage.through.objects.filter(supplypackage_id=rowId)
+        StockPackage.suplyPackage.through.objects.filter(supplypackage_id=rowId)
         ClienteProduto.objects.filter(id=row_id).delete()
     return redirect("pManagement:clienteProduto")

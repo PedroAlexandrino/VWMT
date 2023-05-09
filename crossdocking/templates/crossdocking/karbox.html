@@ -1,0 +1,319 @@
+{% extends "vware/baseArmazem.html" %}
+{% load static %}
+
+{% block body_title %}
+    <div class="text-primary">
+        <h6><b><i class="fa fa-home text-secondary"></i><a href={% url 'main:main' %}><span
+                class="text-secondary"> Home | </span></a> Karbox</b></h6>
+    </div>
+
+    <style>
+         
+
+        .containerFASupply {
+            height: 115px;
+            width: 50%;
+            top: 8px;
+            left: 0px;
+            position: absolute;
+            border: 3px solid transparent;
+        }
+
+        .containerBPDropinSupply {
+            height: 500px;
+            width: 50%;
+            top: 10px;
+            left: 50%;
+            position: absolute;
+            border-left: 3px solid black;
+        }
+
+    #quadradoSubItems {
+        background-color: #f32d2d; /* Cor de fundo do botão */
+        border: none;
+        padding: 140px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 480px;
+        margin: 80px 20px;
+        cursor: pointer;
+        border-radius: 160px; /* Define a borda arredondada */
+    }
+
+    #quadradoSubItems span {
+        display: block;
+        width: 320px;
+        height: 320px;
+        transform: rotate(45deg); /* Rotaciona o quadrado em 45 graus */
+        margin: auto; /* Centraliza o quadrado vertical e horizontalmente */
+    }
+
+     
+
+      
+       
+      
+        
+    </style>
+{% endblock %}
+
+{% block body_content %}
+     
+
+
+    <div class="containerPrincipal">
+        <div class="containerFASupply" style="text-align: center">
+            </br>
+            <div class="form-inline">
+                <p class="mb-n5" id="countTotalFA"></p>
+                <button type="button" class="btn btn-twitter" style="transform: scale(1.5); margin-left: 38%">
+                    <a style="color: white" href="{% url 'receiving:faSupply' %}">Tabela 1</a>
+                </button>
+                
+            </div>
+
+            </br></br>
+            <table id="tabela1" class="display compact" style="width:100%">
+                <thead style="margin-left: -9px">
+                    <tr>
+                        <th style="width: 50%;"></th>
+                        <th style="display: none"> </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="width: 50%;">
+<button id="quadradoSubItems" style="background-color: 4CAF50;"><span></span></button>
+                                
+                            </div>
+                            </td>
+                            <td style="display: none"></td>
+                        </tr>
+                         
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                    
+                            <th style="width: 50%;"></th>
+                            <th style="display: none;width: 50%"></th>
+                            
+                        </tr>
+                        </tfoot>
+            </table>
+        </div>
+        
+        <div class="containerBPDropinSupply" style="text-align: center">
+            </br>
+            <div class="form-inline">
+                <p class="mb-n5" id="countTotalBPDropin"></p>
+                <button type="button" class="btn btn-twitter" style="transform: scale(1.5); margin-left: 35%">
+                    <a style="color: white" href="{% url 'receiving:bpDropinSupply' %}">Tabela 2</a>
+                </button>
+                
+            </div>
+
+            </br></br>
+            <table id="tabela2" class="display compact" style="width:100%">
+                <thead style="margin-left: -9px">
+                    <tr>
+                        <th style="width: 50%;"></th>
+                        <th style="display: none"> </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="width: 50%;">
+<button id="quadradoSubItems" style="background-color: rgb(81, 201, 81);"><span></span></button>
+                                
+                            </div>
+                            </td>
+                            <td style="display: none"></td>
+                        </tr>
+                         
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                    
+                            <th style="width: 50%;"></th>
+                            <th style="display: none;width: 50%"></th>
+                            
+                        </tr>
+                        </tfoot>
+            </table>
+        </div>
+
+        <button type="button" id="btnaddKarbox"  style="margin-top: 45%;" class="btn btn-primary"data-dismiss="modal">Add Karbox SubItem:</button>
+        <button type="button" id="btnDadosEstatisticos"  style="margin-top: 45%;" class="btn btn-primary"data-dismiss="modal">Delete Karbox:</button>
+        <button type="button" id="btnImportExcel"  style="margin-top: 45%;" class="btn btn-primary"data-dismiss="modal">Import Excel:</button>
+
+
+        <div class="modal fade"  id="modalImportExcel" style="pointer-events: none; padding-left: 20%; display: block;" data-keyboard='false' 
+        data-backdrop="static"  role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document"  >
+       <div class="modal-content" style="width: 120%; height: 130%; margin-left: -30%;">
+           <div class="modal-header">
+               <h3 class="modal-title" id="myModalLabel"><b>IMPORT EXCEL:</b></h3>
+           </div>   
+           <div class="modal-body" style="margin-bottom: -12%;">
+               <div class="containerPrincipal" style="width: 100%; height: 100%;margin-bottom: 2%;">
+                    
+                     
+    
+                    <div class="form-inline" style="width: 570px">
+                                        <h4 class="mt-3">IMPORT XLSX FILE:</h4>
+                                        <input style="margin-left: 20px" type="file" name="myfile" id="myfile"
+                                               title="Choose File"></br>
+                    </div>
+                   
+                    
+                    
+               </div>
+               <div class="modal-footer" style = "margin-bottom: 10%" >
+                <button type="button" id="closeModal" class="btn btn-primary" data-dismiss="modal">Sair</button>
+                <button type="button" id="saveModal"  class="btn btn-primary"data-dismiss="modal">Ok</button>
+            </div>
+           
+           </div>
+        </div>
+    </div>
+    </div>
+
+
+
+
+
+        <div class="modal fade"  id="modalAddKarbox" style="pointer-events: none; padding-left: 20%; display: block;" data-keyboard='false' 
+    data-backdrop="static"  role="dialog" aria-labelledby="myModalLabel">
+<div class="modal-dialog" role="document"  >
+   <div class="modal-content" style="width: 120%; height: 130%; margin-left: -30%;">
+       <div class="modal-header">
+           <h3 class="modal-title" id="myModalLabel"><b>ADD KARBOX:</b></h3>
+       </div>   
+       <div class="modal-body" style="margin-bottom: -12%;">
+           <div class="containerPrincipal" style="width: 100%; height: 100%;margin-bottom: 2%;">
+                
+                 
+
+            <table class="table table-borderless mb-n1">
+                <thead>
+                </thead>
+                <tbody>
+                <tr>
+                    <th scope="row" style="color: black"><h6><b>Part-number</b></h6></th>
+                    <td><input type="text" name="partNumberNovo" id="novoPartNumber" required></td>
+                </tr>
+                {% if erro %}
+                    <div class="text-center mb-n2">
+                        <b>{{ erro }}</b>
+                    </div>
+                {% endif %}
+                <tr>
+                    <th scope="row" style="color: black"><h6><b>Description</b></h6></th>
+                    <td><input type="text" name="descricaoNovo" id="novoDescricao" required/></td>
+                </tr>
+                
+                <tr>
+                    <th scope="row" style="color: black"><h6><b>Quantity</b></h6></th>
+                    <td><input type="number" min="0" name="novoQTY" id="novoStock" required/></td>
+                </tr>
+                </tr>
+                </tbody>
+            </table>
+               
+                
+                
+           </div>
+           <div class="modal-footer" style = "margin-bottom: 10%" >
+            <button type="button" id="closeModal" class="btn btn-primary" data-dismiss="modal">Sair</button>
+            <button type="submit" id="saveModal"  class="btn btn-primary"data-dismiss="modal">Ok</button>
+        </div>
+       
+       </div>
+    </div>
+</div>
+</div>
+
+
+
+<form method="POST" class="form" action="{% url 'pManagement:deleteLinhaStockPackage' %}"
+          enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal fade" id="deleteLinha" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title" id="myModalLabel"><b>Delete this row?</b></h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="infoDelete"></p></br>
+                        <input type="hidden" id="rowIdDelete" name="rowIdDelete" value="{{rowIdDelete}}">
+                       
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+
+
+{% endblock %}
+
+{% block javascript %}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/confetti.css">
+<!-- Vais ter de passar estes imports para local e fazer a alteração nesta pag e na portaria, confirmar que tambem foi alterado no server -->
+    <script>
+    
+
+
+    $(document).ready(function () {
+        var tabela1= $('#tabela1').DataTable({
+                paging: false,
+                searching: false,
+                info: false,
+                "scrollY": "680px",
+                scrollCollapse: true,
+                dom: 'frtipB',
+                orderCellsTop: true,
+                buttons: [
+                ],
+                 
+            });
+
+            var tabela2= $('#tabela2').DataTable({
+                paging: false,
+                searching: false,
+                info: false,
+                "scrollY": "680px",
+                scrollCollapse: true,
+                dom: 'frtipB',
+                orderCellsTop: true,
+                buttons: [
+                ],
+                 
+            });
+            
+
+            
+
+            $("#btnaddKarbox").click(function(){
+                $('#modalAddKarbox').modal('show');
+            })
+
+            $("#btnImportExcel").click(function(){
+                $('#modalImportExcel').modal('show');
+            })
+
+
+       
+        });
+    </script>
+{% endblock %}

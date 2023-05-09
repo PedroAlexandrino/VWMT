@@ -454,7 +454,7 @@
                     </div>
                     <div class="form-inline mt-3">
                         <h6 class="mt-1">Client Product: </h6> <!-- partNumbersExpendable -->
-                        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#partNumbersExpendable"style="background-color: #FBA51A; margin-right: 10px"> 
+                        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#partNumbersExpendable"style="background-color: #FBA51A; margin-left: 200px"> 
                             <li class="fa fa-plus fa-fw"></li> Open
                         </button>
                     </div>
@@ -1153,7 +1153,8 @@ var tableExpendable = $('#pnExpendableTable').DataTable({
     "info": false,
     "paging": false,
     "scrollCollapse": true,
-    "scrollY": "420px",
+    "scrollY": "120px",
+   
     columnDefs: [{
         orderable: false,
         className: 'select-checkbox',
@@ -1766,6 +1767,7 @@ $('#example').on('change', 'input', function () {
         }
 
         function uploadStockPackage() {
+            console.log("entrou")
             const DefaultMixinCss = Swal.mixin({
                 customClass: {
                     confirmButton: 'btn btn-primary',
@@ -1776,7 +1778,8 @@ $('#example').on('change', 'input', function () {
             console.log("Button upload")
             var data = new FormData()
             var file = $("#myfile")[0].files[0]
-            if(file==undefined){
+            console.log(file)
+            if(file==undefined || file == ""){
                return DefaultMixinCss.fire({
                 title: 'No file to upload',
                 showCancelButton: false,

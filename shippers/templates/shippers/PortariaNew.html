@@ -1,0 +1,1301 @@
+{% extends "vware/baseArmazemPortaria.html" %}
+{% load static %}
+
+{% block body_title %}
+<link rel="stylesheet" type="text/css" href="/static/SlickGrid/slick.grid.css">
+ 
+
+    <div class="text-primary">
+        <h6><b><i class="fa fa-home text-secondary"></i><a href={% url 'main:main' %}><span
+                class="text-secondary"> Home | </span></a> Portaria</b></h6>
+    </div>
+    <style>
+
+        .button {
+            width: 35%;
+            height: 70px;
+            display: inline-block;
+            font-family: Arial, "Helvetica", sans-serif;
+            font-size: 45px;
+            color: #fff;
+            text-decoration: none;
+            text-align: center;
+            text-shadow: 1px 1px 0 #7D9EAD, 2px 2px 0 #7D9EAD, 1px 1px 0 #7D9EAD;
+            padding-top: 6px;
+            margin-left: auto;
+            margin-right: auto;
+            left: 30px;
+            position: relative;
+            cursor: pointer;
+            border: none;
+            background: #FBA51A;
+            background-image: linear-gradient(bottom, #E57200 0%, #FBA51A 100%);
+            border-radius: 5px;
+            box-shadow: inset 0px 1px 0px #FBA51A, 0px 5px 0px 0px #cb7b25, 0px 10px 5px #999;
+        }
+
+        .button:active {
+            top: 3px;
+            box-shadow: inset 0px 1px 0px #FBA51A, 0px 2px 0px 0px #E57200, 0px 5px 3px #999;
+        }
+
+        .button:hover, button:focus {
+            outline: none;
+            transform: translateY(0.5px);
+        }
+
+        .containerPrincipal {
+            height: 860px;
+            width: 100%;
+            top: 11px;
+            left: 0px;
+            position: relative;
+            border: 1px solid transparent;
+        }
+
+        .column_left {
+            border-left: 2px solid black;
+        }
+
+        tfoot input {
+            width: 100%;
+        }
+
+
+         
+    </style>
+{% endblock %}
+
+{% block body_content %}
+    <!-- PRIMEIRA TABELA -->
+    <div class="containerPrincipal">
+        <input type="text" id="search-box" style="margin-left:85%">
+        <table width="100%">
+            <tr>
+              <td valign="top" width="50%">
+                <div id="gatewayHistory" style="width:100%; height:500px;"></div>
+              </td>
+              <!-- <td valign="top">
+                <h2>Demonstrates:</h2>
+                <ul>
+                  <li>basic grid with minimal configuration</li>
+                </ul>
+                  <h2>View Source:</h2>
+                  <ul>
+                      <li><A href="https://github.com/6pac/SlickGrid/blob/master/examples/example1-simple.html" target="_sourcewindow"> View the source for this example on Github</a></li>
+                  </ul>
+              </td> -->
+            </tr>
+          </table>
+    </div>
+    <button type="button" class="btn btn-secondary mb-3" id="excel">Excel</button>
+    <button type="button" class="btn btn-secondary mb-3" style= "display: none;" id="estatisticas">Estatísticas</button>
+
+    <div style="bottom: 0px; margin-left: 82%; position: absolute">
+        <h6><b><i style="font-size: 20px">Legenda de viaturas </i><a type="button"
+                                                                     class="fas fa-plus-circle fa-2x button5"
+                                                                     id="legenda"
+                                                                     style="color: orange; background-color: black; border-radius: 50%; margin-left: 10px; margin-top: 2px"></a></b>
+        </h6>
+    </div>
+
+    <!-- BTN add nova entrada -->
+    <div style="width: 85%; margin-left: 6%; bottom: 0%; position: absolute; border: 3px solid transparent; text-align: center">
+        <button type="submit" class="button" id="clickCriarNovo" data-toggle="modal"
+                data-target="#criarNovo">
+            NOVA ENTRADA
+        </button>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" action="{% url 'shippers:reportPortaria' %}">
+        {% csrf_token %}
+        <div class="modal fade" id="reportIssue" tabindex="-1" role="dialog"
+             aria-labelledby="myModalLabel">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: rgba(236,144,0,0.86)">
+                        <h4 class="modal-title" id="myModalLabel" style="margin-left: 45%; font-size: 40px"><i>HELP</i>
+                        </h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body"
+                         style="background: linear-gradient(to bottom, rgba(236,144,0,0.86) 0%, ghostwhite 100%); ">
+                        <div style="margin-top: 10px">
+                            <p style="font-size: 20px"><strong>Escreva aqui possíveis erros de utilização desta página
+                                em
+                                específico, ou deixe sugestões de melhoria</strong></p>
+                            <textarea class="form-control mt-n3" name="reportICDR" id="reportICDR" rows="11"
+                                      style="background-color: floralwhite; text-align: center;font-family:sans-serif;font-size:1.5em"
+                                      required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="background-color: ghostwhite">
+                        <button type="submit" id="submitReportICDR" class="btn btn-primary">Submeter</button>
+                        <button type="button" class="btn btn-primary" value="pending" data-dismiss="modal">Fechar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="modal fade" id="tipoViatura" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel" style="margin-left: 40%; font-size: 40px">Escolher
+                        viatura</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <table id="viaturasDisponiveis" class="display compact" style="width:100%">
+                        <thead>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td style="text-align: center; font-size: 100px">1</td>
+                            <td style="text-align: center"><img src='{% static "camioes1.png" %}' width="250px"></td>
+                            <td style="text-align: center; font-size: 100px">6</td>
+                            <td style="text-align: center"><img src='{% static "camioes6.png" %}' width="250px"></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center; font-size: 100px">2</td>
+                            <td style="text-align: center"><img src='{% static "camioes2.png" %}' width="250px"></td>
+                            <td style="text-align: center; font-size: 100px">7</td>
+                            <td style="text-align: center"><img src='{% static "camioes7.png" %}' width="250px"></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center; font-size: 100px">3</td>
+                            <td style="text-align: center"><img src='{% static "camioes3.png" %}' width="250px"></td>
+                            <td style="text-align: center; font-size: 100px">8</td>
+                            <td style="text-align: center"><img src='{% static "camioes8.png" %}' width="250px"></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center; font-size: 100px">4</td>
+                            <td style="text-align: center"><img src='{% static "camioes4.png" %}' width="250px"></td>
+                            <td style="text-align: center; font-size: 100px">9</td>
+                            <td style="text-align: center"><img src='{% static "camioes9.png" %}' width="250px"></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center; font-size: 100px">5</td>
+                            <td style="text-align: center"><img src='{% static "camioes5.png" %}' width="250px"></td>
+                            <td style="text-align: center; font-size: 100px">10</td>
+                            <td style="text-align: center; font-size: 100px">ND</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="confirmar" name="confirmar">Confirmar</button>
+                    <button type="button" class="btn btn-primary" id="fechar">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="tipoViaturaShow" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel" style="margin-left: 40%; font-size: 40px">Viaturas</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <table id="viaturasDisponiveisShow" class="display compact" style="width:100%">
+                        <thead>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td style="text-align: right; font-size: 100px">1 -</td>
+                            <td style="text-align: center"><img src='{% static "camioes1.png" %}' width="250px"></td>
+                            <td style="text-align: right; font-size: 100px">6 -</td>
+                            <td style="text-align: center"><img src='{% static "camioes6.png" %}' width="250px"></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right; font-size: 100px">2 -</td>
+                            <td style="text-align: center"><img src='{% static "camioes2.png" %}' width="250px"></td>
+                            <td style="text-align: right; font-size: 100px">7 -</td>
+                            <td style="text-align: center"><img src='{% static "camioes7.png" %}' width="250px"></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right; font-size: 100px">3 -</td>
+                            <td style="text-align: center"><img src='{% static "camioes3.png" %}' width="250px"></td>
+                            <td style="text-align: right; font-size: 100px">8 -</td>
+                            <td style="text-align: center"><img src='{% static "camioes8.png" %}' width="250px"></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right; font-size: 100px">4 -</td>
+                            <td style="text-align: center"><img src='{% static "camioes4.png" %}' width="250px"></td>
+                            <td style="text-align: right; font-size: 100px">9 -</td>
+                            <td style="text-align: center"><img src='{% static "camioes9.png" %}' width="250px"></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right; font-size: 100px">5 -</td>
+                            <td style="text-align: center"><img src='{% static "camioes5.png" %}' width="250px"></td>
+                            <td style="text-align: right; font-size: 100px">10 -</td>
+                            <td style="text-align: center; font-size: 100px">ND</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" value="pending" data-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" action="{% url 'shippers:submitGateway' %}">
+        {% csrf_token %}
+        <div class="modal fade" id="criarNovo" name="criarNovo" tabindex="-1" role="dialog"
+             aria-labelledby="myModalLabel">
+            <div class="modal-dialog modal-xl" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: rgba(236,144,0,0.86)">
+                        <h4 class="modal-title" id="myModalLabel" style="margin-left: 40%; font-size: 40px"><i>Inserir
+                            dados</i></h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body"
+                         style="background: linear-gradient(to bottom, rgba(236,144,0,0.86) 0%, ghostwhite 100%); ">
+                         <button type="button"style="margin-left:45%"  class="btn btn-secondary mb-3"data-toggle="modal" data-backdrop="static" data-keyboard="false" id="condutorRecorrente">Histórico</button>
+                         <div class="form-inline" style="margin-top: 10px">
+                            <div style="text-align: center">
+                                <p style="font-size: 20px"><strong>CONDUTOR</strong></p>
+                                <input type="text" class="form-control mt-n3" name="condutor" id="condutor"
+                                       list="condutorList"
+                                       style="width: 525px; background-color: floralwhite"
+                                       required>
+                                <datalist id="condutorList">
+                                    {% for condutor in infoCondutores.all %}
+                                        <option value='{{ condutor.condutor }}'>{{ condutor.condutor }}</option>
+                                    {% endfor %}
+                                </datalist>
+                            </div>
+                            <div style="margin-left: 50px; text-align: center">
+                                <p style="font-size: 20px"><strong>ID</strong></p>
+                                <input type="text" class="form-control mt-n3" name="condutorID" id="condutorID"
+                                       list="condutorIDList"
+                                       style="width: 525px; background-color: floralwhite"
+                                       required>
+                                <datalist id="condutorIDList">
+                                    {% for condutorID in infoCondutores.all %}
+                                        <option value='{{ condutorID.condutorID }}'>{{ condutorID.condutorID }}</option>
+                                    {% endfor %}
+                                </datalist>
+                            </div>
+                        </div>
+                        <div class="form-inline" style="margin-top: 10px">
+                            <div style="text-align: center">
+                                <p style="margin-top: 20px; font-size: 20px">
+                                    <strong>CONTACTO</strong></p>
+                                <input type="text" class="form-control mt-n3" name="contacto" id="contacto"
+                                       style="width: 525px; background-color: floralwhite"
+                                       required>
+                            </div>
+                            <div style="margin-left: 50px; text-align: center">
+                                <p style="margin-top: 20px; font-size: 20px">
+                                    <strong>EMPRESA</strong></p>
+                                <input type="text" class="form-control mt-n3" name="empresa" id="empresa"
+                                       list="empresaList"
+                                       style="width: 525px; background-color: floralwhite" required>
+                                <datalist id="empresaList">
+                                    {% for empresa in infoCondutores.all %}
+                                        <option value='{{ empresa.empresa }}'>{{ empresa.empresa }}</option>
+                                    {% endfor %}
+                                </datalist>
+                            </div>
+                        </div>
+                        <div class="form-inline" style="margin-top: 10px">
+                            <div style="text-align: center">
+                                <p style="margin-top: 20px; font-size: 20px"><strong>1ª
+                                    MATRICULA</strong></p>
+                                <input type="text" class="form-control mt-n3" name="1matricula" id="1matricula"
+                                       list="1matriculaList"
+                                       style="width: 525px; background-color: floralwhite"
+                                       required>
+                                <datalist id="1matriculaList">
+                                    {% for matricula in primeiraMatricula.all %}
+                                        <option value='{{ matricula.nome }}'>{{ matricula.nome }}</option>
+                                    {% endfor %}
+                                </datalist>
+                            </div>
+                            <div style="margin-left: 50px; text-align: center">
+                                <p style="margin-top: 20px; font-size: 20px"><strong>2ª
+                                    MATRICULA</strong></p>
+                                <input type="text" class="form-control mt-n3" name="2matricula" id="2matricula"
+                                       list="2matriculaList"
+                                       style="width: 525px; background-color: floralwhite" required>
+                                <datalist id="2matriculaList">
+                                    {% for matricula in segundaMtricula.all %}
+                                        <option value='{{ matricula.nome }}'>{{ matricula.nome }}</option>
+                                    {% endfor %}
+                                </datalist>
+                            </div>
+                        </div>
+                        <div class="form-inline" style="margin-top: 10px">
+                            <div style="text-align: center">
+                                <p style="margin-top: 20px; font-size: 20px"><strong>CARGA /
+                                    DESCARGA</strong></p>
+                                <input type="text" class="form-control mt-n3" name="cargaDescarga" id="cargaDescarga"
+                                       list="cargaDescargaList"
+                                       style="width: 525px; background-color: floralwhite"
+                                       required>
+                                <datalist id="cargaDescargaList">
+                                    {% for cargaDescarga in cargaDescarga.all %}
+                                        <option value='{{ cargaDescarga.nome }}'>{{ cargaDescarga.nome }}</option>
+                                    {% endfor %}
+                                </datalist>
+                            </div>
+                            <div style="margin-left: 50px; text-align: center">
+                                <p style="margin-top: 20px; font-size: 20px"><strong>DOCA</strong>
+                                </p>
+                                <input type="text" class="form-control mt-n3" name="doca" list="docaList" id="doca"
+                                       style="width: 525px; background-color: floralwhite"
+                                       required>
+                                <datalist id="docaList">
+                                    {% for doca in docas.all %}
+                                        <option value='{{ doca.nome }}'>{{ doca.nome }}</option>
+                                    {% endfor %}
+                                </datalist>
+                            </div>
+                        </div>
+                        <div class="form-inline" style="margin-top: 10px">
+                            <div style="text-align: center">
+                                <p style="margin-top: 20px; font-size: 20px"><strong>DESTINO
+                                    CARGA</strong></p>
+                                <input type="text" class="form-control mt-n3" name="destinoCarga" id="destinoCarga"
+                                       list="destinoCargaList"
+                                       style="width: 525px; background-color: floralwhite" required>
+                                <datalist id="destinoCargaList">
+                                    {% for destinoCarga in destinosCarga.all %}
+                                        <option value='{{ destinoCarga.nome }}'>{{ destinoCarga.nome }}</option>
+                                    {% endfor %}
+                                </datalist>
+                            </div>
+                            <div style="margin-left: 50px; text-align: center">
+                                <p style="margin-top: 20px; font-size: 20px; margin-left: 200px;" id="selectVeiculo">
+                                    <strong>TIPO VEICULO</strong></p>
+                                <p style="margin-left: 200px; font-size: 20px" id="valorNovo"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="background-color: ghostwhite">
+                        <input style="margin-right: -25px; display: none" type="checkbox" id="checkboxVeiculo" required>
+                        <button type="submit" class="btn btn-primary" onclick="FbotonOn()" id="criar" name="criar">
+                            Criar
+                        </button>
+                        <button type="button" class="btn btn-primary" value="pending" data-dismiss="modal">Fechar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    
+<div class="modal fade"  id="criarRecorrente" width="150%" height="100%" style="pointer-events: none;"   role="dialog"
+aria-labelledby="myModalLabel">
+<div class="modal-dialog" role="document"  width="100%" height="100%">
+   <div class="modal-content" style="width: 150%;  margin-left: -30%;">
+       <div class="modal-header">
+           <h3 class="modal-title" id="myModalLabel"><b>Histórico:</b></h3>
+           
+       </div>
+       <input type="text" id="search-box" style="margin-left:70%">
+       <div class="modal-body" width="100%" height="100%" style="margin-bottom: -10%;">
+           <div class="containerPrincipal" style="width: 100%; height: 70%;">
+             <style>
+                .slick-grid-border {
+                    border: 1px solid black;
+            }   
+            .slick-header-column {
+            border-right: 1px solid black;
+            border-left: 1px solid black;
+            border-top: 1px solid black;
+            border-bottom: 1px solid black;
+        }
+             </style>
+            <table width="100%">
+                <tr>
+                  <td valign="top" width="50%">
+                    <div id="gatewayRecorrente" class="slick-grid-border" style="width:100%; height:500px;"></div>
+                  </td>
+                  <!-- <td valign="top">
+                    <h2>Demonstrates:</h2>
+                    <ul>
+                      <li>basic grid with minimal configuration</li>
+                    </ul>
+                      <h2>View Source:</h2>
+                      <ul>
+                          <li><A href="https://github.com/6pac/SlickGrid/blob/master/examples/example1-simple.html" target="_sourcewindow"> View the source for this example on Github</a></li>
+                      </ul>
+                  </td> -->
+                </tr>
+              </table>
+
+           </div>
+           <div class="modal-footer" style = "margin-bottom: 10%" >
+            <button type="button" id="closeModal" class="btn btn-default" data-dismiss="modal">Sair</button>
+            <button type="button" id="saveModal"  class="btn btn-primary"data-dismiss="modal">Ok</button>
+        </div>
+       
+       </div>
+    </div>
+</div>
+</div>
+
+
+{% endblock %}
+
+{% block javascript %}
+
+<!-- <script src="/static/js/jquery.waypoints.min.js"></script>
+<script src="/static/js/infinite.min.js"></script>  
+infinite-ajax-scroll.min.js
+-->
+<script src="/static/SlickGrid/slick.core.js"></script>
+<script src="/static/SlickGrid/slick.interactions.js"></script>
+<script src="/static/SlickGrid/slick.grid.js"></script>
+<script src="/static/SlickGrid/slick.formatters.js"></script>
+<script src="/static/SlickGrid/slick.rowselectionmodel.js"></script>
+<script type="text/javascript"> var teste = "{{condutores}}";</script>
+
+<script>
+
+Object.values("{{elementosGateway}}").forEach(function(item) {
+  console.log(item); });
+
+     
+    var grid;
+    var grid1;
+   
+
+    var columns = [
+        {id: "dataHoraChegada", name: "Data/hora chegada", field: "dataHoraChegada"},
+        {id: "condutor", name: "Condutor", field: "condutor"},
+        {id: "ident", name: "Id", field: "ident"},
+        {id: "contacto", name: "Contacto", field: "contacto"},
+        {id: "empresa", name: "Empresa", field: "empresa"},
+        {id: "primeiraMatricula", name: "1ª Matricula", field: "primeiraMatricula"},
+        {id: "segundaMatricula", name: "2ª Matricula", field: "segundaMatricula"},
+        {id: "cargaDescarga", name: "Carga/Descarga", field: "cargaDescarga"},
+        {id: "doca", name: "Doca", field: "doca"},
+        {id: "destinoCarga", name: "Destino Carga", field: "destinoCarga"},
+        {id: "tipoViatura", name: "Tipo de Viatura", field: "tipoViatura"},
+        {id: "dataHoraEntrada", name: "Data/Hora Entrada", field: "dataHoraEntrada"},
+        {id: "abandono", name: "Abandono", field: "abandono", formatter: ({}) => `<input type="checkbox" style="text-align: center" id="emptySaidaRead" title="Filtrar entrada"checked >`},
+        {id: "comentariosEntrada", name: "Comentários Entrada", formatter: ({}) => `<input type="text" name="comentarioEntrada" style="width: 65px" data-toggle="tooltip"value='{{ elem.comentEntrada }}'>`},
+        {id: "dataHoraSaída", name: "Data/Hora Saída", field: "dataHoraSaida"},
+        {id: "comentariosSaída", name: "Comentários Saída", formatter: ({}) => `<button type="button" id="update" class="btn btn-outline-primary btn-xs"style="height: 18px">Update</button>`},
+    
+    ];
+    $.ajax({
+        type: 'GET',
+        url: '/shippers/json_gateway/',
+        success: (req) => {
+            var rows = [];
+            for (let val of req) {
+                console.log("Variavel",val["abandono"])
+                if(val["abandono"] == "false" ){
+                    console.log("Ainda não abandonou")
+                    
+                }
+
+                //rows.push({...val});
+
+                
+            }
+            
+        }
+    })
+
+    var columns1 = [
+        {id: "dataHoraChegada", name: "Data/hora chegada", field: "dataHoraChegada", },
+        {id: "condutor", name: "Condutor", field: "condutor"},
+        {id: "ident", name: "Id", field: "ident"},
+        {id: "contacto", name: "Contacto", field: "contacto"},
+        {id: "empresa", name: "Empresa", field: "empresa"},
+        {id: "primeiraMatricula", name: "1ª Matricula", field: "primeiraMatricula"},
+        {id: "segundaMatricula", name: "2ª Matricula", field: "segundaMatricula"},
+    ];
+    var options = {
+        headerRowHeight: 30,
+        enableCellNavigation: true,
+        enableColumnReorder: false,
+        forceFitColumns: true,
+        selectable: true,
+        enableCellNavigation: true,
+        asyncEditorLoading: true,
+        autoEdit: false,
+        topPanelHeight: 25,
+        showHeaderRow: true,
+        syncColumnCellResize: false
+    };
+
+    var options1 = {
+        headerRowHeight: 30,
+        headerRowCssClass: "slick-header-column", 
+        headerRowCssClass: "slick-header-column",
+        enableCellNavigation: true,
+        enableColumnReorder: false,
+        forceFitColumns: true,
+        showHeaderRow: true,
+       
+    };
+
+
+    $.ajax({
+        type: 'GET',
+        url: '/shippers/json_gateway/',
+        success: (req) => {
+            var rows = [];
+            for (let val of req) {
+                rows.push({...val});
+            }
+
+            grid = new Slick.Grid("#gatewayHistory", rows, columns, options);
+            grid.render(); 
+            
+        }
+    })
+
+   
+
+
+    $("#search-box").keyup(function() {
+    var searchValue = $(this).val().toLowerCase();
+    var filteredData = data.filter(function(item) {
+        return Object.values(item).some(function(value) {
+            return value.toString().toLowerCase().includes(searchValue);
+        });
+    });
+    grid.setData(filteredData);
+    grid.render();
+});
+
+        $(document).ready(function () {
+            setInterval(function () {
+                if (!$('#criarNovo').hasClass('show')) {
+                    window.location.reload();
+                }
+
+            }, 300000)
+            
+        $(document).on('click', '#condutorRecorrente', function () {
+            var myModal = new bootstrap.Modal(document.getElementById('criarRecorrente'))
+            var myModal1 =  document.getElementById('criarNovo')
+            //myModal1.style.display = "none";
+            console.log("ENTROU NO POPUP")
+        $.ajax({
+            type: 'GET',
+            url: '/shippers/json_gateway/',
+            success: (req) => {
+                var rows1 = [];
+                for (let val of req) {
+                    rows1.push({...val});
+                }
+                grid1 = new Slick.Grid("#gatewayRecorrente", rows1, columns1, options1);
+                grid1.render(); 
+            }
+    })
+    myModal.show() 
+        });
+        
+         
+
+            $('input#empresa').change(function () {
+                var empresa = $(this).val()
+                $("#condutorList").empty();
+                        $("#condutorIDList").empty();
+                        for (elem in response.resposta) {
+                            $("<option/>").html(response.resposta[elem].condutor).appendTo("#condutorList");
+                            $("<option/>").html(response.resposta[elem].condutorID).appendTo("#condutorIDList");
+                        }
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/shippers/searchEmpresa/',
+                    data: {
+                        csrfmiddlewaretoken: "{{ csrf_token }}",
+                        'empresa': empresa,
+                    },
+                    
+                    success: function (response) {
+                       
+                        if (response.resposta.length == 0) {
+                            $.ajax({
+                                type: 'GET',
+                                url: '/shippers/searchAllInfo/',
+                                data: {
+                                    csrfmiddlewaretoken: "{{ csrf_token }}",
+                                },
+                                success: function (response) {
+                                    $("#condutorList").empty();
+                                    $("#condutorIDList").empty();
+                                    for (elem in response.resposta) {
+                                        $("<option/>").html(response.resposta[elem].condutor).appendTo("#condutorList");
+                                        $("<option/>").html(response.resposta[elem].condutorID).appendTo("#condutorIDList");
+                                    }
+                                }
+                            })
+                        }
+                    }
+                })
+            });
+
+            $('input#condutor').change(function () {
+                var condutor = $(this).val()
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/shippers/searchCondutor/',
+                    data: {
+                        csrfmiddlewaretoken: "{{ csrf_token }}",
+                        'condutor': condutor,
+                    },
+                    success: function (response) {
+                        if ($("#empresa:text").val() == '') {
+                            $("#empresa:text").val(response.resposta[0].empresa);
+                        }
+                        if ($("#condutorID:text").val() == '') {
+                            $("#condutorID:text").val(response.resposta[0].condutorID);
+                        }
+                        if ($("#contacto:text").val() == '') {
+                            $("#contacto:text").val(response.resposta[0].contacto);
+                        }
+                    }
+                })
+            });
+
+            $('input#condutorID').change(function () {
+                var condutorID = $(this).val()
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/shippers/searchCondutorID/',
+                    data: {
+                        csrfmiddlewaretoken: "{{ csrf_token }}",
+                        'condutorID': condutorID,
+                    },
+                    success: function (response) {
+                        if ($("#condutor:text").val() == '') {
+                            $("#condutor:text").val(response.resposta[0].condutor);
+                        }
+                        if ($("#empresa:text").val() == '') {
+                            $("#empresa:text").val(response.resposta[0].empresa);
+                        }
+                        if ($("#contacto:text").val() == '') {
+                            $("#contacto:text").val(response.resposta[0].contacto);
+                        }
+                    }
+                })
+            });
+
+            $('input#contacto').change(function () {
+                var contacto = $(this).val()
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/shippers/searchContacto/',
+                    data: {
+                        csrfmiddlewaretoken: "{{ csrf_token }}",
+                        'contacto': contacto,
+                    },
+                    success: function (response) {
+                        if ($("#condutor:text").val() == '') {
+                            $("#condutor:text").val(response.resposta[0].condutor);
+                        }
+                        if ($("#condutorID:text").val() == '') {
+                            $("#condutorID:text").val(response.resposta[0].condutorID);
+                        }
+                        if ($("#empresa:text").val() == '') {
+                            $("#empresa:text").val(response.resposta[0].empresa);
+                        }
+                    }
+                })
+            });
+
+            var tableViaturas = $('#viaturasDisponiveis').DataTable({
+                paging: false,
+                info: false,
+                searching: false,
+                ordering: false,
+            });
+
+            $('#viaturasDisponiveis tbody').on('click', 'tr td:nth-child(2n)', function () {
+                if ($(this).hasClass('selected')) {
+                    $(this).removeClass('selected');
+                } else {
+                    tableViaturas.$('td.selected').removeClass('selected');
+                    $(this).addClass('selected');
+                }
+            });
+
+            // Setup - add a text input to each footer cell
+            $('#gatewayHistory tfoot th').each(function (i) {
+                var title = $('#gatewayHistory tfoot th').eq($(this).index()).text();
+                $(this).html('<input class="form-control" style="margin-left: -12px; text-align: center" type="text" placeholder="Procurar" data-index="' + i + '" />');
+            });
+
+            
+            /* var table = $('#gatewayHistory').DataTable({
+                paging: true,
+                info: false,
+                scrollY: 485,
+                scrollX: true,
+                scrollCollapse: true,
+                scroller: {
+                    loadingIndicator: true
+                },
+                order: [[0, 'desc']],
+                columnDefs: [{
+                    "targets": 0,
+                    "type": "time-date-sort"
+                },
+                    {
+                        targets: [3, 4],
+                        render: function (data, type, row) {
+                            return data.length > 9 ?
+                                data.substr(0, 9) + '…' :
+                                data;
+                        }
+                    },
+                    {
+                        targets: [1, 2],
+                        render: function (data, type, row) {
+                            return data.length > 7 ?
+                                data.substr(0, 7) + '…' :
+                                data;
+                        }
+                    },
+                    {
+                        targets: 7,
+                        render: function (data, type, row) {
+                            return data.length > 8 ?
+                                data.substr(0, 8) + '…' :
+                                data;
+                        }
+                    },
+                    {
+                        targets: [5, 6, 8, 9],
+                        render: function (data, type, row) {
+                            return data.length > 6 ?
+                                data.substr(0, 6) + '…' :
+                                data;
+                        }
+                    }
+                ],
+            }); */
+            
+            var pnExpendableTable= new Slick.Grid("#pnExpendableTable", data, columns, {
+            enableCellNavigation: true,
+            enableColumnReorder: false,
+            multiSelect: false,
+            plugins: [new Slick.RowSelectionModel()]
+            });
+
+            // Filter event handler
+            var checked = $('input[id=emptyEntrada]:checkbox').is(':checked');
+            var checkedSaida = $('input[id=emptySaida]:checkbox').is(':checked');
+            var checkedRead = $('input[id=emptyEntradaRead]:checkbox').is(':checked');
+            var checkedSaidaRead = $('input[id=emptySaidaRead]:checkbox').is(':checked');
+            if (checked) {
+                if (checkedSaida) {
+                    table.columns(11).search('Time').draw()
+                    table.columns(14).search('Time').draw()
+                } else {
+                    table.columns(14).search('Time').draw()
+                }
+            }
+            if (checkedSaida && !checked) {
+                table.columns(11).search('Time').draw()
+            }
+            if (checkedRead) {
+                if (checkedSaidaRead) {
+                    table.columns(11).search('^\s*$', true, false).draw()
+                    table.columns(14).search('^\s*$', true, false).draw()
+                } else {
+                    table.columns(14).search('^\s*$', true, false).draw()
+                }
+            }
+            if (checkedSaidaRead && !checkedRead) {
+                table.columns(11).search('^\s*$', true, false).draw()
+            }
+            $(table.table().container()).on('keyup', 'tfoot input', function () {
+                table
+                    .column($(this).data('index'))
+                    .search(this.value)
+                    .draw();
+            });
+
+            $(document).on('click', '#confirmar', function () {
+                var row = tableViaturas.cell('.selected').index();
+                var data = tableViaturas.cell(row).data();
+                var posicao = ''
+                var posicaoPag = ''
+                /* Dá para substituir com switch Case */
+                if (data.includes('camioes1')) {
+                    posicao = '1'
+                    posicaoPag = '1'
+                } else if (data.includes('camioes2')) {
+                    posicao = '2'
+                    posicaoPag = '2'
+                } else if (data.includes('camioes3')) {
+                    posicao = '3'
+                    posicaoPag = '3'
+                } else if (data.includes('camioes4')) {
+                    posicao = '4'
+                    posicaoPag = '4'
+                } else if (data.includes('camioes5')) {
+                    posicao = '5'
+                    posicaoPag = '5'
+                } else if (data.includes('camioes6')) {
+                    posicao = '6'
+                    posicaoPag = '6'
+                } else if (data.includes('camioes7')) {
+                    posicao = '7'
+                    posicaoPag = '7'
+                } else if (data.includes('camioes8')) {
+                    posicao = '8'
+                    posicaoPag = '8'
+                } else if (data.includes('camioes9')) {
+                    posicao = '9'
+                    posicaoPag = '9'
+                } else {
+                    posicao = 'ND'
+                    posicaoPag = '<a type="button" class="fas fa-plus-circle fa-2x button5" style="color: orange; background-color: black; border-radius: 50%"></a>'
+                }
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/shippers/submitViatura/',
+                    data: {
+                        csrfmiddlewaretoken: "{{ csrf_token }}",
+                        'data': posicao,
+                    },
+                    success: function () {
+                        $("#tipoViatura").hide();
+                        $(".modal-backdrop").remove();
+                        var myModal = new bootstrap.Modal(document.getElementById('criarNovo'))
+                        myModal.show()
+
+                        $("#botaoVeiculo").hide('');
+                        $("#valorNovo").html(posicao);
+                        $('#checkboxVeiculo').prop("checked", true);
+                        $('#selectVeiculo').css('background', "transparent");
+
+                    }
+                })
+            });
+
+            $(document).on('click', '#legenda', function () {
+                var myModal = new bootstrap.Modal(document.getElementById('tipoViaturaShow'))
+                myModal.show()
+            });
+
+            $('#gatewayHistory tbody').on('click', '#dataHoraEntrada', function () {
+                var data = table.row($(this).parents('tr')).data();
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/shippers/setDataHoraEntrada/',
+                    data: {
+                        csrfmiddlewaretoken: "{{ csrf_token }}",
+                        'id': data[17]
+                    },
+                    success: function () {
+                        window.location = "{% url 'shippers:portaria'  %}"
+                    }
+                })
+            });
+
+            $('#gatewayHistory tbody').on('click', '#dataHoraSaida', function () {
+                var data = table.row($(this).parents('tr')).data();
+                $.ajax({
+                    type: 'POST',
+                    url: '/shippers/setDataHoraSaida/',
+                    data: {
+                        csrfmiddlewaretoken: "{{ csrf_token }}",
+                        'id': data[17]
+                    },
+                    success: function () {
+                        window.location = "{% url 'shippers:portaria'  %}"
+                    }
+                })
+            });
+
+            
+            $('#gatewayHistory tbody').on('click', '#update', function () {
+                //tens de por o btn update a ficar disabled
+                console.log("Tas ai")
+              
+                this.disabled= true
+                //var elem =  this.getElementById("update")
+                //elem.disabled = true    
+                //buttonObject.disabled = true
+                //text.disabled = true
+                //$("update").attr('disabled', true);
+
+                var data = table.row($(this).parents('tr')).data();
+                var abandonado = $(this).closest("tr").find('td:eq(12) input[name=abandonado]:checkbox').is(":checked")
+                var comentariosEntrada = $(this).closest("tr").find('td:eq(13) input').val()
+                var comentariosSaida = $(this).closest("tr").find('td:eq(15) input').val()
+                var dataHoraEntrada = ''
+                var dataHoraSaida = ''
+
+                if (data[11].startsWith("<input")) {
+                    dataHoraEntrada = $(this).closest("tr").find('td:eq(11) input').val()
+                }
+                if (data[14].startsWith("<input")) {
+                    dataHoraSaida = $(this).closest("tr").find('td:eq(14) input').val()
+                }
+                console.log("ID->", data[17])
+                $.ajax({
+                    type: 'POST',
+                    url: '/shippers/submitGatewayRowUpdate/',
+                    data: {
+                        csrfmiddlewaretoken: "{{ csrf_token }}",
+                        'abandono': abandonado,
+                        'comentariosEntrada': comentariosEntrada,
+                        'comentariosSaida': comentariosSaida,
+                        'dataHoraEntrada': dataHoraEntrada,
+                        'dataHoraSaida': dataHoraSaida,
+                        'id': data[17]
+                    },
+                    success: function () {
+                        window.location.reload()
+                       // elem.disabled = false    
+                       /*  window.location = "{% url 'shippers:submitGatewayRowUpdate'  %}" */
+                    }
+                })
+            });
+
+
+            function clickUpdate(scope) {
+                var data = table.row($(this).parents('tr')).data();
+                var abandonado = $(this).closest("tr").find('td:eq(12) input[name=abandonado]:checkbox').is(":checked")
+                var comentariosEntrada = $(this).closest("tr").find('td:eq(13) input').val()
+                var comentariosSaida = $(this).closest("tr").find('td:eq(15) input').val()
+                var dataHoraEntrada = ''
+                var dataHoraSaida = ''
+
+                if (data[11].startsWith("<input")) {
+                    dataHoraEntrada = $(this).closest("tr").find('td:eq(11) input').val()
+                }
+                if (data[14].startsWith("<input")) {
+                    dataHoraSaida = $(this).closest("tr").find('td:eq(14) input').val()
+                }
+                console.log("ID->", data[17])
+                $.ajax({
+                    type: 'POST',
+                    url: '/shippers/submitGatewayRowUpdate/',
+                    data: {
+                        csrfmiddlewaretoken: "{{ csrf_token }}",
+                        'abandono': abandonado,
+                        'comentariosEntrada': comentariosEntrada,
+                        'comentariosSaida': comentariosSaida,
+                        'dataHoraEntrada': dataHoraEntrada,
+                        'dataHoraSaida': dataHoraSaida,
+                        'id': data[17]
+                    },
+                    success: function () {
+                        window.location = "{% url 'shippers:submitGatewayRowUpdate'  %}"
+                    }
+                })
+            };
+
+
+            $(document).on('click', '#botaoVeiculo', function () {
+                $("#criarNovo").hide();
+                $(".modal-backdrop").remove();
+                var myModal = new bootstrap.Modal(document.getElementById('tipoViatura'))
+                myModal.show()
+            });
+
+            $(document).on('click', '#valorVeiculo', function () {
+                $("#criarNovo").hide();
+                $(".modal-backdrop").remove();
+                var myModal = new bootstrap.Modal(document.getElementById('tipoViatura'))
+                myModal.show()
+            });
+
+            $(document).on('click', '#valorNovo', function () {
+                $("#criarNovo").hide();
+                $(".modal-backdrop").remove();
+                var myModal = new bootstrap.Modal(document.getElementById('tipoViatura'))
+                myModal.show()
+            });
+
+
+            $(document).on('click', '#fechar', function () {
+                $("#tipoViatura").hide();
+                $(".modal-backdrop").remove();
+                $("#valorNovo").html('<a type="button" class="fas fa-plus-circle fa-2x button5" id="botaoVeiculo" style="color: orange; margin-top: -12px; background-color: black; border-radius: 50%"></a>');
+                        var myModal = new bootstrap.Modal(document.getElementById('criarNovo'))
+                        myModal.show()
+                $.ajax({
+                    type: 'POST',
+                    url: '/shippers/    /',
+                    data: {
+                        csrfmiddlewaretoken: "{{ csrf_token }}"
+                    },
+                    success: function () {
+                       
+                        $('#checkboxVeiculo').prop("checked", false);
+                    }
+                })
+            });
+
+            $(document).on('click', '#clickCriarNovo', function () {
+                $("#valorNovo").html('<a type="button" class="fas fa-plus-circle fa-2x button5" id="botaoVeiculo" style="color: orange; margin-top: -12px; background-color: black; border-radius: 50%"></a>');
+                        var myModal = new bootstrap.Modal(document.getElementById('criarNovo'))
+                        myModal.show()
+                $.ajax({
+                    type: 'POST',
+                    url: '/shippers/resetVeiculoDB/',
+                    data: {
+                        csrfmiddlewaretoken: "{{ csrf_token }}"
+                    },
+                    success: function () {
+                       
+                        $('#condutor').val('')
+                        $('#condutorID').val('')
+                        $('#contacto').val('')
+                        $('#empresa').val('')
+                        $('#1matricula').val('')
+                        $('#2matricula').val('')
+                        $('#cargaDescarga').val('')
+                        $('#doca').val('')
+                        $('#destinoCarga').val('')
+                        $('#checkboxVeiculo').prop("checked", false);
+
+                        $.ajax({
+                            type: 'GET',
+                            url: '/shippers/searchAllInfo/',
+                            data: {
+                                csrfmiddlewaretoken: "{{ csrf_token }}",
+                            },
+                            success: function (response) {
+                                $("#condutorList").empty();
+                                $("#condutorIDList").empty();
+                                for (elem in response.resposta) {
+                                    $("<option/>").html(response.resposta[elem].condutor).appendTo("#condutorList");
+                                    $("<option/>").html(response.resposta[elem].condutorID).appendTo("#condutorIDList");
+                                }
+                            }
+                        })
+                    }
+                })
+            });
+
+            $(document).on('click', '#excel', function () {
+                $.ajax({
+                    type: 'GET',
+                    url: '/shippers/downloadExcel/',
+                    data: {},
+                    success: function () {
+                        var element = document.createElement('a');
+                        element.setAttribute('href', '/media/shippers/portaria/workbookPortaria.xls');
+                        element.setAttribute('download', 'my-file-name');
+
+                        element.style.display = 'none';
+                        document.body.appendChild(element);
+
+                        element.click();
+
+                        document.body.removeChild(element);
+                    }
+                })
+            });
+
+            $('input[id=emptyEntrada]:checkbox').on('change', function () {
+                if (this.checked) {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/shippers/mudaEstadoFiltro/',
+                        data: {
+                            csrfmiddlewaretoken: "{{ csrf_token }}",
+                            'posicao': 'saida',
+                            'estado': 'on'
+                        },
+                        success: function () {
+                        }
+                    })
+                } else {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/shippers/mudaEstadoFiltro/',
+                        data: {
+                            csrfmiddlewaretoken: "{{ csrf_token }}",
+                            'posicao': 'saida',
+                            'estado': 'off'
+                        },
+                        success: function () {
+                            window.location = "{% url 'shippers:portaria'  %}"
+                        }
+                    })
+                }
+                // Run the search plugin
+                table.draw();
+            });
+
+            $('input[id=emptySaida]:checkbox').on('change', function () {
+                if (this.checked) {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/shippers/mudaEstadoFiltro/',
+                        data: {
+                            csrfmiddlewaretoken: "{{ csrf_token }}",
+                            'posicao': 'entrada',
+                            'estado': 'on'
+                        },
+                        success: function () {
+                        }
+                    })
+                } else {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/shippers/mudaEstadoFiltro/',
+                        data: {
+                            csrfmiddlewaretoken: "{{ csrf_token }}",
+                            'posicao': 'entrada',
+                            'estado': 'off'
+                        },
+                        success: function () {
+                            window.location = "{% url 'shippers:portaria'  %}"
+                        }
+                    })
+                }
+                // Run the search plugin
+                table.draw();
+            });
+            $('input[id=emptyEntradaRead]:checkbox').on('change', function () {
+                if (this.checked) {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/shippers/mudaEstadoFiltro/',
+                        data: {
+                            csrfmiddlewaretoken: "{{ csrf_token }}",
+                            'posicao': 'saida',
+                            'estado': 'on'
+                        },
+                        success: function () {
+                        }
+                    })
+                } else {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/shippers/mudaEstadoFiltro/',
+                        data: {
+                            csrfmiddlewaretoken: "{{ csrf_token }}",
+                            'posicao': 'saida',
+                            'estado': 'off'
+                        },
+                        success: function () {
+                            window.location = "{% url 'shippers:portaria'  %}"
+                        }
+                    })
+                }
+                // Run the search plugin
+                table.draw();
+            });
+
+            $('input[id=emptySaidaRead]:checkbox').on('change', function () {
+                if (this.checked) {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/shippers/mudaEstadoFiltro/',
+                        data: {
+                            csrfmiddlewaretoken: "{{ csrf_token }}",
+                            'posicao': 'entrada',
+                            'estado': 'on'
+                        },
+                        success: function () {
+                        }
+                    })
+                } else {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/shippers/mudaEstadoFiltro/',
+                        data: {
+                            csrfmiddlewaretoken: "{{ csrf_token }}",
+                            'posicao': 'entrada',
+                            'estado': 'off'
+                        },
+                        success: function () {
+                            window.location = "{% url 'shippers:portaria'  %}"
+                        }
+                    })
+                }
+                // Run the search plugin
+                table.draw();
+            });
+
+            $.fn.dataTable.ext.search.push(
+                function (settings, searchData, index, rowData, counter) {
+                    var checked = $('input[id=emptyEntrada]:checkbox').is(':checked');
+
+                    // If checked and Position column is blank don't display the row
+                    if (checked && !searchData[14].startsWith('Time')) {
+                        return false;
+                    }
+                    // Otherwise display the row
+                    return true;
+                },
+                function (settings, searchData, index, rowData, counter) {
+                    var checked = $('input[id=emptySaida]:checkbox').is(':checked');
+
+                    // If checked and Position column is blank don't display the row
+                    if (checked && !searchData[11].startsWith('Time')) {
+                        return false;
+                    }
+                    // Otherwise display the row
+                    return true;
+                },
+                function (settings, searchData, index, rowData, counter) {
+                    var checked = $('input[id=emptyEntradaRead]:checkbox').is(':checked');
+
+                    // If checked and Position column is blank don't display the row
+                    if (checked && searchData[14] !== '') {
+                        return false;
+                    }
+                    // Otherwise display the row
+                    return true;
+                },
+                function (settings, searchData, index, rowData, counter) {
+                    var checked = $('input[id=emptySaidaRead]:checkbox').is(':checked');
+
+                    // If checked and Position column is blank don't display the row
+                    if (checked && searchData[11] !== '') {
+                        return false;
+                    }
+                    // Otherwise display the row
+                    return true;
+                }
+            );
+        });
+
+        function FbotonOn() {
+            if (!document.getElementById('checkboxVeiculo').checked) {
+                document.getElementById('selectVeiculo').style.backgroundColor = "red";
+            } else
+                document.getElementById('selectVeiculo').style.backgroundColor = "transparent";
+        }
+    </script>
+{% endblock %}

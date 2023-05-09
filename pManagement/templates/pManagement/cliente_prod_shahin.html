@@ -1,0 +1,1101 @@
+{% extends "vware/baseArmazem.html" %}
+{% load static %}
+{% load utils %}
+
+{% block body_title %}
+<style>
+
+  .button {
+
+      height: 70px;
+
+      font-family: Arial, "Helvetica", sans-serif;
+      font-size: 45px;
+      color: #fff;
+      text-decoration: none;
+      text-align: center;
+      text-shadow: 1px 1px 0 #7D9EAD, 2px 2px 0 #7D9EAD, 1px 1px 0 #7D9EAD;
+      padding-top: 6px;
+      margin-left: auto;
+      margin-right: auto;
+      left: 30px;
+      position: relative;
+      cursor: pointer;
+      border: none;
+      background: #FBA51A;
+      background-image: linear-gradient(bottom, #E57200 0%, #FBA51A 100%);
+      border-radius: 5px;
+      box-shadow: inset 0px 1px 0px #FBA51A, 0px 5px 0px 0px #cb7b25, 0px 10px 5px #999;
+
+  }
+
+  .tr-hover
+  {
+      background-color:#fefefe;
+  }
+
+
+  .buttons{
+      padding: 15px 25px;
+      background: #FBA51A;
+      text-align: center;
+      padding-top: 6px;
+      font-size: 15px;
+      width: 100px;
+      margin-left: 8px"
+  }
+
+
+  .buttonsUpdate1{
+      position: relative;
+      right:    0;
+      bottom:   35px;
+      padding: 5px 10px;
+      background: #FBA51A;
+      text-align: center;
+      font-size: 15px;
+      margin: 0;
+      width: 5%;
+      height: auto;
+      margin-left: 81%;
+
+  }
+  .buttonsUpdate2{
+      position: relative;
+      right:    0;
+      bottom:   70px;
+      padding: 5px 10px;
+      background: #FBA51A;
+      text-align: center;
+      font-size: 15px;
+      margin: 0;
+      width: 5%;
+      height: auto;
+      margin-left: 81%;
+  }
+  .buttonsPaginator{
+      position: relative;
+      padding: 5px 10px;
+      background: #FBA51A;
+      text-align: center;
+
+  }
+  .buttonFirst{
+      position: relative;
+      right:    0;
+      background: #FBA51A;
+      text-align: center;
+      margin: 0;
+      height: auto;
+
+      padding: 2px 5px;
+      font-size: 15px;
+      width: 4%;
+      margin-left: 80%;
+      bottom:   121px;
+
+
+  }
+  .buttonPrevious{
+      position: relative;
+      right:    0;
+      background: #FBA51A;
+      text-align: center;
+      margin: 0;
+      height: auto;
+
+      padding: 2px 5px;
+      font-size: 15px;
+      width: 4%;
+      margin-left: 84%;
+      bottom:   145px;
+  }
+  .buttonActual{
+      position: relative;
+      right:    0;
+      background: #FBA51A;
+      text-align: center;
+      margin: 0;
+      height: auto;
+
+      padding: 2px 5px;
+      font-size: 15px;
+      width: 2%;
+      margin-left: 88%;
+      bottom:   169px;
+  }
+  .buttonNext{
+      position: relative;
+      right:    0;
+      background: #FBA51A;
+      text-align: center;
+      margin: 0;
+      height: auto;
+
+      padding: 2px 5px;
+      font-size: 15px;
+      width: 3%;
+      margin-left: 90%;
+      bottom:   193px;
+  }
+  .buttonLast{
+      position: relative;
+      right:    0;
+      background: #FBA51A;
+      text-align: center;
+      margin: 0;
+      height: auto;
+
+      padding: 2px 5px;
+      font-size: 15px;
+      width: 3%;
+      margin-left: 93%;
+      bottom:   217px;
+  }
+</style>
+<div class="text-primary" xmlns="http://www.w3.org/1999/html">
+  <h6>
+    <b
+      ><i class="fa fa-home text-secondary"></i><a href={% url 'main:main' %}><span class="text-secondary"> 
+        Home | </span></a> Cliente Package</b>
+  </h6>
+</div>
+{% endblock %}
+{% block body_content %}
+<!-- MAIN -->
+  <p></p>
+   
+    <table id="example" class="stripe hover cell-border" style="width: 100%">
+      <thead>
+        <tr>
+          <td style="text-align: center">Client</td>
+          <td style="text-align: center">Product Name</td>
+          <td style="text-align: center">Comment</td>
+          <td style="text-align: center"></td>
+          <td style="display: none"></td>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- for que vai precorrer todos os dados da view no caso em especifico, vai precorrer a tabela das relações Cliente & Produto -->
+        {% for ref in ClienteProduto.all %}
+        <tr>
+          <td style="width: 40%" title="{{ ref.cliente.oem|default:""}}">{{ref.cliente.oem|default:""}}</td>
+          
+          <td style="width: 40%" title="{{ ref.produto.nome|default:""}}">{{ref.produto.nome|default:""}}</td>
+
+          <td style="width: 40%" title="{{ ref.comment|default:""}}">{{ref.comment|default:""}}
+          <td style="width: 10%">
+            <div class="form-inline">
+              <a
+                type="button"
+                id="botaoEdit"
+                title="Edit"
+                class="fas fa-pen-square"
+                style="height: 18px; margin-left: 10px"
+                data-toggle="modal"
+                data-target="#updateLinha"
+              >
+              </a>
+              <a
+                type="button"
+                id="botaoDelete"
+                title="Delete"
+                class="fas fa-trash-alt"
+                style="margin-left: 10px; height: 18px"
+                data-toggle="modal"
+                data-target="#deleteLinha"
+              >
+              </a>
+            </div>
+          </td>
+          <td style="display: none" value="{{ ref.id }}">{{ ref.id }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <th>Cliente</th>
+          <th>Descrição</th>
+          <th>Comentario</th>
+          <th></th>
+          <th style="display: none"></th>
+        </tr>
+      </tfoot>
+    </table>
+
+    <div
+      style="
+        width: 30%;
+        margin-left: 30%;
+        top: 120%;
+        position: absolute;
+        border: 3px solid transparent;
+        text-align: center;
+      "
+    >
+      <button
+        type="submit"
+        class="button"
+        data-toggle="modal"
+        data-target="#addLinha"
+      >
+        NOVO ITEM
+      </button>
+    </div>
+    <div style="position: absolute">
+      <button
+        type="button"
+        class="form-control"
+        style="background-color: lightgrey"
+        id="excel"
+      >
+        Excel
+      </button>
+    </div>
+
+    <!-- 
+                        <button type="button"  title="Download Excel" class="btn btn-primary buttons"  onclick="uploadStockPackage()" style="background-color: #21127251" id="excel">Excel</button>
+                  -->
+    <!-- Modal onde é adicionada uma nova linha -->
+   <form id="createNewRow">
+    {% csrf_token %}
+    <div
+      class="modal fade"
+      id="addLinha"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="myModalLabel"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <!-- modal onde vai ser adicionado nova relação -->
+            <h3 class="modal-title" id="myModalLabel"><b>Create new row</b></h3>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <table class="table table-borderless mb-n1">
+              <thead></thead>
+              <tbody>
+                <div class="form-inline">
+                  <p class="mt-2" style="margin-left: 10px;">Cliente</p>
+                  <input  type="text"  list="clientList" id="getCliente" style="margin-left: 42px" name="getCliente"required/>
+                 
+                  <datalist id="clientList">
+                    {% for clientes in ClientesOEM.all %}
+                    <option value="{{clientes.oem}}" ></option>
+                    {% endfor %}
+                  </datalist>
+                  
+
+                   
+                </div>
+                <div class="form-inline mt-3">
+                  <h6 class="mt-1" style="margin-left: 10px;" >Product:</h6>
+                  <input type="text" list="prodList" id="getProds" style="margin-left: 34px;" name="getProds"required/>
+                  <datalist required id="prodList">
+                    {% for produtos in Produtos.all %}
+                    <option  value="{{produtos.nome}}"></option>
+                    {% endfor %}
+                  </datalist>
+                </div>
+                 
+                <tr>
+                  <th scope="row" style="color: black;width: 1%;">
+                    <h6><b>Comment</b></h6>
+                  </th>
+                  <td>
+                    <input type="text" style="margin-left: 1%" name="newComment" id="newComment" />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+         
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">
+              Close
+            </button>
+            <button
+              type="submit"
+              class="btn btn-primary"
+              id="CreateButtonNew"
+            >
+              Create
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+
+    <!-- Modal onde é feito o delete de uma linha especifica -->
+    <form
+      method="POST"
+      class="form"
+      action="{% url 'pManagement:deleteLinhaClienteProduto' %}"
+      enctype="multipart/form-data"
+    >
+      {% csrf_token %}
+      <div
+        class="modal fade"
+        id="deleteLinha"
+        tabindex="-1"
+        role="dialog"
+        aria-labelledby="myModalLabel">
+
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3 class="modal-title" id="myModalLabel">
+                <b>Delete this row?</b>
+              </h3>
+              <button
+                type="button"
+                class="close"
+                data-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <p id="infoDelete"></p>
+              <input
+                type="hidden"
+                id="rowIdDelete"
+                name="rowIdDelete"
+                value="{{rowIdDelete}}"
+              />
+              <!-- garantir que o id que vai é relativo ao id do supplyPackage que depois vai estar contido na tabela -->
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-default"
+                data-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-primary">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+    <!-- Modal onde é feito EDIT de cada linha -->
+    <form id="editForm" >
+      {% csrf_token %}
+      <div
+        class="modal fade"
+        id="updateLinha"
+        tabindex="-1"
+        role="dialog"
+        aria-labelledby="myModalLabel"
+      >
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <!-- modal onde vai ser adicionado nova relação -->
+              <h3 class="modal-title" id="myModalLabel"><b>Edit Row</b></h3>
+              <input type="hidden" id="rowIdUpdate" name="rowIdUpdate" value="{{ ref.id }}">
+              <button
+                type="button"
+                class="close"
+                data-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <table class="table table-borderless mb-n1">
+                <thead></thead>
+                <tbody>
+                  <h3><b>Replace by: </b></h3>
+                  <div class="form-inline">
+                    <p class="mt-2" style="margin-left: 10px;">Cliente</p>
+                    <input  type="text"  list="clientList" id="getClienteEdit" style="margin-left: 42px" name="getCliente"required/>
+                   
+                    <datalist id="clientList">
+                      {% for clientes in ClientesOEM.all %}
+                      <option value="{{clientes.oem}}" ></option>
+                      {% endfor %}
+                    </datalist>
+                     
+                  </div>
+                  <div class="form-inline mt-3">
+                    <h6 class="mt-1" style="margin-left: 10px;" >Product:</h6>
+                    <input type="text" list="prodList" id="getProdsEdit" style="margin-left: 34px;" name="getProds"required/>
+                    <datalist required id="prodList">
+                      {% for produtos in Produtos.all %}
+                      <option  value="{{produtos.nome}}"></option>
+                      {% endfor %}
+                    </datalist>
+                  </div>
+                   
+                  <tr>
+                    <th scope="row" style="color: black;width: 1%;">
+                      <h6><b>Comment</b></h6>
+                    </th>
+                    <td>
+                      <input type="text" style="margin-left: 1%" name="editComment" id="editComment" />
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+           
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">
+                Close
+              </button>
+              <button
+                type="submit"
+                class="btn btn-primary"    
+                id="EditButton"      
+                  
+              >
+                Edit
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+      <!-- MODAL DOS CLICAVEIS DO ADD/EDIT-->
+      <div
+        class="modal fade"
+        id="partNumbersExpendable"
+        data-backdrop="false"
+        tabindex="-1"
+        role="dialog"
+        aria-labelledby="myModalLabel"
+      >
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3 class="modal-title" id="myModalLabel">
+                <b>Cliente Package:</b>
+              </h3>
+              <button
+                type="button"
+                class="close"
+                data-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <p id="infoLinhaExpendable"></p>
+              <table id="pnExpendableTable" class="display" style="width: 100%">
+                <thead>
+                  <tr>
+                    <td></td>
+                    <th>Client name</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for pn in clientes.all %}
+                  <tr>
+                    <td></td>
+                    <td>{{ pn.oem }}</td>
+                    <td></td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td></td>
+                    <th></th>
+                    <td></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">
+              Close
+            </button>
+            <button type="submit" id="savePNExpendable" class="btn btn-primary">
+              Save
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL DOS CLICAVEIS DIRETAMENTE DA TABELA -->
+    <div
+      class="modal fade"
+      id="partNumbersReturnable"
+      data-backdrop="false"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="myModalLabel"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 class="modal-title" id="myModalLabel"><b>Products</b></h3>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p id="infoLinhaReturnable"></p>
+            <table id="pnReturnable" class="display" style="width: 100%">
+              <thead style="width: 100%">
+                <tr>
+                  <th></th>
+                  <th>Products</th>
+                  <th style="display: none"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for pn in Produtos.all %}
+                <tr>
+                  <td></td>
+                  <td>{{ pn.nome }}</td>
+                  <td style="display: none">{{ pn.id }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <th style="display: none"></th>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="listaClientProd"
+      data-backdrop="false"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="myModalLabel"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 class="modal-title" id="myModalLabel"><b>ProductsV11</b></h3>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <table
+              id="listaLinhaReturnable"
+              class="display"
+              style="width: 100%"
+            >
+              <thead style="width: 100%">
+                <tr>
+                  <th>Products</th>
+                  <th style="display: none"></th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+              <tfoot>
+                <tr>
+                  <td></td>
+                  <td style="display: none"></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="alerts"></div>
+
+
+
+    <div class="modal fade" id="partNumbersReturnable" data-backdrop="false" tabindex="-1" role="dialog"
+    aria-labelledby="myModalLabel">
+   <div class="modal-dialog" role="document">
+       <div class="modal-content">
+           <div class="modal-header">
+               <h3 class="modal-title" id="myModalLabel"><b>Part numbers Stock Package</b></h3>
+               <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                       aria-hidden="true">&times;</span></button>
+           </div>
+           <div class="modal-body">
+               <p id="infoLinhaReturnable"></p></br>
+               <table id="pnReturnable" class="display" style="width:100%">
+                   <thead style="width:100%">
+                   <tr>
+                       <th></th>
+                       <th>Dia</th>
+                       <th>Media</th>
+                       <th style="display: none"></th>
+                   </tr>
+                   </thead>
+                   <tbody>
+                   <!-- {% for pn in stock_package_parts.all %} -->
+                       <tr>
+                           <td></td>
+                          <!--  <td> {{ pn.pn }} </td>
+                           <td> {{ pn.descricao }} </td>
+                           <td style="display: none"> {{ pn.id }} </td> -->
+                       </tr>
+                   {% endfor %}
+                   </tbody>
+                   <tfoot>
+                   <tr>
+                       <td></td>
+                       <th></th>
+                       <td></td>
+                       <td></td>
+                   </tr>
+                   <div class="modal-footer">
+        <!--   <button type="button" class="btn btn-default" data-dismiss="modal">Close</button> -->
+       
+      </div>
+                   </tfoot>
+               </table>
+           </div>
+           <div class="modal-footer">
+                <button type="button" class="btn btn-secondary mb-3" id="estatisticas">Excel Historico</button>
+               <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+               <!-- <button type="submit" id="savePNReturnable" class="btn btn-primary">Save</button> -->
+           </div>
+       </div>
+   </div>
+</div>
+
+
+
+
+
+ 
+
+    {% endblock %} {% block javascript %}
+    <script>
+
+function CreateNewRowButton() {
+  var newComment = $("#newComment").val();
+
+  var clienteAdd = $("#getCliente").val();
+  var produtos =  $("#getProds").val();
+  console.log("FOI CLICADO NO ADD")
+  // var newClient = clienteAdd.querySelector('[value='${"#clientList"}) 
+
+  //console.log("campos-> ",prods,el,clienteAdd, produtos, newComment)
+  console.log("CLIENTES", clienteAdd)
+  var elem = document.getElementById("CreateButtonNew")
+  elem.disabled = true
+  $.ajax({
+    type: "POST",
+    url: "{% url 'pManagement:createClienteProduto' %}",
+    data: {
+      csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
+      newClient : clienteAdd,
+      newProd : produtos,
+      newComment: newComment,
+    },
+    success: function () {
+      window.location.replace("{% url 'pManagement:clienteProduto' %}");
+      elem.disabled = false
+      
+    },
+  });
+}
+        function EditRowButton(scope){
+          console.log("Cliscas-te no save");
+          var rowIdUpdate = $("#rowIdUpdate").val();
+          var cliente = $("#getClienteEdit").val();
+          var prods =  $("#getProdsEdit").val();
+          var novoCommentEdit = $("#editComment").val();
+
+          console.log("REQUEST A CAMINHO COM.... --> ", novoCommentEdit)
+          var elem = document.getElementById("EditButton")
+          var dataForm = new FormData();
+         // var stockPackages = document.getElementById('getProds').value;
+          dataForm.append("rowIdUpdate", rowIdUpdate);
+          dataForm.append("editComment", novoCommentEdit);
+          dataForm.append("getCliente", cliente);
+          dataForm.append("getProds", prods);
+          dataForm.append(
+            "csrfmiddlewaretoken",
+            $("input[name=csrfmiddlewaretoken]").val()
+          );
+          elem.disabled = true
+          $.ajax({
+            type: "POST",
+            url: "{% url 'pManagement:updateClienteProduto' %}",
+            contentType: false,
+            processData: false,
+            csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
+            data: dataForm,
+          
+            success: function () {
+              //window.location.reload()
+              elem.disabled = false
+            },
+          });
+        }
+      
+
+function addAlert(message) {
+  console.log("ENtroi no alerta")
+    $('#alerts').append(
+        '<div class="modal fade">' +
+            '<button type="button" class="close" data-dismiss="alert">' +
+            '&times;</button>' + message + '</div>');
+}
+
+      $(".clearable.example .ui.selection.dropdown").dropdown({
+        clearable: true,
+      });
+      $(".clearable.example .ui.inline.dropdown").dropdown({
+        clearable: true,
+        placeholder: "any",
+      });
+
+      $(document).ready(function () {
+          $("#editForm").submit((ev) => {
+            console.log("Running the event")
+            ev.preventDefault()
+            EditRowButton($(this))
+          })
+
+          $("#createNewRow").submit((ev) => {
+            ev.preventDefault()
+            CreateNewRowButton($(this))
+          })
+
+        // Setup - add a text input to each footer cell
+        $("#example thead th").each(function (i) {
+          var title = $("#example thead th").eq($(this).index()).text();
+          $(this).html(
+            '<input class="form-control" style="margin-left: -15px" type="text" placeholder="Search ' +
+              title +
+              '" data-index="' +
+              i +
+              '" />'
+          );
+        });
+
+        $("#example").on("change", "input", function () {
+          //Get the cell of the input
+          var cella = $(this).closest("th");
+
+          //update the input value
+          $(this).attr("value", $(this).val());
+          var nome = $(this).attr("name");
+          var qty = $(this).attr("value");
+
+          //invalidate the DT cache
+          table.cell($(cella)).invalidate().draw();
+        });
+
+        var table = $("#example").DataTable({
+          paging: false,
+          orderCellsTop: true,
+          fixedHeader: true,
+          height: 1,
+          overflowY : "scroll",
+          scrollX: true,
+          scrollY: 460,
+          scrollCollapse: true,
+          info: false,
+          order: [[0, 'desc']],
+   
+          select: {
+            style: "os",
+            selector: "th:first-child",
+            blurable: true,
+          },
+          columnDefs: [{
+                    targets: "_all",
+                    render: function (data, type, row) {
+                        if (data.startsWith('<')) {
+                            return data
+                        }
+                        return data.length > 19 ?
+                            data.substr(0, 19) + '…' :
+                            data;
+                    }
+                }],
+
+          
+
+          initComplete: function () {
+            this.api()
+              .columns([0, 1, 2])
+              .every(function () {
+                $(document).ready(function () {
+                  $("td").hover(
+                    function () {
+                      // $(this).get((this.selectedRow));
+                      $(this).css("color", "#000000");
+                    },
+                    function () {
+                      $(this).css("background-color", "none");
+                      $(this).css("color", "black"); // or whatever your original color was
+                    }
+                  );
+                });
+                var column = this;
+
+                var select = $(
+                  '<select class="form-control" style="margin-left: -18px" id="selected"><option value=""></option></select>'
+                )
+                  .appendTo($(column.footer()).empty())
+                  .on("change", function () {
+                    var val = $.fn.dataTable.util.escapeRegex($(this).val());
+                    column
+                      .search(val ? "^" + val + "$" : "", true, false)
+                      .draw();
+                  });
+
+                column
+                  .data()
+                  .unique()
+                  .sort()
+                  .each(function (d, j) {
+                    select.append(
+                      '<option value="' + d + '">' + d + "</option>"
+                    );
+                    console.log("tas", column.data().unique().sort());
+                    console.log("Coluna ->", column);
+                  });
+              });
+          },
+        });
+
+        $("#example tbody").on("click", "#botaoDelete", function () {
+          var data = table.row($(this).parents("tr")).data();
+          console.log("CHEGOU AO DELETwdwdaE");
+
+          console.log("DATA-> ", data);
+          var cliente = data[0];
+          var comment = data[2];
+          var produto = data[1];
+
+          var modalInfo =
+            "<p>" +
+            "<b>Client Name:</b>&emsp;&emsp;" +
+            data[0] +
+            "</b>" +
+            "<p>" +
+            "<b>Comment:</b>&emsp;&emsp;&emsp;" +
+            comment +
+            "</p>" +
+            "<p>" +
+            "<b>Produto:</b>&emsp;&emsp;&emsp;" +
+            produto 
+            "</b>" +
+            "<p>" 
+
+          $("#rowIdDelete").val(data[4]);
+          $("#infoDelete").html(modalInfo);
+        });
+
+        // Filter event handler
+        $(table.table().container()).on("keyup", "thead input", function () {
+          table.column($(this).data("index")).search(this.value).draw();
+        });
+
+        $("#listaClientProd").on("hidden.bs.modal", function () {
+          $(this).find("form").trigger("reset");
+        });
+
+        $("#example tbody").on("click", "button", function () {
+          var data = table.row($(this).parents("tr")).data();
+          //alert(data[0] + "'s quantity of " + data[2] + " is: " + data[4]);
+          //$("#myModal").modal('show');
+          // Add response in Modal body
+          
+          var cliente = data[0];
+          var comment = data[2];
+          var produto = data[1];
+
+          // falta linkar seguintes campos com os ids dos campos da tabela exemple (a)
+          var time = moment().format("DD-MM-YYYY HH:mm:ss");
+          $("#cliente_name").val(cliente);
+          $("#comentario").val(comment);
+          $("#prod_name").val(produto);
+        });
+
+        $(document).on("click", "#botaoEdit", function () {
+          var data = table.row($(this).parents("tr")).data();
+          var cliente = data[0];
+          var prod = data[1];
+          var commentario = data[2];
+
+          console.log("cliente", cliente);
+          console.log("commentario", commentario);
+          /* $('#clienteEdit option[data-name="' + cliente + '"]')
+            .show()
+            .prop("selected", true); */
+          document.getElementById("getClienteEdit").value = cliente;
+          document.getElementById("getProdsEdit").value = prod;
+          document.getElementById("editComment").value = commentario;
+          document.getElementById("rowIdUpdate").value = data[4];
+
+        /*   tableReturnable.rows().deselect();
+          $.each(tableReturnable.rows().nodes(), function (i, item) {
+            var row = tableReturnable.row(i);
+
+            rows.some((element) => {
+              if (element["cliente_id"] == data[4]) {
+                row.select();
+                return true;
+              }
+              return false;
+            });
+          }); */
+        });
+
+        function ClearFilters() {
+          $(".form-control").val(""); // Clear ext and select inputs with classname form-control
+          $("#chk").prop("checked", false).change(); // Clear checkbox and trigger change event
+
+          var table = $("#example").DataTable();
+          table.search("").columns().search("").draw();
+        }
+
+        $(document).on("click", "#excel", function () {
+          console.log("PRINT");
+          window.location.replace(
+            "{% url 'pManagement:downloadExcelClienteProduto' %}"
+          );
+        });
+
+        /* --------------------/////--------------------------------BTNS COM POPUPS-----------------//------ */
+
+        var tableExpendable = $("#pnExpendableTable").DataTable({
+          info: false,
+          paging: false,
+          scrollCollapse: true,
+          scrollY: "420px",
+          columnDefs: [
+            {
+              orderable: false,
+              className: "select-checkbox",
+              targets: 0,
+            },
+          ],
+          select: {
+            style: "multi",
+            selector: "td:first-child",
+          },
+          order: [[1, "asc"]],
+
+          initComplete: function () {
+            this.api()
+              .columns([1])
+              .every(function () {
+                var that = this;
+                //$('#pnExpendable tfoot tr').appendTo('#pnExpendable thead');   // To displays the search boxs at the top instead to the bottom of the table
+                $("input", this.footer()).on("keyup change clear", function () {
+                  console.log("print10");
+                  if (that.search() !== this.value) {
+                    that.search(this.value).draw();
+                  }
+                });
+              });
+          },
+        });
+
+        $("#pnReturnable tfoot th").each(function (i) {
+          var title = $("#pnReturnable tfoot th").eq($(this).index()).text();
+          //$(this).html('<input class="form-control" style="margin-left: -18px" type="text" placeholder="Search ' + title + '" data-index="' + i + '" />');
+        });
+        var tableReturnable = $("#pnReturnable").DataTable({
+          info: false,
+          paging: false,
+          scrollCollapse: true,
+          scrollY: "420px",
+          columnDefs: [
+            {
+              orderable: false,
+              className: "select-checkbox",
+              targets: 0,
+            },
+          ],
+          select: {
+            style: "multi",
+            selector: "td:first-child",
+          },
+          order: [[1, "asc"]],
+          initComplete: function () {
+            this.api()
+              .columns([1])
+              .every(function () {
+                var that = this;
+
+                //$('#pnReturnable tfoot tr').appendTo('#pnReturnable thead');   // To displays the search boxs at the top instead to the bottom of the table
+                $("input", this.footer()).on("keyup change clear", function () {
+                  console.log("print6");
+                  if (that.search() !== this.value) {
+                    that.search(this.value).draw();
+                  }
+                });
+              });
+          },
+        });
+
+        /* Clicavel da cell ClientPackage */
+        /* Verificar os nomes para conseguires enviar para a view o ID do item selecionado */
+      
+      $(document).on("click", "#excel", function () {
+        $.ajax({
+          type: "GET",
+          url: "/pManagement/downloadExcelClienteProduto/",
+          data: {},
+          success: function () {
+            var element = document.createElement("a");
+            element.setAttribute("href", "/media/workbookSupplyPackage.xls");
+            //é aqui que se pode fazer o sistema de pastas?
+            element.setAttribute("download", "my-file-name");
+
+            element.style.display = "none";
+            document.body.appendChild(element);
+
+            element.click();
+
+            document.body.removeChild(element);
+          }});
+        });
+      });
+    </script>
+    {% endblock %}
+  </div>
+</div>

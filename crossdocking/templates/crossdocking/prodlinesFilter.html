@@ -38,7 +38,6 @@
                        
                 <button type="submit" class="btn btn-outline-primary ml-4 mt-3">Search
                 </button>
-                <input type="hidden" accept="" id="textPath"></br>
                 <input type="hidden" id="requestDay" name="requestDay" value="{{ data }}">
                 <input type="hidden" id="data" name="data" value="{{ data }}">
             </form>
@@ -328,13 +327,15 @@
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="/myJavascript.js?version=4"></script>
     <script>
+        
         $(function () {
             $("#datepicker").datepicker({
                 dateFormat: 'yy-m-d',
                 inline: true,
                 onSelect: function (dateText, inst) {
-                    var path = "//PAVPD002/E_Proj/sharedir/MP&L/Schedule/";
+                    var path = "//PAVPD002/E_Proj/sharedir/MP&L/Schedule/"; /* BUG FILESYS */
                     var date = $("#datepicker").datepicker("getDate");
+                    console.log("Data -> ", date)
                     var mes = date.getMonth();
                     if (mes == 0)
                         mes = "Janeiro"
@@ -365,7 +366,7 @@
                     $("#textPath").val(path + "" + $.datepicker.formatDate("yy", date) + "/" + "" + mes + " " + $.datepicker.formatDate("yy", date) + "/Daily_Schedule_" + $.datepicker.formatDate("dd.mm.yy", date) + ".xlsx");
                     $("#textPath1").val(path + "" + $.datepicker.formatDate("yy", date) + "/" + "" + mes + " " + $.datepicker.formatDate("yy", date) + "/Daily_Schedule_" + $.datepicker.formatDate("dd_mm_yy", date) + ".xlsx");
                     
-                    $("#requestDay").val("" + $.datepicker.formatDate("dd-mm-yy", date))
+                    $("#requestDay").val("" + $.datepicker.formatDate("yy-mm-dd", date))
                 }
             });
         });

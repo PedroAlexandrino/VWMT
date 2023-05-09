@@ -1,0 +1,1091 @@
+{% extends "vware/baseArmazem.html" %}
+{% load static %}
+
+{% block body_title %}
+
+    <div class="text-primary">
+        <h6><b><i class="fa fa-home text-secondary"></i><a href={% url 'main:main' %}><span
+                class="text-secondary"> Home | </span></a> Portaria Tracking</b></h6>
+    </div>
+    <style>
+
+        .button {
+            width: 35%;
+            height: 70px;
+            display: inline-block;
+            font-family: Arial, "Helvetica", sans-serif;
+            font-size: 45px;
+            color: #fff;
+            text-decoration: none;
+            text-align: center;
+            text-shadow: 1px 1px 0 #7D9EAD, 2px 2px 0 #7D9EAD, 1px 1px 0 #7D9EAD;
+            padding-top: 6px;
+            margin-left: auto;
+            margin-right: auto;
+            left: 30px;
+            position: relative;
+            cursor: pointer;
+            border: none;
+            background: #FBA51A;
+            background-image: linear-gradient(bottom, #E57200 0%, #FBA51A 100%);
+            border-radius: 5px;
+            box-shadow: inset 0px 1px 0px #FBA51A, 0px 5px 0px 0px #cb7b25, 0px 10px 5px #999;
+        }
+
+        .button:active {
+            top: 3px;
+            box-shadow: inset 0px 1px 0px #FBA51A, 0px 2px 0px 0px #E57200, 0px 5px 3px #999;
+        }
+
+        .button:hover, button:focus {
+            outline: none;
+            transform: translateY(0.5px);
+        }
+
+        .containerPrincipal {
+            height: 860px;
+            width: 100%;
+            top: 11px;
+            left: 0px;
+            position: relative;
+            border: 1px solid transparent;
+        }
+
+        .column_left {
+            border-left: 2px solid black;
+        }
+
+        tfoot input {
+            width: 100%;
+        }
+
+
+        @media screen and (max-width: 1700px) {
+            .button {
+                width: 35%;
+                height: 70px;
+                display: inline-block;
+                font-family: Arial, "Helvetica", sans-serif;
+                font-size: 45px;
+                color: #fff;
+                text-decoration: none;
+                text-align: center;
+                text-shadow: 1px 1px 0 #7D9EAD, 2px 2px 0 #7D9EAD, 1px 1px 0 #7D9EAD;
+                padding-top: 6px;
+                margin-left: auto;
+                margin-right: auto;
+                left: 30px;
+                position: relative;
+                cursor: pointer;
+                border: none;
+                background: #FBA51A;
+                background-image: linear-gradient(bottom, #E57200 0%, #FBA51A 100%);
+                border-radius: 5px;
+                box-shadow: inset 0px 1px 0px #FBA51A, 0px 5px 0px 0px #cb7b25, 0px 10px 5px #999;
+            }
+
+            .button:active {
+                top: 3px;
+                box-shadow: inset 0px 1px 0px #FBA51A, 0px 2px 0px 0px #E57200, 0px 5px 3px #999;
+            }
+
+            .button:hover, button:focus {
+                outline: none;
+                transform: translateY(0.5px);
+            }
+
+            .containerPrincipal {
+                height: 790px;
+                width: 100%;
+                top: 11px;
+                left: 0px;
+                position: relative;
+                border: 1px solid transparent;
+            }
+
+            .column_left {
+                border-left: 2px solid black;
+            }
+
+            tfoot input {
+                width: 100%;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block body_content %}
+    <div class="containerPrincipal">
+        
+        <table id="qadShipersTable"  class="display" style="margin-left: 0%; height: 150%;  width: 100%; text-align: center">
+            <thead>
+            <tr>
+                <th  style="font-size: 13px">ID</th>
+                <th  style="font-size: 13px">Ship Date</th>
+                <th  style="font-size: 13px">Ship Time</th>
+                <th  style="font-size: 13px">City</th>
+                <th  style="font-size: 13px">Country</th>
+                <th  style="font-size: 13px">Carrier</th>
+                <th  style="font-size: 13px">FOB</th>
+                <th  style="font-size: 13px">Mode of Transport</th>
+                <th  style="font-size: 13px">Vehicle ID</th>
+                <th  style="font-size: 13px;display: none">Total Master packs</th>
+                <th  style="font-size: 13px">Confirmed</th>
+                <th  style="font-size: 13px">Timestamp</th>
+                <th style="display: none"></th>
+                <th style="display: none"></th>
+            </tr>
+            </thead>
+            <tbody>
+                {% for element in shippers_tracking %}
+                {% if element.estado == "outdated" %}
+                {% else %}
+                {% if element.estado == "deleted" %}
+                    <tr>
+                        <td title="{{ element.abs_id }}" style="background-color: #fd5d3d;">{{ element.abs_id }}</td>
+                        <td title="{{ element.ship_date }}"style="background-color: #fd5d3d;">{{ element.ship_date }}</td>
+                        <td title="{{ element.ship_time }}"style="background-color: #fd5d3d;">{{ element.ship_time }}</td>
+                        <td title="{{ element.city }}"style="background-color: #fd5d3d;">{{ element.city }}</td>
+                        <td title="{{ element.country }}"style="background-color: #fd5d3d;">{{ element.country }}</td>
+                        <td title="{{ element.carrier }}"style="background-color: #fd5d3d;">{{ element.carrier }}</td>
+                        <td title="{{ element.fob }}"style="background-color: #fd5d3d;">{{ element.fob }}</td>
+                        <td title="{{ element.mode_of_transport }}"style="background-color: #fd5d3d;">{{ element.mode_of_transport }}</td>
+                        <td title="{{ element.vehicle_id }}"style="background-color: #fd5d3d;">{{ element.vehicle_id }}</td>
+                        <td style="display: none" title="{{ element.total_master_packs }}"style="background-color: #fd5d3d;">{{ element.total_master_packs }}</td>
+                        <td title="{{ element.confirmed }}"style="background-color: #fd5d3d;">{{ element.confirmed }}</td>
+                        <td title="{{ element.confirmed }}"style="background-color: #fd5d3d;">{{ element.timestamp }}</td>
+                        <th style="display: none" >{{ element.estado }}</th>
+                        <th style="display: none" >{{ element.id }}</th>
+                    </tr>
+                {% else %}
+                {% if element.estado == "updated" %}
+                    <tr>
+                        <td title="{{ element.abs_id }}" style="background-color: #FBA51A;">{{ element.abs_id }}</td>
+                        <td title="{{ element.ship_date }}"style="background-color: #FBA51A;">{{ element.ship_date }}</td>
+                        <td title="{{ element.ship_time }}"style="background-color: #FBA51A;">{{ element.ship_time }}</td>
+                        <td title="{{ element.city }}"style="background-color: #FBA51A;">{{ element.city }}</td>
+                        <td title="{{ element.country }}"style="background-color: #FBA51A;">{{ element.country }}</td>
+                        <td title="{{ element.carrier }}"style="background-color: #FBA51A;">{{ element.carrier }}</td>
+                        <td title="{{ element.fob }}"style="background-color: #FBA51A;">{{ element.fob }}</td>
+                        <td title="{{ element.mode_of_transport }} "style="background-color: #FBA51A;">{{ element.mode_of_transport }}</td>
+                        <td title="{{ element.vehicle_id }}"style="background-color: #FBA51A;">{{ element.vehicle_id }}</td>
+                        <td style="display: none" title="{{ element.total_master_packs }}"style="background-color: #FBA51A;">{{ element.total_master_packs }}</td>
+                        <td title="{{ element.confirmed }}"style="background-color: #FBA51A;">{{ element.confirmed }}</td>
+                        <td title="{{ element.confirmed }}"style="background-color: #FBA51A;">{{ element.timestamp }}</td>
+                        <th style="display: none" >{{ element.estado }}</th>
+                        <th style="display: none" >{{ element.id }}</th>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td title="{{ element.abs_id }}">{{ element.abs_id }}</td>
+                        <td title="{{ element.ship_date }}">{{ element.ship_date }}</td>
+                        <td title="{{ element.ship_time }}">{{ element.ship_time }}</td>
+                        <td title="{{ element.city }}">{{ element.city }}</td>
+                        <td title="{{ element.country }}">{{ element.country }}</td>
+                        <td title="{{ element.carrier }}">{{ element.carrier }}</td>
+                        <td title="{{ element.fob }}">{{ element.fob }}</td>
+                        <td title="{{ element.mode_of_transport }}">{{ element.mode_of_transport }}</td>
+                        <td title="{{ element.vehicle_id }}">{{ element.vehicle_id }}</td>
+                        <td style="display: none" title="{{ element.total_master_packs }}">{{ element.total_master_packs }}</td>
+                        <td title="{{ element.confirmed }}">{{ element.confirmed }}</td>
+                        <td title="{{ element.confirmed }}">{{ element.timestamp }}</td>
+                        <th style="display: none" >{{ element.estado }}</th>
+                        <th style="display: none" >{{ element.id }}</th>
+                    </tr>
+                {% endif %}
+                 {% endif %}
+                {% endif %}
+
+                {% endfor %}
+            </tbody>
+            <tfoot>
+            <tr>
+                <th  style="font-size: 13px"></th>
+                <th  style="font-size: 13px"></th>
+                <th  style="font-size: 13px"></th>
+                <th  style="font-size: 13px"></th>
+                <th  style="font-size: 13px"></th>
+                <th  style="font-size: 13px"></th>
+                <th  style="font-size: 13px"></th>
+                <th  style="font-size: 13px"></th>
+                <th  style="font-size: 13px"></th>
+                <th  style="font-size: 13px"></th>
+                <th  style="font-size: 13px;display: none"></th>
+                <th  style="font-size: 13px"></th>
+                <th style="display: none"></th>
+                <th style="display: none"></th>
+            </tr>
+            </tfoot>
+        </table>
+
+
+             
+            <div style="width: 85%; margin-left: 6%; bottom: 0%; position: absolute; border: 3px solid transparent; text-align: center">
+                 <!-- Aqui estava o btn de nova Entrada-->
+            </div>
+            <div style="position: absolute; right: 25px; bottom: 0">
+                <a href="#reportIssue" data-toggle="modal" data-target="#reportIssue" class="fas fa-info-circle"
+                   style="font-size: 15px; height: 22px"> Help</a>
+            </div>
+            </div>
+       
+    <form method="POST" enctype="multipart/form-data" action="{% url 'shippers:reportPortariaTracking' %}">
+        {% csrf_token %}
+        <div class="modal fade" id="reportIssue" tabindex="-1" role="dialog"
+             aria-labelledby="myModalLabel">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: rgba(236,144,0,0.86)">
+                        <h4 class="modal-title" id="myModalLabel" style="margin-left: 45%; font-size: 40px"><i>HELP</i>
+                        </h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body"
+                         style="background: linear-gradient(to bottom, rgba(236,144,0,0.86) 0%, ghostwhite 100%); ">
+                        <div style="margin-top: 10px">
+                            <p style="font-size: 20px"><strong>Escreva aqui possíveis erros de utilização desta página
+                                em
+                                específico, ou deixe sugestões de melhoria</strong></p>
+                            <textarea class="form-control mt-n3" name="reportICDR" id="reportICDR" rows="11"
+                                      style="background-color: floralwhite; text-align: center;font-family:sans-serif;font-size:1.5em"
+                                      required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="background-color: ghostwhite">
+                        <button type="submit" id="submitReportICDR" class="btn btn-primary">Submeter</button>
+                        <button type="button" class="btn btn-primary" value="pending" data-dismiss="modal">Fechar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+     
+
+
+
+     
+
+
+
+
+
+
+
+<div style="position: absolute;margin-bottom: -55%;">
+    <!--  -->
+</div>
+   
+<div class="modal fade"  id="modalCalendario" style="pointer-events: none;" data-keyboard='false' 
+    data-backdrop="static"  role="dialog" aria-labelledby="myModalLabel">
+<div class="modal-dialog" role="document"  >
+    
+   <div class="modal-content" style="width: 100%; height: 120%;margin-bottom: -12%">
+       <div class="modal-header">
+           <h3 class="modal-title" id="myModalLabel"><b>Escolha data Inicio e de Fim:</b></h3>
+           
+       </div>
+       <div class="modal-body" style="margin-bottom: -12%;">
+           <div class="containerPrincipal" style="width: 100%; height: 100%;margin-bottom: 10%">
+            <div style="margin-left: 16%;"> 
+                <div id="calendar" ></div>
+            </div>
+           </div>
+           <div class="modal-footer" style = "margin-bottom: 10%" >
+            <button type="button" id="closeModalExcel" class="btn btn-primary" data-dismiss="modal">Sair</button>
+            <button type="button" id="saveModalExcel"  class="btn btn-primary"data-dismiss="modal">Ok</button>
+        </div>
+       
+       </div>
+    </div>
+</div>
+</div>
+
+
+
+<div class="modal fade"  id="modalAlteracoes"  
+    data-backdrop="static"  role="dialog" aria-labelledby="myModalLabel">
+<div class="modal-dialog" role="document"  >
+    
+   <div class="modal-content" style="width: 200%; height: 120%;margin-bottom: -12%; margin-left: -50%;">
+       <div class="modal-header">
+           <h3 class="modal-title" id="myModalLabel"><b>Alterações da Linha:</b></h3>
+           
+       </div>
+       <div class="modal-body" style="margin-bottom: -12%;">
+           <div class="containerPrincipal" style="width: 100%; height: 100%;margin-bottom: 10%">
+            
+            <table id="tabelaEdicoes"  class="display" style="margin-left: 0%; height: 150%;  width: 100%; text-align: center">
+                <thead>
+                    <tr>
+                        <th  style="font-size: 13px">ID</th>
+                        <th  style="font-size: 13px">Ship Date</th>
+                        <th  style="font-size: 13px">Ship Time</th>
+                        <th  style="font-size: 13px">City</th>
+                        <th  style="font-size: 13px">Country</th>
+                        <th  style="font-size: 13px">Carrier</th>
+                        <th  style="font-size: 13px">FOB</th>
+                        <th  style="font-size: 13px">Mode of Transport</th>
+                        <th  style="font-size: 13px">Vehicle ID</th>
+                        <th  style="font-size: 13px;display: none">Total Master packs</th>
+                        <th  style="font-size: 13px">Confirmed</th>
+                        <th  style="font-size: 13px">Timestamp</th>
+                        <th style="display: none"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                </tbody>
+                <tfoot>
+                <tr>
+                    <th  style="font-size: 13px"></th>
+                    <th  style="font-size: 13px"></th>
+                    <th  style="font-size: 13px"></th>
+                    <th  style="font-size: 13px"></th>
+                    <th  style="font-size: 13px"></th>
+                    <th  style="font-size: 13px"></th>
+                    <th  style="font-size: 13px"></th>
+                    <th  style="font-size: 13px"></th>
+                    <th  style="font-size: 13px"></th>
+                    <th  style="font-size: 13px"></th>
+                    <th  style="font-size: 13px;display: none"></th>
+                    <th  style="font-size: 13px"></th>
+                    <th style="display: none"></th>
+                </tr>
+                </tfoot>
+            </table>
+
+
+
+
+
+           </div>
+           <div class="modal-footer" style = "margin-bottom: 10%" >
+            <button type="button" id="saveModalExcel"  class="btn btn-primary"data-dismiss="modal">Ok</button>
+        </div>
+       
+       </div>
+    </div>
+</div>
+</div>
+
+<button id="refresh-btn" style="width: 20%; height: 20%;margin-left:40%;"  class="btn btn-primary">Refresh  </button>
+
+<!-- <p style="font-size: 10px">Refresh Automatico (1h) LAST {{id_to_refresh}} </p> -->
+
+
+
+
+<button type="button" style="width: 10%; height: 10%;background-color: darkgrey; margin-left: 70%;" class="form-control" id="excel">Excel BD</button>
+
+<button type="button" style="width: 10%; height: 10%;background-color: darkgrey; margin-left: 5%;" class="form-control" id="btnHistorico">Historico</button>
+
+
+
+
+<div class="modal fade"  id="modalHistorico"  style="margin-left: 20%;pointer-events: none;"
+    data-backdrop="static"  role="dialog" aria-labelledby="myModalLabel">
+<div class="modal-dialog" role="document"  >
+    
+   <div class="modal-content" style="width: 120%; height: 100%;margin-bottom: -10%; margin-left: -60%;">
+       <div class="modal-header">
+           <h3 class="modal-title" id="myModalLabel"><b>Escolha um dia:</b></h3>
+           
+       </div>
+       <div class="modal-body" style="margin-bottom: -12%;">
+           <div class="containerPrincipal" style="width: 100%; height: 100%;margin-bottom: 10%">
+       <div style="margin-left: 20%;">
+            
+                <div id="calendar" style="margin-left: 50%;" ></div>
+                <button id="btn-today" style="margin-top:1%; margin-left: 30%" >Hoje</button>
+        </div>
+
+           </div>
+           <div class="modal-footer" style = "margin-bottom: 10%" >
+            <button type="button" id="btnSelectDataTabela"  class="btn btn-primary"data-dismiss="modal">Ok</button>
+            <button type="dismiss" id="btnDismiss" style="display: none;" class="btn btn-primary"data-dismiss="modal">DISMISS</button>
+             
+       </div>
+       
+       </div>
+    </div>
+</div>
+</div>
+
+
+
+
+
+{% endblock %}
+
+{% block javascript %}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/confetti.css">
+
+    <script>
+    var selectedDates1 = [];
+
+    var datePicker = flatpickr("#calendar", {
+        inline: true,
+        dateFormat: "Y-m-d",
+        mode: "range",
+        defaultDate: "today",
+    onClose: function(selectedDates, dateStr, instance) {
+        selectedDates1 = [selectedDates[0], selectedDates[1]];
+            }
+    });
+
+
+
+
+        var data = "{{id_to_refresh}}";
+        var dataObj = new Date(data);
+        var hora = dataObj.getHours();
+        var minutos = dataObj.getMinutes();
+        var segundos = dataObj.getSeconds();
+        console.log(hora, minutos, segundos);
+
+        var id_to_refresh = hora + ":" + minutos + ":" + segundos;
+  document.getElementById("refresh-btn").textContent = "Refresh Automatico (1h) LAST " + id_to_refresh;
+
+  setInterval(function () {
+                    $.ajax({
+                     type: 'GET',
+                     url: '/shippers/getIdToRefreshShippersTracking/',
+                     data: {
+                         csrfmiddlewaretoken: "{{ csrf_token }}",
+                     },
+                     success: function (response) {
+                var id_para_update = "{{ id_to_refresh }}"
+                const agora = new Date();
+                const horasAtuais = agora.getHours() +1;
+                
+                //const dataHoraFormatada = `${ano}-${mes}-${dia} ${horasAtuais.toString().padStart(2, '0')}:00:00`;
+
+                const dataHora = id_para_update;
+                const objDataHora = new Date(dataHora);
+                const hora = objDataHora.getHours();
+                //console.log(horasAtuais , id_para_update );
+
+                console.log("DATAS PARA REFRESH DE HORA", agora.getHours() , "<-|->", hora );
+                console.log("A resposta é->  ",response.refreshDate, "<-|->", id_para_update)
+                //exprimenta separar os ifs
+                 if (response.refreshDate != id_para_update   ){
+                    console.log("REFRESH",id_para_update, response.refreshDate)
+                    $.ajax({
+                        type: 'POST',
+                        url: '/shippers/populate_shippers_trackingPage/',
+                        data: {
+                            csrfmiddlewaretoken: "{{ csrf_token }}",
+                        },
+                        success: function (req) {
+                            //console.log("resposta!!!")
+                            //console.log("tamanho req-->", req.length)
+                            window.location.reload();
+                    }
+                    })
+                 }else if(agora.getHours() != hora ){
+                    console.log("hora difrente--> ")
+                    $.ajax({
+                        type: 'POST',
+                        url: '/shippers/populate_shippers_trackingPage/',
+                        data: {
+                            csrfmiddlewaretoken: "{{ csrf_token }}",
+                        },
+                        success: function (req) {
+                            //console.log("resposta!!!")
+                            //console.log("tamanho req-->", req.length)
+                            window.location.reload();
+                    }
+                    })
+                 }
+                     }
+                 });
+
+            }, 60000 ); //3600000
+
+        $("#excel").click(function(){
+            console.log("ENTROU")
+            /* var myModal = new bootstrap.Modal(document.getElementById('modalHistorico'))
+            myModal.show() */
+        });
+
+        $("#btnHistorico").click(function(){
+            console.log("ENTROU")
+            var myModal = new bootstrap.Modal(document.getElementById('modalHistorico'))
+            myModal.show()
+            //datePicker.setDate(null);
+            console.log("PAra limpar calendario")
+        });
+
+        $("#refresh-btn").click(function(){
+            Swal.fire({
+                    icon: 'success',
+                    title: 'A fazer pesquisa, pode demorar algum tempo.',
+                    showConfirmButton: false
+                    });
+            $.ajax({
+                        type: 'POST',
+                        url: '/shippers/populate_shippers_trackingPage/',
+                        data: {
+                            csrfmiddlewaretoken: "{{ csrf_token }}",
+                            
+                             
+                        },//RE*ARAR ESTE REQUEST PARA FAZER O UPDATE CASO ECISTAM VALORES NOVOS
+                        success: function (req) {
+                            console.log("resposta!!!")
+                            console.log("tamanho req-->", req.length)
+                        if (req.length === 0){
+                            Swal.fire({
+                            icon: 'error',
+                            title: 'A fazer pesquisa não trouxe dados.',
+                            showConfirmButton: false
+                            });
+                        }else{
+                            setTimeout(function(){
+                                Swal.fire({
+                                icon: 'success',
+                                title: 'A pesquisa trouxe dados.',
+                                showConfirmButton: false
+                            },4000, window.location.reload());
+                        })
+                            
+                            
+                       // window.location.reload()
+
+                        }
+                           
+                            
+                    }
+                    })
+        });
+       
+       
+        $('#modalAlteracoes').on('show.bs.modal', function (e) {
+            setTimeout(function() {
+                $('#tabelaEdicoes').dataTable().fnFilter(' ');
+                console.log('3 segundos');
+                $('#tabelaEdicoes').dataTable().fnFilter('');
+            }, 400);
+           //datePicker.setDate(null);
+            
+        })
+
+        $('#modalAlteracoes').on('hide.bs.modal', function (e) {
+            console.log("FECHOU")
+            
+        })
+
+        
+        $('#qadShipersTable tbody').on('dblclick', 'tr td:first-child', function () {
+    // Obtenha os dados da linha clicada
+    var rowData = table.row($(this)).data();
+
+    // Crie o elemento HTML que representa os dados da linha
+    var rowHtml = $('<div>').append($('<p style="font-size: 15px">').text('Coluna 1: ' + "rowData[0]" + 'Coluna 2: ' + "rowData[1]" + 'Coluna 3: ' + "rowData[2]"))
+
+    // Crie o dropdown correspondente a essa linha
+    var dropdown = $('<div>').addClass('dropdown')
+                            .append($('<div style="width:2000px;">').addClass('dropdown-menu')
+                                            .attr('aria-labelledby', 'dropdownMenuButton')
+                                            .append(rowHtml));
+        
+    // Adicione o dropdown à linha clicada
+    $(this).parent().append($('<tr>').append($('<td colspan="3">').append(dropdown)))
+    
+    // Abra o dropdown
+    dropdown.dropdown('toggle');
+})
+$(document).on('click', function(e) {
+        if (!$(e.target).closest('.dropdown').length) {
+            $('.dropdown').removeClass('show');
+        }})
+
+        
+        
+            $('#qadShipersTable tbody').on('dblclick', 'tr', function () {
+            var data = table.row(this).data();
+            //alert('Você clicou na linha com ID: ' + data[11] + ' e nome: ' + data[1]);
+            console.log("DATA-> ",data[11] )
+            if(data[12] != "novo"){
+            $('#modalAlteracoes').modal('show');
+            tabelaEdicoes.clear()
+            
+            $.ajax({
+                type: 'POST',
+                url: '/shippers/json_trackingShippers/',
+                data: {
+                        csrfmiddlewaretoken: "{{ csrf_token }}",
+                        abs_id: data[0],
+                    },
+                error: () => alert("Error ao criar a tabela"),
+                success: (req) => {
+                    /* Popular a table com dados de /json */
+                    //console.log("DATA-->",data[11] )
+                  
+                    //console.log(`[#tabelaEdicoes] a carregar ${req.length} dados para a tabela`)
+                    //var tabelaEdicoes = document.getElementById("tabelaEdicoes");
+                    let row = ``
+                    for(let value of req) {
+
+                        console.log("REQ-->",  value["abs_id"])/* 
+                        value["ship_time"],value["city"],value["country"],value["fob"],
+                        value["mode_of_transport"],value["vehicle_id"],value["total_master_packs"],
+                        value["confirmed"],value["id"],) */
+                        /* console.log("Data--->", data) */
+                        if(value["abs_id"].toString() === data[0]){
+                            console.log("Esta linha é a original")
+                        /* }else{
+                            console.log("Esta linha é repetida") */
+                        //ACABAR O REFRESH; COM O CODIGO COMENTADO EM BAIXO ESTAVA A APARECER O ID
+                        row = `<tr>
+                            <td title="${ value.abs_id }" > ${ value.abs_id }</td>
+                            <td title="${ value.ship_date }"> ${ value.ship_date }</td>
+                            <td title="${ value.ship_time }"> ${ value.ship_time }</td>
+                            <td title="${ value.city }"> ${ value.city }</td>
+                            <td title="${ value.country }"> ${ value.country }</td>
+                            <td title="${ value.carrier }"> ${ value.carrier }</td>
+                            <td title="${ value.fob }"> ${ value.fob }</td>
+                            <td title="${ value.mode_of_transport }" > ${ value.mode_of_transport }</td>
+                            <td title="${ value.vehicle_id }"> ${ value.vehicle_id }</td>
+                            <td style="display: none" title="${ value.total_master_packs }"> ${ value.total_master_packs }</td>
+                            <td title="${ value.confirmed }"> ${ value.confirmed }</td>
+                            <td title="${ value.timestamp }"> ${ value.timestamp }</td>
+                            <th style="display: none" >${ value.estado }</th>
+                            <th style="display: none" >${ value.id }</th>
+                        </tr>`;
+                        tabelaEdicoes.rows.add($(row))
+
+                        //---------------------------------------------------------//
+                        /* tabelaEdicoes.rows.add(
+                            [[
+                                value["abs_id"],
+                                value["ship_date"],
+                                value["ship_time"],
+                                value["city"],
+                                value["country"],
+                                value["carrier"],
+                                value["fob"],
+                                value["mode_of_transport"],
+                                value["vehicle_id"],
+                                value["total_master_packs"],
+                                value["confirmed"],
+                                value["timestamp"],
+                                value["id"],
+                            ]]
+                        ) */
+                    }
+                    }
+                    tabelaEdicoes.draw()
+                    //console.log(`[#pnExpendableTable] ${req.length} dado carregados com sucesso (dados carregados em ${new Date() - t2}ms)`)
+                    //$('#modalAlteracoes').modal('show');
+                    
+                }
+            })
+        }else{
+            console.log("NOVO")
+        }
+        });
+        
+
+        $("#excelDatado").click(function(){
+            $('#modalCalendario').modal('show');
+        });
+
+        $("#saveModalExcel").click(function(){
+            var startDate = datePicker.selectedDates[0];
+            var endDate = datePicker.selectedDates[1];
+            startDate = startDate.toISOString().slice(0, 10)
+            endDate =  endDate.toISOString().slice(0, 10)
+            console.log("datas->",endDate,startDate)
+            $.ajax({
+                type: "POST",
+                url: '/shippers/createExcelPortaria/',
+                data: {csrfmiddlewaretoken: "{{ csrf_token }}",
+                 start_date: startDate, end_date: endDate },
+                success: function() {
+                    console.log("Funciou")
+                    var element = document.createElement('a');
+                        element.setAttribute('href', '/media/shippers/portaria/workbookPortariaEntreData.xls');
+                        element.setAttribute('download', 'workbookPortariaEntreDatas');
+                        element.style.display = 'none';
+                        document.body.appendChild(element);
+                        element.click();
+                        document.body.removeChild(element);
+                },
+                error: function(xhr) {
+                    alert("Não consegui carregar o ficheiro")
+                }
+            });
+        });
+
+       
+
+            var table = $('#qadShipersTable').DataTable({
+                paging: false,
+                info: false,
+                scrollY: 485,
+                scrollX: true,
+                scrollCollapse: true,
+                dom: 'frtipB',
+                orderCellsTop: true,
+                /* select: {
+                  style: 'single',
+                  selector: 'tr'
+                }, */
+                order:[[1,'desc'],[2,'desc']],
+                
+                buttons: [
+                    'excel'
+                ],
+            });
+
+            var tabelaEdicoes = $('#tabelaEdicoes').DataTable({
+                paging: false,
+                info: false,
+                scrollY: 345,
+                scrollX: true,
+                scrollCollapse: true,
+                dom: 'frtipB',
+                orderCellsTop: true,
+                
+                order:[[11,'desc']],
+                columnDefs: [{
+                    "targets": 0,
+                    "type": "time-date-sort"
+                },
+                    
+                ],
+                buttons: [
+                    'excel'
+                ],
+            });
+
+
+            $("#btnSelectDataTabela").click(function(){
+            //console.log(selectedDates1[0], selectedDates1[1]);
+            table.clear()
+            var startDate = selectedDates1[0];
+            var endDate = selectedDates1[1];
+            startDate = startDate.toISOString().slice(0, 10)
+            endDate =  endDate.toISOString().slice(0, 10)
+            console.log("datas->",endDate,startDate)
+            $.ajax({
+            type: 'POST',
+            url: '/shippers/historicoTabelaShippersTracking/',
+            data: {
+                csrfmiddlewaretoken: "{{ csrf_token }}",
+                'startDate':  startDate,
+                'endDate':  endDate,
+                    
+            },
+            success: function (req) {
+                
+
+                const t1 = new Date();
+                
+                let row = ``
+                let tdStyle = '';
+                contador =1
+                console.log("TAMANHO----",req.length)
+                if (req.length === 0){
+                    Swal.fire({
+                    icon: 'error',
+                    title: 'A pesquisa falhou.',
+                    showConfirmButton: false
+                    });
+
+                 }
+                    else{
+                for(let value of req) {
+                    contador = contador + 1
+                    if (value.estado ==="novo"){
+                        row = `<tr>
+                                <td title="${ value.abs_id }" > ${ value.abs_id }</td>
+                                <td title="${ value.ship_date }"> ${ value.ship_date }</td>
+                                <td title="${ value.ship_time }"> ${ value.ship_time }</td>
+                                <td title="${ value.city }"> ${ value.city }</td>
+                                <td title="${ value.country }"> ${ value.country }</td>
+                                <td title="${ value.carrier }"> ${ value.carrier }</td>
+                                <td title="${ value.fob }"> ${ value.fob }</td>
+                                <td title="${ value.mode_of_transport }" > ${ value.mode_of_transport }</td>
+                                <td title="${ value.vehicle_id }"> ${ value.vehicle_id }</td>
+                                <td style="display: none" title="${ value.total_master_packs }"> ${ value.total_master_packs }</td>
+                                <td title="${ value.confirmed }"> ${ value.confirmed }</td>
+                                <td title="${ value.timestamp }"> ${ value.timestamp }</td>
+                                    <th style="display: none" >${ value.estado }</th>
+                                <th style="display: none" >${ value.id }</th>
+                        </tr>`;
+                        table.rows.add($(row))
+
+                    }else if (value.estado ==="updated"){
+
+                   
+                        tdStyle = 'style="background-color: #FBA51A;"';
+                        row = `<tr>
+                                <td title="${ value.abs_id }" ${tdStyle}> ${ value.abs_id }</td>
+                                <td title="${ value.ship_date }"${tdStyle}> ${ value.ship_date }</td>
+                                <td title="${ value.ship_time }"${tdStyle}> ${ value.ship_time }</td>
+                                <td title="${ value.city }"${tdStyle}> ${ value.city }</td>
+                                <td title="${ value.country }"${tdStyle}> ${ value.country }</td>
+                                <td title="${ value.carrier }"${tdStyle}> ${ value.carrier }</td>
+                                <td title="${ value.fob }"${tdStyle}> ${ value.fob }</td>
+                                <td title="${ value.mode_of_transport }"${tdStyle}> ${ value.mode_of_transport }</td>
+                                <td title="${ value.vehicle_id }"${tdStyle}> ${ value.vehicle_id }</td>
+                                <td style="display: none" title="${ value.total_master_packs }"> ${ value.total_master_packs }</td>
+                                <td title="${ value.confirmed }"${tdStyle}> ${ value.confirmed }</td>
+                                <td title="${ value.timestamp }"${tdStyle}> ${ value.timestamp }</td>
+                                    <th style="display: none" >${ value.estado }</th>
+                                <th style="display: none" >${ value.id }</th>
+                        </tr>`;
+                        table.rows.add($(row))
+
+                    }
+                    else if (value.estado ==="deleted"){
+                        tdStyle = 'style="background-color: #fd5d3d;"';
+                        row = `<tr>
+                                <td title="${ value.abs_id }" ${tdStyle}> ${ value.abs_id }</td>
+                                <td title="${ value.ship_date }"${tdStyle}> ${ value.ship_date }</td>
+                                <td title="${ value.ship_time }"${tdStyle}> ${ value.ship_time }</td>
+                                <td title="${ value.city }"${tdStyle}> ${ value.city }</td>
+                                <td title="${ value.country }"${tdStyle}> ${ value.country }</td>
+                                <td title="${ value.carrier }"${tdStyle}> ${ value.carrier }</td>
+                                <td title="${ value.fob }"${tdStyle}> ${ value.fob }</td>
+                                <td title="${ value.mode_of_transport }" ${tdStyle}> ${ value.mode_of_transport }</td>
+                                <td title="${ value.vehicle_id }"${tdStyle}> ${ value.vehicle_id }</td>
+                                <td style="display: none" title="${ value.total_master_packs }"> ${ value.total_master_packs }</td>
+                                <td title="${ value.confirmed }"${tdStyle}> ${ value.confirmed }</td>
+                                <td title="${ value.timestamp }"${tdStyle}> ${ value.timestamp }</td>
+                                    <th style="display: none" >${ value.estado }</th>
+                                <th style="display: none" >${ value.id }</th>
+                        </tr>`;
+                        table.rows.add($(row))
+                    }
+                    
+                    }
+                    
+                    
+                    /* if (value["estado"] === "outdated" && value["estado"] != "novo" && value["estado"] === "updated"){
+                    console.log("não é para adicionar linha")
+                    }else{
+                        console.log("Esta linha já foi alterada",tdStyle)
+                        row += `<tr>
+                                <td title="${ value.abs_id }" ${tdStyle}> ${ value.abs_id }</td>
+                                <td title="${ value.ship_date }"${tdStyle}> ${ value.ship_date }</td>
+                                <td title="${ value.ship_time }"${tdStyle}> ${ value.ship_time }</td>
+                                <td title="${ value.city }"${tdStyle}> ${ value.city }</td>
+                                <td title="${ value.country }"${tdStyle}> ${ value.country }</td>
+                                <td title="${ value.carrier }"${tdStyle}> ${ value.carrier }</td>
+                                <td title="${ value.fob }"${tdStyle}> ${ value.fob }</td>
+                                <td title="${ value.mode_of_transport }" "${tdStyle}> ${ value.mode_of_transport }</td>
+                                <td title="${ value.vehicle_id }"${tdStyle}> ${ value.vehicle_id }</td>
+                                <td style="display: none" title="${ value.total_master_packs }"> ${ value.total_master_packs }</td>
+                                <td title="${ value.confirmed }"${tdStyle}> ${ value.confirmed }</td>
+                                <td title="${ value.timestamp }"${tdStyle}> ${ value.timestamp }</td>
+                                <th style="display: none" >${ value.id }</th>
+                        </tr>
+                        `;
+                        table.rows.add($(row))
+                        
+                        
+                } */
+                
+                 
+                    console.log("!contador----)",contador)
+                    table.draw()
+                    console.log("sucess");
+                    console.log(`[#History] ${req.length} dado carregados com sucesso (dados carregados em ${new Date() - t1}ms)`)
+                    var myModal = new bootstrap.Modal(document.getElementById('modalHistorico'))
+                    myModal.hide();
+                    $('#modalAlteracoes').modal('hide');
+                        
+                }
+                
+                    }
+                
+
+                    })
+            
+        });
+
+
+
+    $("#btn-today").click(function(){
+    const hoje = new Date();
+    const ano = hoje.getFullYear();
+    const mes = (hoje.getMonth() + 1).toString().padStart(2, "0");
+    const dia = hoje.getDate().toString().padStart(2, "0");
+    const dataFormatada = `${ano}-${mes}-${dia}`;
+    console.log(dataFormatada);
+    table.clear()
+    
+
+/* datePicker.datePicker.setDate(dataFormatada) */
+    $.ajax({
+                type: 'POST',
+                url: '/shippers/hojeTabelaShippersTracking/',
+                data: {
+                    csrfmiddlewaretoken: "{{ csrf_token }}",
+                    'data':  dataFormatada,
+                },
+                success: function (req) {
+                    const t1 = new Date();
+                    let row = ``
+                    let tdStyle = '';
+                    contador =1
+                    console.log("TAMANHO----",req.length)
+                    if (req.length === 0){
+                        Swal.fire({
+                        icon: 'error',
+                        title: 'A pesquisa falhou.',
+                        showConfirmButton: false
+                        });
+
+                    }
+                        else{
+                            console.log("tem dados")
+                            table.clear()
+                    for(let value of req) {
+                        contador = contador + 1
+                        if (value.estado ==="novo"){
+                            row = `<tr>
+                                    <td title="${ value.abs_id }" > ${ value.abs_id }</td>
+                                    <td title="${ value.ship_date }"> ${ value.ship_date }</td>
+                                    <td title="${ value.ship_time }"> ${ value.ship_time }</td>
+                                    <td title="${ value.city }"> ${ value.city }</td>
+                                    <td title="${ value.country }"> ${ value.country }</td>
+                                    <td title="${ value.carrier }"> ${ value.carrier }</td>
+                                    <td title="${ value.fob }"> ${ value.fob }</td>
+                                    <td title="${ value.mode_of_transport }" > ${ value.mode_of_transport }</td>
+                                    <td title="${ value.vehicle_id }"> ${ value.vehicle_id }</td>
+                                    <td style="display: none" title="${ value.total_master_packs }"> ${ value.total_master_packs }</td>
+                                    <td title="${ value.confirmed }"> ${ value.confirmed }</td>
+                                    <td title="${ value.timestamp }"> ${ value.timestamp }</td>
+                                    <th style="display: none" >${ value.estado }</th>
+                                    <th style="display: none" >${ value.id }</th>
+                            </tr>`;
+                            table.rows.add($(row))
+
+                        }else if (value.estado ==="updated"){
+
+                    
+                            tdStyle = 'style="background-color: #FBA51A;"';
+                            row = `<tr>
+                                    <td title="${ value.abs_id }" ${tdStyle}> ${ value.abs_id }</td>
+                                    <td title="${ value.ship_date }"${tdStyle}> ${ value.ship_date }</td>
+                                    <td title="${ value.ship_time }"${tdStyle}> ${ value.ship_time }</td>
+                                    <td title="${ value.city }"${tdStyle}> ${ value.city }</td>
+                                    <td title="${ value.country }"${tdStyle}> ${ value.country }</td>
+                                    <td title="${ value.carrier }"${tdStyle}> ${ value.carrier }</td>
+                                    <td title="${ value.fob }"${tdStyle}> ${ value.fob }</td>
+                                    <td title="${ value.mode_of_transport }"${tdStyle}> ${ value.mode_of_transport }</td>
+                                    <td title="${ value.vehicle_id }"${tdStyle}> ${ value.vehicle_id }</td>
+                                    <td style="display: none" title="${ value.total_master_packs }"> ${ value.total_master_packs }</td>
+                                    <td title="${ value.confirmed }"${tdStyle}> ${ value.confirmed }</td>
+                                    <td title="${ value.timestamp }"${tdStyle}> ${ value.timestamp }</td>
+                                    <th style="display: none" >${ value.estado }</th>
+                                    <th style="display: none" >${ value.id }</th>
+                            </tr>`;
+                            table.rows.add($(row))
+
+                        }
+                        else if (value.estado ==="deleted"){
+                            tdStyle = 'style="background-color: #fd5d3d;"';
+                            row = `<tr>
+                                    <td title="${ value.abs_id }" ${tdStyle}> ${ value.abs_id }</td>
+                                    <td title="${ value.ship_date }"${tdStyle}> ${ value.ship_date }</td>
+                                    <td title="${ value.ship_time }"${tdStyle}> ${ value.ship_time }</td>
+                                    <td title="${ value.city }"${tdStyle}> ${ value.city }</td>
+                                    <td title="${ value.country }"${tdStyle}> ${ value.country }</td>
+                                    <td title="${ value.carrier }"${tdStyle}> ${ value.carrier }</td>
+                                    <td title="${ value.fob }"${tdStyle}> ${ value.fob }</td>
+                                    <td title="${ value.mode_of_transport }" ${tdStyle}> ${ value.mode_of_transport }</td>
+                                    <td title="${ value.vehicle_id }"${tdStyle}> ${ value.vehicle_id }</td>
+                                    <td style="display: none" title="${ value.total_master_packs }"> ${ value.total_master_packs }</td>
+                                    <td title="${ value.confirmed }"${tdStyle}> ${ value.confirmed }</td>
+                                    <td title="${ value.timestamp }"${tdStyle}> ${ value.timestamp }</td>
+                                    <th style="display: none" >${ value.estado }</th>
+                                    <th style="display: none" >${ value.id }</th>
+                            </tr>`;
+                            table.rows.add($(row))
+                        }
+                        
+                        
+                        }
+
+                        console.log("!contador----)",contador)
+                        table.draw()
+                        var dismiss = document.getElementById("btnDismiss");
+                        // Simula um clique no botão
+                        dismiss.click();
+                        
+                        $("#modalHistorico").hide();
+                        $(".modal-backdrop").remove();
+                        //console.log("sucess");
+                        console.log(`[#History] ${req.length} dado carregados com sucesso (dados carregados em ${new Date() - t1}ms)`)
+                            }
+                        }
+                        })
+                        
+            })
+
+            
+
+
+  
+        setInterval(function () {
+           
+            $.ajax({
+                        type: 'POST',
+                        url: '/shippers/json_trackingShippersUpdate/',
+                        data: {
+                            csrfmiddlewaretoken: "{{ csrf_token }}",
+                            
+                             
+                        },//RE*ARAR ESTE REQUEST PARA FAZER O UPDATE CASO ECISTAM VALORES NOVOS
+                        success: function (req) {
+                            console.log("resposta!!!", req.resposta)
+                            if(req.resposta != "{{id_to_refresh}}"){
+                                console.log("É para fazer refresh")
+                                //location.reload();
+
+                            }
+                            
+                    }
+                    })
+
+
+
+        },3600000 );   //3600000
+
+            $(document).on('click', '#excel', function () {
+                $.ajax({
+                    type: 'GET',
+                    url: '/shippers/downloadExcelShippersTracking/',
+                    data: {},
+                    success: function () {
+                        var element = document.createElement('a');
+                        //Ainda por fazer
+                        element.setAttribute('href', '/media/shippers/portaria/workbookPortariaTracking.xls');
+                        element.setAttribute('download', 'my-file-name');
+
+                        element.style.display = 'none';
+                        document.body.appendChild(element);
+
+                        element.click();
+
+                        document.body.removeChild(element);
+                    }
+                })
+            });
+
+           
+ 
+       
+
+        
+            
+    </script>
+
+{% endblock %}

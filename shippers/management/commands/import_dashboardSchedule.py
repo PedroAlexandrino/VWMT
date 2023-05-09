@@ -138,6 +138,7 @@ class Command(BaseCommand):
             boards = {}
             sch_global = Schedule_Global.objects.all()
             dataset = Dataset()
+            #BUG FILESYS este ficheiro tem de ser substituido por uma tabela da bd
             data_folder = Path("W:\mnfg\Final_Assy\Produção\Dashboard Schedule")
             if run == 1:
                 tomorrow = date.today() + timedelta(days=1)

@@ -1,4 +1,4 @@
-{% extends "vware/baseArmazemInicio.html" %}
+{% extends "vware/baseArmazem.html" %}
 {% load static %}
 {% load crispy_forms_tags %}
 
@@ -938,6 +938,10 @@
                 <b>Visteon
                     Warehouse Management Tools </b></p>
         </div>
+        <div style="position:absolute; top: 13%; left: 8%">
+            <p style="font-size: large; text-indent: 22px; color: rgba(255,158,42,0.85); text-shadow: 0.1px 0.1px rgba(255,158,42,0.85), 0.2px 0.2px rgba(255,158,42,0.85)">
+                <b id="versao">PORTAIL 1.0.0 </b></p>
+        </div>
 
         <!-- botao relativo ao Receiving -->
         <div class="dropdownReceiving">
@@ -951,6 +955,7 @@
                 <a href={% url 'receiving:tpm' %}>TPM</a>
                 <a href={% url 'receiving:icdr' %}>ICDR</a>
                 <a href={% url 'receiving:tenda' %}>Tenda</a>
+                <a href={% url 'receiving:tendaMecflow' %}>Tenda MECFLOW</a>
             </div>
         </div>
         <!-- botao relativo ao OEM database -->
@@ -971,6 +976,7 @@
                 <p style="text-align: center; background-color: chocolate; font-size: 25px; border-top-right-radius: 15px; border-top-left-radius: 15px; margin-bottom: 0px; border-bottom: 2px solid black">
                     <b>Shipping</b></p>
                 <a href={% url 'shippers:portaria' %}>Portaria</a>
+                <a href={% url 'shippers:shippersTrackingPage' %}>Shippers Tracking</a>
                 <a href={% url 'shippers:trackingPage' %}>Tracking</a>
                 <a href={% url 'shippers:security' %}>Security</a>
                 <a href={% url 'shippers:shippersConfirmation' %}>Confirmation</a>
@@ -1018,4 +1024,181 @@
             </div>
         </div>
     </div>
+
+
+  
+
+
+<div class="modal fade"  id="modalUpdates" style="pointer-events: none;" data-keyboard='false' 
+data-backdrop="static"  role="dialog" aria-labelledby="myModalLabel">
+<div class="modal-dialog" role="document"  >
+<div class="modal-content">
+   <div class="modal-header">
+       <h3 class="modal-title" id="myModalLabel"><b>Updates:</b></h3>
+       
+   </div>
+   <div class="modal-body"  >
+       <div class="containerPrincipal">
+        <table id="tabelaUpdates"  class="display" style="margin-left: 0%; height: 150%;  width: 100%; text-align: center">
+            <thead>
+            <tr>
+                <th style="display: none"></th>
+                <th >Data</th>
+                <th>Update</th>
+                
+            </tr>
+            </thead>
+            <tbody>
+            {% for elements in updates.all %}
+            <tr>
+              <th style="display: none">{{ elements.id }}</th>
+              <th>{{ elements.update }}</th>
+              <th>{{ elements.data }}</th>
+            </tr>
+            {% endfor %}
+            </tbody>
+            <tfoot>
+            <tr>
+                
+                <th style="display: none"></th>
+                <th></th>
+                <th></th>
+                
+            </tr>
+            </tfoot>
+        </table>
+
+       </div>
+       
+       <div class="modal-footer">
+
+        
+        <button type="button" id="openAddUpdate"  class="btn btn-primary"data-dismiss="modal">Add Update</button>
+        
+        <button type="button" id="closeModal" class="btn btn-primary" data-dismiss="modal">Sair</button>
+        <button type="button" id="saveModal"  class="btn btn-primary"data-dismiss="modal">Ok</button>
+    </div>
+   
+   </div>
+</div>
+</div>
+</div>
+
+
+
+
+<div class="modal fade"  id="modalAddUpdate" style="pointer-events: none;" data-keyboard='false' 
+    data-backdrop="static"  role="dialog" aria-labelledby="myModalLabel">
+<div class="modal-dialog" role="document"  >
+   <div class="modal-content" style="width: 200%; height: 130%; margin-left: -30%;">
+       <div class="modal-header">
+           <h3 class="modal-title" id="myModalLabel"><b>UPDATE:</b></h3>
+           
+       </div>
+       <div class="modal-body" style="margin-bottom: -12%;">
+           <div class="containerPrincipal" style="width: 100%; height: 100%;margin-bottom: 2%;">
+                <div style="margin-top: 10px">
+                    <p style="font-size: 20px"><strong>Add Update:</strong></p>
+                    <textarea class="form-control mt-n3" name="reportDiario" id="updateTextArea" rows="5" 
+                              style="height: 178px;resize:none;background-color: floralwhite; text-align: center;font-family:sans-serif;font-size:1.5em;width: 50%">
+                    </textarea>
+                </div>
+  
+           </div>
+           
+           <div class="modal-footer" style = "margin-bottom: 10%" >
+
+            
+            
+            <button type="button" id="closeModal" class="btn btn-primary" data-dismiss="modal">Sair</button>
+            <button type="button" id="addUpdate"  class="btn btn-primary"data-dismiss="modal">Ok</button>
+        </div>
+       
+       </div>
+    </div>
+</div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+$(document).ready(function () {
+var tabelaUpdates = $('#tabelaUpdates').DataTable({
+                paging: false,
+                info: false,
+                scrollY: 345,
+                scrollX: true,
+                scrollCollapse: true,
+                dom: 'frtipB',
+                orderCellsTop: true,
+                order:[[1,'desc']],
+                columnDefs: [{
+                    "targets": 0,
+                    "type": "time-date-sort"
+                },
+                ],
+                /* buttons: [
+                    'excel'
+                ], */
+            });
+
+    $("#versao").dblclick(function() {
+        console.log("entrou ")
+    var myModal = new bootstrap.Modal(document.getElementById('modalUpdates'))
+            myModal.show()
+  });
+
+  $("#openAddUpdate").click(function() {
+    var myModal = new bootstrap.Modal(document.getElementById('modalAddUpdate'))
+            myModal.show()
+  });
+
+  $("#addUpdate").click(function() {
+    var textarea = document.getElementById("updateTextArea");
+    $.ajax({
+        type: "POST",
+        url: '/main/addUpdate/',
+        data: {
+            csrfmiddlewaretoken: "{{ csrf_token }}", 
+            update : textarea.value,
+        },
+        success: function(response) {
+            $.ajax({
+                type: "POST",
+                url: '/main/updatesJson/',
+                data: {
+                    csrfmiddlewaretoken: "{{ csrf_token }}", 
+                    update : textarea.value,
+                },
+                success: function(response) {
+                    //injetar update na tabela
+                    tabelaUpdates.clear()
+                    let row = ``
+                    for(let value of req) {
+                        row = `<tr>
+                                    <td title="${ value.id }" > ${ value.id }</td>
+                                    <td title="${ value.date }"> ${ value.date }</td>
+                                    <td title="${ value.update }"> ${ value.update }</td>
+                                </tr>`;
+                                tabelaUpdates.rows.add($(row))
+                    }
+                    tabelaUpdates.draw()
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Update added.',
+                        showConfirmButton: false
+                    });
+                },
+                error: function(xhr) {
+                    alert("Update not added")
+                }
+            });
+            var myModal = new bootstrap.Modal(document.getElementById('modalAddUpdate'))
+            myModal.hide()
+        }
+    });
+});
+
+})
+    </script>
 {% endblock %}

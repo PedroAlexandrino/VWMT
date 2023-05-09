@@ -13,65 +13,64 @@
 
 
 {% block body_content %}
-
-    <!--  -->
-    <table id="tabelaFiltrada" class="display" style="width:100%">
+<div class="containerPrincipal">
+    <table id="qadShipersTable"  class="display" style="margin-left: 0%; height: 150%;  width: 100%; text-align: center">
         <thead>
         <tr>
-            <th>ID</th>
-            <th>Ship Date</th>
-            <th>Ship Time</th>
-            <th>Name</th>
-            <th>City</th>
-            <th>Carrier</th>
-            <th>Mode of Transport</th>
-            <th>Vehicle ID</th>
-            <th>Item Number</th>
-            <th>Description</th>
-            <th>Qty to Ship</th>
-            <th>Qty Shipped</th>
-            <th>In Process</th>
-            <th>Confirmed</th>
+            <th  style="font-size: 13px">ID</th>
+            <th  style="font-size: 13px">Ship Date</th>
+            <th  style="font-size: 13px">Ship Time</th>
+            <th  style="font-size: 13px">City</th>
+            <th  style="font-size: 13px">Country</th>
+            <th  style="font-size: 13px">Carrier</th>
+            <th  style="font-size: 13px">FOB</th>
+            <th  style="font-size: 13px">Mode of Transport</th>
+            <th  style="font-size: 13px">Vehicle ID</th>
+            <th  style="font-size: 13px">Total Master packs</th>
+            <th  style="font-size: 13px">Confirmed</th>
+            <th style="display: none"></th>
         </tr>
         </thead>
         <tbody>
-        {% for element in tabelaFiltrada.all %}
-            {% if not element.itemNumber == None and not element.description == None and not element.quantityToShip == None and not element.quantityShipped == None and not element.quantityToShip == 'Qty to Ship' %}
-                <tr>
-                    <td>{{ element.idComum }}</td>
-                    <td>{{ element.shipDate }}</td>
-                    <td>{{ element.shipTime }}</td>
-                    <td>{{ element.name }}</td>
-                    <td>{{ element.city }}</td>
-                    <td>{{ element.carrier }}</td>
-                    <td>{{ element.modeOfTransport }}</td>
-                    <td>{{ element.vehicleID }}</td>
-                    <td>{{ element.itemNumber }}</td>
-                    <td>{{ element.description }}</td>
-                    <td>{{ element.quantityToShip }}</td>
-                    <td>{{ element.quantityShipped }}</td>
-                    <td>{{ element.inProcess }}</td>
-                    <td>{{ element.confirmed }}</td>
-                </tr>
-            {% endif %}
-        {% endfor %}
-        </tbody>
+            {% for element in shippers_tracking %}
+            <tr>
+                <td>{{ element.abs_id }}</td>
+                <td>{{ element.ship_date }}</td>
+                <td>{{ element.ship_time }}</td>
+                <td>{{ element.city }}</td>
+                <td>{{ element.country }}</td>
+                <td>{{ element.carrier }}</td>
+                <td>{{ element.fob }}</td>
+                <td>{{ element.mode_of_transport }}</td>
+                <td>{{ element.vehicle_id }}</td>
+                <td>{{ element.total_master_packs }}</td>
+                <td>{{ element.confirmed }}</td>
+                <th style="display: none"></th>
+            </tr>
+            {% endfor %}
         </tbody>
         <tfoot>
         <tr>
-            <th></th>
+            <th  style="font-size: 13px"></th>
+            <th  style="font-size: 13px"></th>
+            <th  style="font-size: 13px"></th>
+            <th  style="font-size: 13px"></th>
+            <th  style="font-size: 13px"></th>
+            <th  style="font-size: 13px"></th>
+            <th  style="font-size: 13px"></th>
+            <th  style="font-size: 13px"></th>
+            <th  style="font-size: 13px"></th>
+            <th  style="font-size: 13px"></th>
+            <th  style="font-size: 13px"></th>
+            <th style="display: none"></th>
         </tr>
         </tfoot>
     </table>
 
-    <div class="mt-4 form-inline">
-        <form method="POST" enctype="multipart/form-data" action="{% url 'shippers:uploadFiles' %}">
-            {% csrf_token %}
-            <div style="margin-left: 50px">
-                <button class="btn btn-outline-primary mt-3" type="submit">Update</button>
-            </div>
-        </form>
-    </div>
+</div>
+     
+
+
 
 {% endblock %}
 
@@ -82,12 +81,55 @@
             $("#textPath").val(path);
         });
 
-        var table = $('#tabelaFiltrada').DataTable({
+        var table = $('#qadShipersTable').DataTable({
             paging: false,
             searching: false,
             info: false,
             scrollY: 720,
             scrollCollapse: true,
         });
+
+
+
+        $.ajax({
+                type: 'GET',
+                url: '/shippers/json_gateway',
+                error: () => alert("Error ao criar as tableas #gatewayHistory e #pnExpendableTable"),
+                success: (req) => {
+                    /* Popular a table com dados de /json se bater com alguma matricula mete a linha verde*/
+                    console.log(`[#qadShipersTable] a carregar ${req.length} dados para a tabela`)
+                    const t1 = new Date();
+
+                    if("{{ readOnly }}" === "True"){
+                        for (let value of req) {
+                            let row = `<tr><td title="${value.dataHoraChegada}">${value.dataHoraChegada}</td>
+                                <td title="${value.condutor}">${value.condutor}</td>
+                                <td title="${value.ident}">${value.ident}</td>
+                                <td title="${value.contacto}">${value.contacto}</td>
+                                <td title="${value.empresa}">${value.empresa}</td>
+                                <td title="${value.primeiraMatricula}">${value.primeiraMatricula}</td>
+                                <td title="${value.segundaMatricula}">${value.segundaMatricula}</td>
+                                <td title="${value.cargaDescarga}">${value.cargaDescarga}</td>
+                                <td title="${value.doca}">${value.doca}</td>
+                                <td title="${value.destinoCarga}">${value.destinoCarga}</td>
+                                <td title="${value.tipoViatura}">${value.tipoViatura}</td>
+                                <td title="${value.dataHoraEntrada}">${value.dataHoraEntrada}</td>`;
+                            if (value.abandono === 'false') {
+                                row += `<td style="text-align: center; width: 20px"><input type="checkbox" id="abandonado"
+                                title="Abandonado"name="abandonado"checked disabled></td>`
+                            } else {
+                                row += `<td style="text-align: center; width: 100px"><input type="checkbox" id="abandonado"
+                                    name="abandonado" title="Abandonado" disabled></td>`
+                            }
+                            row += ` <td title="${value.comentEntrada}">${value.comentEntrada}</td>
+                            <td title="${value.dataHoraSaida}">${value.dataHoraSaida}</td>
+                            <td title="${value.comentSaida}">${value.comentSaida}</td>
+                            <td style="display: none"  id="idRow" value="${value.id}">${value.id}</td>`
+                            row += "</tr>"
+                            table.rows.add($(row))
+                        }        
+                    }
+                }
+            })
     </script>
 {% endblock %}

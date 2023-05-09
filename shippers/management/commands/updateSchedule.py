@@ -43,8 +43,9 @@ class Command(BaseCommand):
                 mes = "Novembro"
             if mes == "12":
                 mes = "Dezembro"
-
-            textPath = (
+                
+            #BUG FILESYS Substituir por tabela da base de dados
+            textPath = (    
                 "//PAVPD002/E_Proj/sharedir/MP&L/Schedule/"
                 + day.strftime("%Y")
                 + "/"

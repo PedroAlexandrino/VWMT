@@ -53,6 +53,111 @@
             border-top: 3px solid black;
             border-left: 3px solid black;
         }
+      
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input { 
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+    margin-right: 10px;
+  }
+
+  .switch input {
+    display: none;
+  }
+
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
+
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
+
+  
+
+  input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+  }
+
+  input:checked + .slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+  }
+
+  label {
+    display: inline-block;
+    vertical-align: middle;
+  }
     </style>
 {% endblock %}
 
@@ -66,8 +171,9 @@
                 <button type="button" class="btn btn-twitter" style="transform: scale(1.5); margin-left: 38%">
                     <a style="color: white" href="{% url 'receiving:faSupply' %}">FA Supply</a>
                 </button>
-                <p class="mb-n5" style="margin-left: 23%; background-color: #ff0000" id="countRedFA"></p>
-                <p class="mb-n5" style="margin-left: 5%; background-color: #FFD700" id="countYellowFA"></p>
+                <p class="mb-n5" style="margin-left: 23%; background-color: #e80b0bb6" id="countRedFA"></p>
+                <p class="mb-n5" style="margin-left: 5%; background-color: #ffd900bc" id="countYellowFA"></p>
+                <p class="mb-n5" style="margin-left: 63%; background-color: #e80b0bb6; margin-top: -3.5%" id="countRedActualDayFA"></p>
             </div>
 
             </br></br>
@@ -82,6 +188,7 @@
                     <th>Quantity Expected</th>
                     <th>Created</th>
                     <th>Created</th>
+                    <th style="text-align: center; display: none;">Timestamp</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -97,6 +204,7 @@
                                 <td>{{ line.wtsk_qty_exp }}</td>
                                 <td>{{ line.wtsk_create_date }}</td>
                                 <td>{{ line.wtsk_create_time }}</td>
+                                <td style="text-align: center;display: none;">{{ line.timestamp }}</td>
                             </tr>
                         {% endif %}
                     {% endfor %}
@@ -111,8 +219,9 @@
                 <button type="button" class="btn btn-twitter" style="transform: scale(1.5); margin-left: 35%">
                     <a style="color: white" href="{% url 'receiving:bpDropinSupply' %}">BP Dropin Supply</a>
                 </button>
-                <p class="mb-n5" style="margin-left: 20%; background-color: #ff0000" id="countRedBPDropin"></p>
-                <p class="mb-n5" style="margin-left: 5%; background-color: #FFD700" id="countYellowBPDropin"></p>
+                <p class="mb-n5" style="margin-left: 20%; background-color: #e80b0bb6" id="countRedBPDropin"></p>
+                <p class="mb-n5" style="margin-left: 5%; background-color: #ffd900bc" id="countYellowBPDropin"></p>
+                <p class="mb-n5" style="margin-left: 63%;margin-top: -3.5%; background-color: #e80b0bb6" id="countRedActualDayBPDropin"></p>
             </div>
 
             </br></br>
@@ -156,8 +265,9 @@
                 <button type="button" class="btn btn-twitter" style="transform: scale(1.5); margin-left: 35%">
                     <a style="color: white" href="{% url 'receiving:bpSMDSupply' %}">BP SMD Supply</a>
                 </button>
-                <p class="mb-n5" style="margin-left: 20%; background-color: #ff0000" id="countRedBPSmd"></p>
-                <p class="mb-n5" style="margin-left: 5%; background-color: #FFD700" id="countYellowBPSmd"></p>
+                <p class="mb-n5" style="margin-left: 20%; background-color: #e80b0bb6" id="countRedBPSmd"></p>
+                <p class="mb-n5" style="margin-left: 5%; background-color: #ffd900bc" id="countYellowBPSmd"></p>
+                <p class="mb-n5" style="margin-left: 61%; margin-top: -3.5%; background-color: #e80b0bb6" id="countRedActualDayBPSMD"></p>
             </div>
 
             </br></br>
@@ -295,7 +405,7 @@
                     <div class="modal-body"
                          style="background: linear-gradient(to bottom, rgba(236,144,0,0.86) 0%, ghostwhite 100%); ">
                         <div style="margin-top: 10px">
-                            <p style="font-size: 20px"><strong>Escreva aqui possíveis erros de utilização desta página
+                            <p style="font-size: 20px"><strong>Escreva aqui possíveis erros de utilizacao desta página
                                 em
                                 específico, ou deixe sugestões de melhoria</strong></p>
                             <textarea class="form-control mt-n3" name="reportICDR" id="reportICDR" rows="11"
@@ -312,11 +422,398 @@
             </div>
         </div>
     </form>
+
+   
+    
+    <div class="modal fade"  id="modalEstatisticas" style="pointer-events: none; padding-left: 20%; display: block;" data-keyboard='false' 
+    data-backdrop="static"  role="dialog" aria-labelledby="myModalLabel">
+<div class="modal-dialog" role="document"  >
+   <div class="modal-content" style="width: 120%; height: 130%; margin-left: -30%;">
+       <div class="modal-header">
+           <h3 class="modal-title" id="myModalLabel"><b>Estatisticas:</b></h3>
+       </div>   
+       <div class="modal-body" style="margin-bottom: -12%;">
+           <div class="containerPrincipal" style="width: 100%; height: 100%;margin-bottom: 2%;">
+                <div style="margin-left: 20%;"> 
+                    <div id="calendar" ></div>
+                </div>
+                 
+
+                <div class="switch-container" style="margin-top:5% ;"  >
+                    <label for="switch-label" class="switch-label">Media:</label>
+                    <label class="switch">
+                      <input type="checkbox" id="sliderEstatisticas">
+                      <span class="slider round"></span>
+                    </label>
+                    <label for="switch-label" class="switch-label">Totais:</label>
+                  </div>
+
+                
+                <div > 
+                <table id="tabelaEstatisticas"  class="display" style="display:none;margin-left: 1%;text-align: center ; height: 100%; width: 98%; text-align: center;">
+                    <thead>
+                        <tr>
+                            <th  style="font-size: 13px"></th>
+                            <th  style="font-size: 13px">1 Turno</th>
+                            <th  style="font-size: 13px">2 Turno</th>
+                            <th  style="font-size: 13px">3 Turno</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <th  style="font-size: 13px"></th>
+                        <th  style="font-size: 13px"></th>
+                        <th  style="font-size: 13px"></th>
+                        <th  style="font-size: 13px"></th>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+                <div style="margin-top: 10px">
+                    <p style="display: none;font-size: 20px"><strong>Para report diario</strong></p>
+                    <textarea class="form-control mt-n3" name="reportDiario" id="reportFaSupply" rows="5" 
+                              style="display: none;height: 178px;resize:none;background-color: floralwhite; text-align: center;font-family:sans-serif;font-size:1.5em;width: 50%">
+                    </textarea>
+                </div>
+                
+           </div>
+           <div class="modal-footer" style = "margin-bottom: 10%" >
+            <button type="button" id="closeModal" class="btn btn-primary" data-dismiss="modal">Sair</button>
+            <button type="button" id="saveModal"  class="btn btn-primary"data-dismiss="modal">Ok</button>
+        </div>
+       
+       </div>
+    </div>
+</div>
+</div>
+
+
+
+<button type="button" id="btnDadosEstatisticos"  class="btn btn-primary"data-dismiss="modal">Dados Estatisticos:</button>
+<button id="refresh-btn" style="width: 20%; height: 20%;margin-left:40%;"  class="btn btn-primary">Refresh  </button>
+
+   
 {% endblock %}
 
 {% block javascript %}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/confetti.css">
     <script>
-        $(document).ready(function () {
+    
+
+$(document).ready(function () {
+    $("#refresh-btn").click(function(){console.log("Clicas-te no btn refresh")
+            Swal.fire({
+                    icon: 'error',
+                    title: 'A popular a base de dados, pode demorar',
+                    showConfirmButton: true
+                    });
+            $.ajax({
+                type: "POST",
+                url: '/receiving/adiciona_val_vermelhos_automatico_Supply/',
+                data: {csrfmiddlewaretoken: "{{ csrf_token }}",
+                success: function(response) {
+                    console.log("RESPOSTA -->",response)
+                    console.log("é para fazer refresh")
+                    // temporizador 12s para dar tempo para popular as tabelas
+                    setInterval(function () {
+                location.reload()
+                //window.location.reload()
+                
+            }, 12000);
+                }, }
+            })
+        })
+    var tabelaEstatisticas = $('#tabelaEstatisticas').DataTable({
+            paging: false,
+            searching: false,
+            info: false,
+            scrollY: 245,
+            scrollX: 145,
+            scrollCollapse: true,
+            dom: 'frtipB',
+            orderCellsTop: true,
+            buttons: [
+            ],
+                
+        });
+
+
+    var selectedDates = [];
+    var today = new Date()
+    var datePicker =  flatpickr("#calendar", {
+    inline: true,
+    dateFormat: "m-d-Y",
+    mode: "range",
+    defaultDate: [today, today],
+    onClose: function(selectedDates, dateStr, instance, startDate,endDate) {
+        
+        selectedDates[0].toISOString().slice(0, 10)
+        selectedDates[1].toISOString().slice(0, 10)
+    }
+    });
+        $("#saveModal").click(function(){
+            var textarea = document.getElementById("reportFaSupply");
+            var text = textarea.value;
+            var turno = "";
+            const agora = new Date();
+            const horasAtuais = agora.getHours() ;
+            const minutosAtuais = agora.getMinutes() ;
+            const datas = horasAtuais.toString() + " "+ minutosAtuais.toString()
+            console.log("TESTE", datas )
+                
+            if(horasAtuais >= 8  && horasAtuais <= 16 && minutosAtuais <= 30 ){
+                turno= "1"
+            }else if(horasAtuais >= 16 && minutosAtuais > 30 && horasAtuais < 1  ){
+                turno= "2"
+            }else if(horasAtuais >= 1 && horasAtuais < 8  ){
+                turno= "3"
+            }
+            
+            /* if(text.length != 0){
+            $.ajax({
+                type: "POST",
+                url: '/receiving/addCommentsToReport/',
+                data: {csrfmiddlewaretoken: "{{ csrf_token }}", 
+                report : text, table: "receiving_bpsmdsupplyreditems", turno:turno },
+                success: function(response) {
+                    alert("report foi guardado")
+
+                },
+            })
+        } */
+
+        })
+         
+        
+        $("#sliderEstatisticas").click(function(){
+            console.log("ENTROU btn1turno")
+            var start_date = datePicker.selectedDates[0];
+            var end_date = datePicker.selectedDates[1];
+            console.log("DATAS-->", start_date, end_date)
+            if( start_date == undefined || end_date == undefined){
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Nao foi selecionada nenhuma data.',
+                    showConfirmButton: false
+                    });
+            }
+            else{
+                console.log("entrou no else")
+            
+            const checkbox = document.querySelector('input[type="checkbox"]'); 
+            if (checkbox.checked) {
+            $.ajax({
+                type: "POST",
+                url: '/receiving/mediaTurnosEcontadores/',
+                data: {csrfmiddlewaretoken: "{{ csrf_token }}",
+                start_date: start_date.toLocaleString(), end_date: end_date.toLocaleString(),},
+                success: function(response) {
+                    console.log("RESPONSE->",response)
+                    tabelaEstatisticas.clear()
+                    row = ``
+                    row += `<tr>
+                        <td style="font-size: 13px">FA </td>
+                        <td title="${ response.contadorFAT1 }" > ${ response.contadorFAT1 }</td>
+                        <td title="${ response.contadorFAT2 }" > ${ response.contadorFAT2 }</td>
+                        <td title="${ response.contadorFAT3 }" > ${ response.contadorFAT3 }</td>
+                    </tr>`;
+
+                    console.log("row-->",row)
+                    row += `<tr>
+                        <td style="font-size: 13px">BP DROPIN</td>
+                        <td title="${ response.contadorBpDropT1 }"> ${ response.contadorBpDropT1 }</td>
+                        <td title="${ response.contadorBpDropT2 }"> ${ response.contadorBpDropT2 }</td>
+                        <td title="${ response.contadorBpDropT3 }"> ${ response.contadorBpDropT3 }</td>
+                    </tr>`;
+                    
+                    row += `<tr>
+                        <td style="font-size: 13px">BPSMD</td>
+                        <td title="${ response.contadorBpsmdT1 }"> ${ response.contadorBpsmdT1 }</td>
+                        <td title="${ response.contadorBpsmdT2 }"> ${ response.contadorBpsmdT2 }</td>
+                        <td title="${ response.contadorBpsmdT3 }"> ${ response.contadorBpsmdT3 }</td>
+                    </tr>`;
+                    
+                    tabelaEstatisticas.rows.add($(row))
+                    
+
+
+                    tabelaEstatisticas.draw()
+                    $("#tabelaEstatisticas").find("thead th:eq(1)").text("1 Turno");
+                    $("#tabelaEstatisticas").find("thead th:eq(2)").text("2 Turno");
+                    $("#tabelaEstatisticas").find("thead th:eq(3)").text("3 Turno");
+                    $('#tabelaEstatisticas').show();
+                },
+           
+            
+                    error: function(response) {
+                        console.log("Contador:", response.media);
+                        alert("Querry feita sem sucesso")
+                    }
+            });
+        }else{
+            
+            $.ajax({
+                type: "POST",
+                url: '/receiving/mediaTurnosEcontadores/',
+                data: {csrfmiddlewaretoken: "{{ csrf_token }}",
+                start_date: start_date.toLocaleString(), end_date: end_date.toLocaleString(),},
+                success: function(response) {
+                    console.log("RESPONSE->",response)
+                    tabelaEstatisticas.clear()
+                    row = ``
+                    row += `<tr>
+                        <td style="font-size: 13px">FA </td>
+                        <td title="${ response.mediaFAT1 }" > ${ response.mediaFAT1 }</td>
+                        <td title="${ response.mediaFAT2 }" > ${ response.mediaFAT2 }</td>
+                        <td title="${ response.mediaFAT3 }" > ${ response.mediaFAT3 }</td>
+                    </tr>`;
+
+                    console.log("row-->",row)
+                    row += `<tr>
+                        <td style="font-size: 13px">BP DROPIN</td>
+                        <td title="${ response.mediaBPDropinT1 }"> ${ response.mediaBPDropinT1 }</td>
+                        <td title="${ response.mediaBPDropinT2 }"> ${ response.mediaBPDropinT2 }</td>
+                        <td title="${ response.mediaBPDropinT3 }"> ${ response.mediaBPDropinT3 }</td>
+                    </tr>`;
+                    
+                    row += `<tr>
+                        <td style="font-size: 13px">BPSMD</td>
+                        <td title="${ response.mediaBPSMDT1 }"> ${ response.mediaBPSMDT1 }</td>
+                        <td title="${ response.mediaBPSMDT2 }"> ${ response.mediaBPSMDT2 }</td>
+                        <td title="${ response.mediaBPSMDT3 }"> ${ response.mediaBPSMDT3 }</td>
+                    </tr>`;
+                    
+                    tabelaEstatisticas.rows.add($(row))
+                    
+
+
+                    tabelaEstatisticas.draw()
+                    $("#tabelaEstatisticas").find("thead th:eq(1)").text("1 Turno");
+                    $("#tabelaEstatisticas").find("thead th:eq(2)").text("2 Turno");
+                    $("#tabelaEstatisticas").find("thead th:eq(3)").text("3 Turno");
+                    $('#tabelaEstatisticas').show();
+                },
+           
+            
+                    error: function(response) {
+                        console.log("Media:", response.media);
+                        alert("Querry feita sem sucesso")
+                    }
+            });
+
+        }
+    }
+        });
+
+
+        $.ajax({
+                type: "POST",
+                url: '/receiving/getErros/',
+                data: {csrfmiddlewaretoken: "{{ csrf_token }}",
+                pagina: "MNFG",},
+                success: function(response) {
+                    var table = $('#FASupply').DataTable(); // substitua myTable pelo ID da sua tabela
+                    var data = table.row(0).data();
+                    console.log("Primeira linha da tabela: ", data, data[10]);
+                    //console.log("RESPONSE->",response) NANDAS O TIMESTAMP NA VIEW
+
+                    console.log("RESPOSTA -->", response)
+
+                    if (response.erro > 0){
+                        let data = response.timestamp.timestamp;
+                        let dataObj = new Date(data);
+                        let horas = dataObj.getHours();
+                        let minutos = dataObj.getMinutes();
+                        let horaFormatada = horas.toString().padStart(2, "0") + ":" + minutos.toString().padStart(2, "0");
+                        document.getElementById("refresh-btn").style.backgroundColor = "#FBA51A";
+                        document.getElementById("refresh-btn").textContent = "Last Error " + horaFormatada;
+
+                    }else{
+                        document.getElementById("refresh-btn").style.backgroundColor = "";
+                        document.getElementById("refresh-btn").textContent = "Last Refresh " + "{{timestamp}}";
+                        //document.getElementById("refresh-btn").style.display = "none";
+                        
+
+                    }
+                },
+                error: function(response) {
+                        //console.log("Contador:", response.media);
+                        alert("Querry feita sem sucesso")
+                    }
+            });
+        
+        
+        $("#btnDadosEstatisticos").click(function(){
+            var today = new Date();
+            
+            $('#modalEstatisticas').modal('show');
+            
+            var data = new Date();
+            var dia = data.getDate();
+            var mes = data.getMonth() + 1;  
+            var ano = data.getFullYear();
+            var dataFormatada = mes + '/' + dia + '/' + ano + ', 00:00:00 AM';
+
+            $.ajax({
+                type: "POST",
+                url: '/receiving/mediaTurnosEcontadores/',
+                data: {csrfmiddlewaretoken: "{{ csrf_token }}",
+                start_date: dataFormatada, end_date: dataFormatada,},
+                success: function(response) {
+                    console.log("RESPONSE->",response)
+                    tabelaEstatisticas.clear()
+                    row = ``
+                    row += `<tr>
+                        <td style="font-size: 13px">FA </td>
+                        <td title="${ response.contadorFAT1 }" > ${ response.contadorFAT1 }</td>
+                        <td title="${ response.contadorFAT2 }" > ${ response.contadorFAT2 }</td>
+                        <td title="${ response.contadorFAT3 }" > ${ response.contadorFAT3 }</td>
+                    </tr>`;
+
+                    console.log("row-->",row)
+                    row += `<tr>
+                        <td style="font-size: 13px">BP DROPIN</td>
+                        <td title="${ response.contadorBpDropT1 }"> ${ response.contadorBpDropT1 }</td>
+                        <td title="${ response.contadorBpDropT2 }"> ${ response.contadorBpDropT2 }</td>
+                        <td title="${ response.contadorBpDropT3 }"> ${ response.contadorBpDropT3 }</td>
+                    </tr>`;
+                    
+                    row += `<tr>
+                        <td style="font-size: 13px">BPSMD</td>
+                        <td title="${ response.contadorBpsmdT1 }"> ${ response.contadorBpsmdT1 }</td>
+                        <td title="${ response.contadorBpsmdT2 }"> ${ response.contadorBpsmdT2 }</td>
+                        <td title="${ response.contadorBpsmdT3 }"> ${ response.contadorBpsmdT3 }</td>
+                    </tr>`;
+                    
+                    tabelaEstatisticas.rows.add($(row))
+                    
+
+
+                    tabelaEstatisticas.draw()
+                    
+                    $("#tabelaEstatisticas").find("thead th:eq(1)").text("1 Turno");
+                    $("#tabelaEstatisticas").find("thead th:eq(2)").text("2 Turno");
+                    $("#tabelaEstatisticas").find("thead th:eq(3)").text("3 Turno");
+                    $('#tabelaEstatisticas').show();
+                },
+           
+            
+                    error: function(response) {
+                        console.log("Contador:", response.media);
+                        alert("Querry feita sem sucesso")
+                    }
+            });
+            // $("#tabelaEstatisticas").hide();
+        })
+
+      
+
             const lastData = document.getElementById('lastData').value
             const hourRed = document.getElementById('hourRed').value
             const hourYellow = document.getElementById('hourYellow').value
@@ -381,6 +878,7 @@
                     if (moment().startOf('day').diff(moment(data[6], 'YYYY-MM-DD'), 'days') == 0) {
                         if (moment().diff(moment(data[7], 'HH:mm:ss'), 'hours') == hourYellow && moment().diff(moment(data[7], 'HH:mm:ss'), 'hours') <= hourRed) {
                             countFAyellow += 1
+                           
                             $('td', cells[1]).css({
                                 'background-color': '#FFD700',
                             });
@@ -433,6 +931,13 @@
                         }
                         if (moment().diff(moment(data[7], 'HH:mm:ss'), 'hours') >= hourRed) {
                             countFAred += 1
+                            console.log("contador-->",countFAred,data)
+                            //TODO:
+                            /* AJAX que vai adicionar novo vermelho caso ele ainda nao exista na bd
+                            adiciona_val_media() guarda linha + timestamp para fazeres as medias
+                            -MEdia diaria
+                            -Media mensal
+                            */
                             $('td', cells[1]).css({
                                 'background-color': '#ff0000',
                             });
@@ -484,7 +989,10 @@
                             });
                         }
                     } else {
+                        //Seria aqui onde irias por o codigo para adicionar na bd os vermelhos do FASUPPLY
                         countFAred += 1
+                        console.log("contador-->",countFAred)
+                        
                         $('td', cells[1]).css({
                             'background-color': '#ff0000',
                         });
@@ -537,6 +1045,8 @@
                     }
                 }
             });
+            console.log("contador-->",countFAred)
+
 
             $('#countRedFA').text("Red's: " + countFAred)
             $('#countYellowFA').text("Yellow's: " + countFAyellow)
@@ -633,6 +1143,7 @@
                         }
                         if (moment().diff(moment(data[7], 'HH:mm:ss'), 'hours') >= hourRed) {
                             countBPDropinRed += 1
+                            //AQUI ADICIONAR CODIGO PARA ADD RED NA BD DEVE TER 
                             $('td', cells[1]).css({
                                 'background-color': '#ff0000',
                             });
@@ -738,7 +1249,72 @@
                 }
             });
 
+            //---------------------------------------------------------------///------------------------------------
+                                            //Contador vermelhos diarios por turno para cada tabela
             $('#countRedBPDropin').text("Red's: " + countBPDropinRed)
+
+
+        let agora = new Date();
+        let horasAtuais = agora.getHours();
+        let minutosAtuais = agora.getMinutes().toString().padStart(2, "0");
+        let horasEminutos = parseInt(horasAtuais.toString() + minutosAtuais.toString());
+        console.log("horasEminutos:", horasEminutos);
+        console.log(horasEminutos <= 1630 && horasEminutos >= 800)
+        if (horasEminutos <= 1630 && horasEminutos >= 800) {
+            console.log("TURNO 1");
+            $.ajax({
+                type: 'POST',
+                url: '/receiving/getVermelhosSupply/',
+                data: {
+                    csrfmiddlewaretoken: "{{ csrf_token }}",
+                    table : "all"
+
+                },
+                success: function (response) {
+                    console.log("RESPOSTA-->", response)
+                    $('#countRedActualDayFA').text("1 turno Reds: " + response.contadorFA)
+                    $('#countRedActualDayBPDropin').text("1 turno Reds: " + response.contadorBP)
+                    $('#countRedActualDayBPSMD').text("1 turno Reds: " + response.contadorBPSMD) 
+                }
+        });
+           
+        } else if (horasEminutos >= 100 && horasEminutos <= 800) {
+            console.log("TURNO 3");
+            $.ajax({
+                type: 'POST',
+                url: '/receiving/getVermelhosSupply/',
+                data: {
+                    csrfmiddlewaretoken: "{{ csrf_token }}",    
+                    table : "all"
+
+                },
+                success: function (response) {
+                    //RESPOSTA-->", response)
+                    $('#countRedActualDayFA').text("3 turno Reds: " + response.contadorFA)
+                    $('#countRedActualDayBPDropin').text("3 turno Reds: " + response.contadorBP)
+                    $('#countRedActualDayBPSMD').text("3 turno Reds: " + response.contadorBPSMD) 
+                }
+        });
+        } else {
+            $.ajax({
+                type: 'POST',
+                url: '/receiving/getVermelhosSupply/',
+                data: {
+                    csrfmiddlewaretoken: "{{ csrf_token }}",
+                    table : "all"
+
+                },
+                success: function (response) {
+                    console.log("RESPOSTA-->", response)
+                    $('#countRedActualDayFA').text("2 turno Reds: " + response.contadorFA)
+                    $('#countRedActualDayBPDropin').text("2 turno Reds: " + response.contadorBP)
+                    $('#countRedActualDayBPSMD').text("2 turno Reds: " + response.contadorBPSMD) 
+                }
+        });
+        }
+ 
+            //---------------------------------------------------------------///------------------------------------
+
             $('#countYellowBPDropin').text("Yellow's: " + countBPDropinYellow)
             $('#countTotalBPDropin').text("Total: " + totalBPDropin)
             var countBPSmdRed = 0
@@ -781,6 +1357,7 @@
                     if (moment().startOf('day').diff(moment(data[6], 'YYYY-MM-DD'), 'days') == 0) {
                         if (moment().diff(moment(data[7], 'HH:mm:ss'), 'hours') == hourYellow && moment().diff(moment(data[7], 'HH:mm:ss'), 'hours') <= hourRed) {
                             countBPSmdYellow += 1
+                            console.log("contadorAmarelo-->",countBPSmdYellow)
                             $('td', cells[1]).css({
                                 'background-color': '#FFD700',
                             });
@@ -833,6 +1410,7 @@
                         }
                         if (moment().diff(moment(data[7], 'HH:mm:ss'), 'hours') >= hourRed) {
                             countBPSmdRed += 1
+                            console.log("contadorRED-->",countBPSmdRed, data)
                             $('td', cells[1]).css({
                                 'background-color': '#ff0000',
                             });
@@ -939,6 +1517,9 @@
             });
 
             $('#countRedBPSmd').text("Red's: " + countBPSmdRed)
+            console.log("contadorRED TOTAL-->",countBPSmdRed)
+            console.log("contadorAmarelo TOTAL-->",countBPSmdYellow)
+
             $('#countYellowBPSmd').text("Yellow's: " + countBPSmdYellow)
             $('#countTotalBPSmd').text("Total: " + totalBPSmd)
 
